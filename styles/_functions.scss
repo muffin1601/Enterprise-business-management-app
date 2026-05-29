@@ -1,0 +1,7 @@
+// SCSS helper functions. Kept tiny — the design system is CSS-variable first.
+@use 'sass:math';
+
+/// px → rem off a 16px root (use sparingly; prefer the --space-* / --fs-* vars).
+@function rem($px, $base: 16) {
+  @return math.div($px, $base) * 1rem;
+}

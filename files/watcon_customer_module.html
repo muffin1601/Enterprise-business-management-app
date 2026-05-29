@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>Watcon — Customer Module</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200;300;400&family=Zen+Kaku+Gothic+New:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Zen Kaku Gothic New',sans-serif;background:#f8f7f4;color:#0a0a0a;font-size:13px;}
+input,select,button,textarea{font-family:'Zen Kaku Gothic New',sans-serif;}
+input[type=number]{-moz-appearance:textfield;}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-thumb{background:#ccc;}
+
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:11px 20px;border-bottom:1px solid rgba(10,10,10,0.1);background:#fff;position:sticky;top:0;z-index:100;}
+.brand{font-family:'Noto Serif JP',serif;font-weight:300;font-size:15px;letter-spacing:0.2em;}
+.bc{font-size:9px;letter-spacing:0.4em;color:#aaa;text-transform:uppercase;margin-left:14px;}
+
+.main{padding:22px;max-width:1200px;margin:0 auto;}
+
+/* buttons */
+.btn-primary{background:#0a0a0a;color:#f8f7f4;border:none;padding:9px 20px;font-size:10px;letter-spacing:0.4em;text-transform:uppercase;cursor:pointer;font-family:inherit;transition:opacity 0.15s;}
+.btn-primary:hover{opacity:0.8;}
+.btn-ghost{background:transparent;color:#555;border:1px solid rgba(10,10,10,0.2);padding:7px 16px;font-size:10px;letter-spacing:0.3em;text-transform:uppercase;cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.btn-ghost:hover{border-color:#0a0a0a;color:#0a0a0a;}
+.btn-sm{padding:5px 12px;font-size:9px;letter-spacing:0.25em;}
+.btn-icon{background:none;border:none;cursor:pointer;color:#aaa;font-size:15px;padding:4px;transition:color 0.15s;}
+.btn-icon:hover{color:#0a0a0a;}
+
+/* search */
+.search-wrap{position:relative;flex:1;}
+.search-input{width:100%;border:1px solid rgba(10,10,10,0.14);padding:9px 12px 9px 34px;font-size:12px;outline:none;color:#0a0a0a;background:#fff;}
+.search-input:focus{border-color:#0a0a0a;}
+.search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:15px;color:#bbb;}
+
+/* panel */
+.panel{background:#fff;border:1px solid rgba(10,10,10,0.1);padding:18px;margin-bottom:16px;}
+.panel-title{font-size:8px;letter-spacing:0.45em;text-transform:uppercase;color:#aaa;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(10,10,10,0.07);display:flex;align-items:center;justify-content:space-between;}
+
+/* form fields */
+.lbl{font-size:8px;letter-spacing:0.35em;text-transform:uppercase;color:#aaa;display:block;margin-bottom:5px;}
+.field-input{width:100%;background:transparent;border:none;border-bottom:1px solid rgba(10,10,10,0.2);padding:7px 0;font-size:12px;color:#0a0a0a;outline:none;letter-spacing:0.02em;transition:border-color 0.2s;}
+.field-input:focus{border-bottom-color:#0a0a0a;}
+.field-input:disabled{color:#aaa;border-bottom-color:rgba(10,10,10,0.08);cursor:default;}
+.field-select{width:100%;background:#fff;border:1px solid rgba(10,10,10,0.16);padding:7px 9px;font-size:12px;color:#0a0a0a;outline:none;}
+.field-textarea{width:100%;background:transparent;border:1px solid rgba(10,10,10,0.18);padding:8px;font-size:12px;color:#0a0a0a;outline:none;resize:vertical;min-height:70px;line-height:1.5;}
+.field-textarea:focus{border-color:#0a0a0a;}
+.field-textarea:disabled{color:#aaa;border-color:rgba(10,10,10,0.08);cursor:default;background:#fafaf8;}
+
+/* grid */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.frow{margin-bottom:14px;}
+
+/* customer card */
+.cust-card{background:#fff;border:1px solid rgba(10,10,10,0.1);padding:16px;cursor:pointer;transition:border-color 0.15s;position:relative;}
+.cust-card:hover{border-color:#0a0a0a;}
+.cust-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
+.cust-avatar{width:38px;height:38px;border-radius:50%;background:#0a0a0a;color:#f8f7f4;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif JP',serif;font-size:13px;font-weight:300;flex-shrink:0;}
+.cust-name{font-size:13px;font-weight:500;margin-bottom:2px;line-height:1.3;}
+.cust-id{font-size:8px;letter-spacing:0.3em;color:#bbb;text-transform:uppercase;}
+.cust-meta{font-size:11px;color:#888;margin-top:6px;line-height:1.6;}
+.cust-tag{display:inline-block;font-size:8px;letter-spacing:0.2em;text-transform:uppercase;padding:2px 8px;border:1px solid rgba(10,10,10,0.15);color:#666;margin-top:6px;margin-right:4px;}
+.cust-tag.active-tag{background:#0a0a0a;color:#f8f7f4;border-color:#0a0a0a;}
+
+/* summary strip on card */
+.cust-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid rgba(10,10,10,0.07);margin-top:10px;padding-top:10px;}
+.cs-item{text-align:center;padding:4px 0;}
+.cs-item+.cs-item{border-left:1px solid rgba(10,10,10,0.07);}
+.cs-val{font-family:'Noto Serif JP',serif;font-size:13px;font-weight:300;color:#0a0a0a;}
+.cs-lbl{font-size:8px;letter-spacing:0.25em;text-transform:uppercase;color:#aaa;margin-top:2px;}
+.cs-val.outstanding{color:#8a3030;}
+.cs-val.paid{color:#1a5a1a;}
+
+/* detail view */
+.detail-header{display:flex;align-items:flex-start;gap:16px;margin-bottom:20px;}
+.detail-avatar{width:52px;height:52px;border-radius:50%;background:#0a0a0a;color:#f8f7f4;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif JP',serif;font-size:18px;font-weight:300;flex-shrink:0;}
+.detail-name{font-family:'Noto Serif JP',serif;font-size:22px;font-weight:300;margin-bottom:3px;}
+.detail-sub{font-size:10px;color:#aaa;letter-spacing:0.15em;}
+
+/* metric cards */
+.metric-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.metric{background:#f8f7f4;padding:13px 15px;border:1px solid rgba(10,10,10,0.07);}
+.metric.accent{border-left:3px solid #0a0a0a;}
+.metric.danger{border-left:3px solid #8a3030;}
+.metric.success{border-left:3px solid #1a5a1a;}
+.m-lbl{font-size:8px;letter-spacing:0.4em;text-transform:uppercase;color:#aaa;margin-bottom:6px;}
+.m-val{font-family:'Noto Serif JP',serif;font-size:20px;font-weight:300;line-height:1;}
+.m-sub{font-size:10px;color:#aaa;margin-top:4px;}
+.m-val.danger{color:#8a3030;}
+.m-val.success{color:#1a5a1a;}
+
+/* quick action buttons */
+.qa-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px;}
+.qa-btn{background:#fff;border:1px solid rgba(10,10,10,0.12);padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;transition:border-color 0.15s;font-family:inherit;}
+.qa-btn:hover{border-color:#0a0a0a;}
+.qa-btn i{font-size:20px;color:#555;}
+.qa-btn-label{font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:#555;text-align:center;}
+.qa-btn-count{font-family:'Noto Serif JP',serif;font-size:16px;font-weight:300;color:#0a0a0a;}
+.qa-btn.coming-soon{opacity:0.5;cursor:default;}
+.qa-btn.coming-soon:hover{border-color:rgba(10,10,10,0.12);}
+
+/* running bill */
+.rb-table{width:100%;border-collapse:collapse;font-size:11px;}
+.rb-table th{text-align:left;padding:8px 6px;font-size:8px;letter-spacing:0.35em;text-transform:uppercase;color:#aaa;font-weight:400;border-bottom:1px solid rgba(10,10,10,0.12);}
+.rb-table th.r,.rb-table td.r{text-align:right;}
+.rb-table td{padding:9px 6px;border-bottom:1px solid rgba(10,10,10,0.05);color:#444;vertical-align:top;}
+.rb-table tr:hover td{background:#fafaf8;}
+.rb-challan{font-size:9px;letter-spacing:0.2em;color:#0a0a0a;font-weight:500;}
+.rb-date{color:#aaa;font-size:10px;white-space:nowrap;}
+.rb-items{font-size:10px;color:#888;margin-top:2px;line-height:1.5;}
+.rb-total-row td{background:#f8f7f4;font-weight:500;border-top:2px solid #0a0a0a;border-bottom:none;}
+.rb-discount-row td{color:#1a5a1a;border-bottom:1px solid rgba(10,10,10,0.05);}
+.rb-payment-row td{color:#185fa5;border-bottom:1px solid rgba(10,10,10,0.05);}
+.rb-outstanding-row td{border-top:2px solid #8a3030;font-weight:500;font-size:12px;}
+.rb-outstanding-row td.r{color:#8a3030;font-family:'Noto Serif JP',serif;font-size:16px;}
+
+/* address block */
+.addr-block{background:#f8f7f4;padding:12px 14px;border:1px solid rgba(10,10,10,0.08);font-size:11px;color:#555;line-height:1.7;}
+.addr-label{font-size:8px;letter-spacing:0.4em;text-transform:uppercase;color:#aaa;margin-bottom:6px;}
+
+/* tab strip */
+.tab-strip{display:flex;border-bottom:1px solid rgba(10,10,10,0.1);margin-bottom:18px;}
+.tab{padding:10px 18px;font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:#aaa;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.15s;}
+.tab:hover{color:#555;}
+.tab.active{color:#0a0a0a;border-bottom-color:#0a0a0a;}
+
+/* badge */
+.badge{display:inline-block;font-size:8px;letter-spacing:0.15em;text-transform:uppercase;padding:2px 8px;}
+.badge-active{background:#1a5a1a;color:#fff;}
+.badge-inactive{background:#555;color:#fff;}
+.badge-outstanding{background:#8a3030;color:#fff;}
+
+/* back row */
+.back-row{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+
+/* edit bar */
+.edit-bar{background:#f8f4e0;border:1px solid #d4c060;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+
+/* copy addr */
+.copy-addr-btn{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#0a0a0a;background:none;border:1px solid rgba(10,10,10,0.2);padding:4px 10px;cursor:pointer;font-family:inherit;}
+.copy-addr-btn:hover{background:#0a0a0a;color:#f8f7f4;}
+
+/* no items */
+.empty{text-align:center;padding:50px 0;font-size:10px;color:#ccc;letter-spacing:0.3em;}
+
+/* filter tabs */
+.ftabs{display:flex;border:1px solid rgba(10,10,10,0.14);margin-right:10px;}
+.ftab{padding:9px 14px;font-size:10px;letter-spacing:0.2em;background:#fff;color:#888;border:none;cursor:pointer;font-family:inherit;}
+.ftab.active{background:#0a0a0a;color:#f8f7f4;}
+
+/* section divider */
+.sec-divider{font-size:8px;letter-spacing:0.45em;text-transform:uppercase;color:#aaa;margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid rgba(10,10,10,0.07);}
+
+/* running bill summary footer */
+.rb-footer{background:#fff;border:1px solid rgba(10,10,10,0.12);margin-top:0;}
+.rb-footer-row{display:flex;justify-content:space-between;align-items:baseline;padding:10px 16px;border-bottom:1px solid rgba(10,10,10,0.06);font-size:12px;}
+.rb-footer-row:last-child{border-bottom:none;}
+.rb-footer-label{color:#555;letter-spacing:0.05em;}
+.rb-footer-val{font-family:'Noto Serif JP',serif;font-size:16px;font-weight:300;}
+.rb-footer-row.discount .rb-footer-val{color:#1a5a1a;}
+.rb-footer-row.payment .rb-footer-val{color:#185fa5;}
+.rb-footer-row.outstanding{border-top:2px solid #8a3030;background:#fff8f8;}
+.rb-footer-row.outstanding .rb-footer-label{font-weight:500;font-size:13px;}
+.rb-footer-row.outstanding .rb-footer-val{font-size:22px;color:#8a3030;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div style="display:flex;align-items:center;">
+    <span class="brand">WATCON</span>
+    <span class="bc">/ Customer Module</span>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;" id="top-actions">
+    <!-- injected by JS -->
+  </div>
+</div>
+
+<div class="main" id="app"></div>
+
+<script>
+const fmt = n => new Intl.NumberFormat('en-IN',{maximumFractionDigits:2}).format(n);
+const fmtC = n => '₹ ' + fmt(n);
+const today = new Date().toISOString().split('T')[0];
+
+// ── SEED DATA ──────────────────────────────────────────────────────────────────
+const CUSTOMERS = [
+  {
+    id:'CUST-001', name:'Rahul Constructions', status:'active',
+    contact:'Rahul Mehta', phone:'9820012345', email:'rahul@rahulconstructions.in',
+    gstin:'27AABCR1234A1Z5', pan:'AABCR1234A',
+    billingName:'Rahul Constructions Pvt Ltd',
+    billingAddress:'Plot 14, MIDC Industrial Area\nAndheri East, Mumbai - 400093\nMaharashtra',
+    deliveryName:'Site Office — Rahul Constructions',
+    deliveryAddress:'Survey No. 42, Near Highway Junction\nThane West, Thane - 400601\nMaharashtra',
+    sameAsDelivery: false,
+    notes:'Key account. Always confirm stock before dispatch.',
+    challans:[
+      {no:'DC-1021', date:'2026-05-10', items:[{name:'Porcelain Floor Tile 600×600',qty:400,unit:'SQM',rate:680,value:272000}], discount:0},
+      {no:'DC-0998', date:'2026-04-22', items:[{name:'Porcelain Floor Tile 600×600',qty:250,unit:'SQM',rate:680,value:170000},{name:'GI Pipe 20mm · Medium Duty',qty:80,unit:'MTR',rate:280,value:22400}], discount:0},
+      {no:'DC-0971', date:'2026-04-01', items:[{name:'Porcelain Floor Tile 600×600',qty:590,unit:'SQM',rate:680,value:401200}], discount:0},
+      {no:'DC-0940', date:'2026-03-15', items:[{name:'Vitrified Tile 800×800',qty:180,unit:'SQM',rate:920,value:165600}], discount:0},
+    ],
+    postSaleDiscount: 35000,
+    payments:[
+      {date:'2026-05-15', amount:250000, ref:'NEFT-78123', mode:'NEFT'},
+      {date:'2026-04-28', amount:180000, ref:'CHQ-445512', mode:'Cheque'},
+      {date:'2026-04-05', amount:200000, ref:'NEFT-67891', mode:'NEFT'},
+    ]
+  },
+  {
+    id:'CUST-002', name:'Elite Residences', status:'active',
+    contact:'Priya Shah', phone:'9867543210', email:'priya.shah@eliteresidences.com',
+    gstin:'27AAACE5678B2Z1', pan:'AAACE5678B',
+    billingName:'Elite Residences LLP',
+    billingAddress:'1201, Lotus Business Park\nLink Road, Malad West\nMumbai - 400064, Maharashtra',
+    deliveryName:'Elite Residences — Worli Site',
+    deliveryAddress:'Plot 7-B, Worli Sea Face\nWorli, Mumbai - 400018\nMaharashtra',
+    sameAsDelivery: false,
+    notes:'Premium client. Requires delivery advice 48hrs in advance.',
+    challans:[
+      {no:'DC-1023', date:'2026-05-12', items:[{name:'Italian Marble Slab 2400×1200',qty:18,unit:'SQM',rate:6200,value:111600}], discount:0},
+      {no:'DC-1001', date:'2026-04-12', items:[{name:'Porcelain Floor Tile 600×600 · Gloss',qty:200,unit:'SQM',rate:720,value:144000}], discount:0},
+    ],
+    postSaleDiscount: 12000,
+    payments:[
+      {date:'2026-05-18', amount:111600, ref:'RTGS-23451', mode:'RTGS'},
+      {date:'2026-04-20', amount:100000, ref:'RTGS-22100', mode:'RTGS'},
+    ]
+  },
+  {
+    id:'CUST-003', name:'Metro Interiors', status:'active',
+    contact:'Anil Kumar', phone:'9821987654', email:'anil@metrointeriors.in',
+    gstin:'27AABCM9876C3Z8', pan:'AABCM9876C',
+    billingName:'Metro Interiors & Décor Pvt Ltd',
+    billingAddress:'Shop 4-5, Maratha Mandir Building\nDadar West, Mumbai - 400028\nMaharashtra',
+    deliveryName:'Metro Interiors',
+    deliveryAddress:'Shop 4-5, Maratha Mandir Building\nDadar West, Mumbai - 400028\nMaharashtra',
+    sameAsDelivery: true,
+    notes:'',
+    challans:[
+      {no:'DC-1019', date:'2026-05-02', items:[{name:'Engineered Wood Plank · Oak · Matte',qty:300,unit:'SQF',rate:380,value:114000}], discount:0},
+      {no:'DC-0990', date:'2026-04-15', items:[{name:'Vitrified Tile 800×800',qty:180,unit:'SQM',rate:920,value:165600}], discount:0},
+      {no:'DC-0961', date:'2026-04-01', items:[{name:'Porcelain Floor Tile 600×600',qty:590,unit:'SQM',rate:680,value:401200}], discount:0},
+    ],
+    postSaleDiscount: 20000,
+    payments:[
+      {date:'2026-05-10', amount:300000, ref:'NEFT-88231', mode:'NEFT'},
+      {date:'2026-04-20', amount:250000, ref:'NEFT-84500', mode:'NEFT'},
+    ]
+  },
+  {
+    id:'CUST-004', name:'Skyline Developers', status:'active',
+    contact:'Deepak Joshi', phone:'9988776655', email:'deepak@skylinedev.com',
+    gstin:'27AABCS4561D4Z2', pan:'AABCS4561D',
+    billingName:'Skyline Developers Pvt Ltd',
+    billingAddress:'702, Trade Centre\nBandra Kurla Complex\nMumbai - 400051, Maharashtra',
+    deliveryName:'Skyline — Goregaon Project Site',
+    deliveryAddress:'Survey 18, Film City Road\nGoregaon East, Mumbai - 400065\nMaharashtra',
+    sameAsDelivery: false,
+    notes:'Multi-site project. Confirm delivery address before each challan.',
+    challans:[
+      {no:'DC-1015', date:'2026-05-08', items:[{name:'Vitrified Tile 800×800',qty:200,unit:'SQM',rate:920,value:184000}], discount:0},
+    ],
+    postSaleDiscount: 0,
+    payments:[
+      {date:'2026-05-14', amount:90000, ref:'CHQ-556677', mode:'Cheque'},
+    ]
+  },
+  {
+    id:'CUST-005', name:'The Arch Studio', status:'active',
+    contact:'Neha Patel', phone:'9823456780', email:'neha@thearchstudio.in',
+    gstin:'27AABCT7890E5Z9', pan:'AABCT7890E',
+    billingName:'The Arch Studio LLP',
+    billingAddress:'301, Maker Chambers V\nNariman Point\nMumbai - 400021, Maharashtra',
+    deliveryName:'The Arch Studio',
+    deliveryAddress:'301, Maker Chambers V\nNariman Point\nMumbai - 400021, Maharashtra',
+    sameAsDelivery: true,
+    notes:'Interior design firm. Small but frequent orders.',
+    challans:[
+      {no:'DC-1022', date:'2026-04-28', items:[{name:'Italian Marble Slab 2400×1200',qty:22,unit:'SQM',rate:6200,value:136400}], discount:0},
+      {no:'DC-1007', date:'2026-04-10', items:[{name:'Engineered Wood Plank · Walnut · Gloss',qty:200,unit:'SQF',rate:410,value:82000}], discount:0},
+    ],
+    postSaleDiscount: 8000,
+    payments:[
+      {date:'2026-05-05', amount:136400, ref:'RTGS-30011', mode:'RTGS'},
+      {date:'2026-04-18', amount:50000, ref:'NEFT-71234', mode:'NEFT'},
+    ]
+  },
+];
+
+// ── HELPERS ────────────────────────────────────────────────────────────────────
+function initials(name){
+  return name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+}
+function custTotals(c){
+  const totalBilled = c.challans.reduce((s,ch)=>s+ch.items.reduce((ss,it)=>ss+it.value,0),0);
+  const totalPaid   = c.payments.reduce((s,p)=>s+p.amount,0);
+  const discount    = c.postSaleDiscount||0;
+  const outstanding = totalBilled - discount - totalPaid;
+  return{totalBilled, totalPaid, discount, outstanding};
+}
+
+// ── STATE ──────────────────────────────────────────────────────────────────────
+let view = 'list';         // list | detail | new | edit
+let selectedCust = null;
+let detailTab = 'running'; // running | info
+let searchText = '';
+let filterStatus = 'all';
+let customers = JSON.parse(JSON.stringify(CUSTOMERS)); // local mutable copy
+
+// ── RENDER ─────────────────────────────────────────────────────────────────────
+function render(){
+  const app = document.getElementById('app');
+  const ta  = document.getElementById('top-actions');
+  if(view==='list'){
+    ta.innerHTML = `<button class="btn-primary" onclick="goNew()">+ New Customer</button>`;
+    app.innerHTML = renderList();
+  } else if(view==='detail'){
+    ta.innerHTML = `
+      <button class="btn-ghost btn-sm" onclick="goEdit()"><i class="ti ti-pencil" style="margin-right:4px;font-size:13px;"></i>Edit</button>
+      <button class="btn-ghost btn-sm" onclick="goList()">← All Customers</button>`;
+    app.innerHTML = renderDetail();
+  } else if(view==='new'||view==='edit'){
+    ta.innerHTML = '';
+    app.innerHTML = renderForm();
+  }
+}
+
+// ── LIST VIEW ──────────────────────────────────────────────────────────────────
+function renderList(){
+  const filtered = customers.filter(c=>{
+    const ms = (c.name+' '+c.contact+' '+c.phone+' '+c.email+' '+c.id).toLowerCase().includes(searchText);
+    const mf = filterStatus==='all'||c.status===filterStatus;
+    return ms&&mf;
+  });
+
+  return `
+  <div style="display:flex;gap:10px;margin-bottom:18px;align-items:center;">
+    <div class="search-wrap">
+      <i class="ti ti-search search-icon"></i>
+      <input class="search-input" placeholder="Search by name, phone, email, ID…" value="${searchText}" oninput="onSearch(this.value)"/>
+    </div>
+    <div class="ftabs">
+      <button class="ftab ${filterStatus==='all'?'active':''}" onclick="setFilter('all')">All</button>
+      <button class="ftab ${filterStatus==='active'?'active':''}" onclick="setFilter('active')">Active</button>
+      <button class="ftab ${filterStatus==='inactive'?'active':''}" onclick="setFilter('inactive')">Inactive</button>
+    </div>
+    <span style="font-size:10px;color:#aaa;white-space:nowrap;">${filtered.length} customers</span>
+  </div>
+
+  ${filtered.length===0?'<div class="empty">No customers found</div>':
+  `<div class="cust-grid">
+    ${filtered.map(c=>{
+      const t = custTotals(c);
+      return `<div class="cust-card" onclick="goDetail('${c.id}')">
+        <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
+          <div class="cust-avatar">${initials(c.name)}</div>
+          <div style="flex:1;min-width:0;">
+            <div class="cust-name">${c.name}</div>
+            <div class="cust-id">${c.id}</div>
+            <div class="cust-meta">
+              <i class="ti ti-phone" style="font-size:11px;margin-right:3px;"></i>${c.phone}<br/>
+              <i class="ti ti-mail" style="font-size:11px;margin-right:3px;"></i>${c.email}
+            </div>
+          </div>
+          <span class="badge badge-${c.status==='active'?'active':'inactive'}">${c.status}</span>
+        </div>
+        ${c.gstin?`<span class="cust-tag">GST: ${c.gstin.slice(0,8)}…</span>`:''}
+        <div class="cust-strip">
+          <div class="cs-item">
+            <div class="cs-val">${fmtC(t.totalBilled)}</div>
+            <div class="cs-lbl">Billed</div>
+          </div>
+          <div class="cs-item">
+            <div class="cs-val paid">${fmtC(t.totalPaid)}</div>
+            <div class="cs-lbl">Received</div>
+          </div>
+          <div class="cs-item">
+            <div class="cs-val ${t.outstanding>0?'outstanding':''}">${fmtC(Math.max(0,t.outstanding))}</div>
+            <div class="cs-lbl">Outstanding</div>
+          </div>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`}`;
+}
+
+// ── DETAIL VIEW ────────────────────────────────────────────────────────────────
+function renderDetail(){
+  const c = selectedCust;
+  const t = custTotals(c);
+
+  const runningBillRows = c.challans.map(ch=>{
+    const challanVal = ch.items.reduce((s,it)=>s+it.value,0);
+    const itemSummary = ch.items.map(it=>`${it.name} — ${fmt(it.qty)} ${it.unit} × ${fmtC(it.rate)}`).join('<br/>');
+    return `<tr>
+      <td><div class="rb-challan">${ch.no}</div></td>
+      <td><div class="rb-date">${ch.date}</div></td>
+      <td><div class="rb-items">${itemSummary}</div></td>
+      <td class="r" style="font-family:'Noto Serif JP',serif;font-size:13px;white-space:nowrap;">${fmtC(challanVal)}</td>
+    </tr>`;
+  }).join('');
+
+  const paymentRows = c.payments.map(p=>`
+    <tr>
+      <td style="color:#aaa;font-size:10px;white-space:nowrap;">${p.date}</td>
+      <td style="font-size:11px;">${p.mode}</td>
+      <td style="font-size:11px;color:#888;">${p.ref}</td>
+      <td class="r" style="font-family:'Noto Serif JP',serif;font-size:13px;color:#185fa5;">${fmtC(p.amount)}</td>
+    </tr>`).join('');
+
+  const infoTab = `
+    <div class="g2" style="gap:16px;margin-bottom:16px;">
+      <div>
+        <div class="addr-label">Billing Details</div>
+        <div class="addr-block">
+          <div style="font-weight:500;margin-bottom:4px;">${c.billingName}</div>
+          ${c.billingAddress.replace(/\n/g,'<br/>')}
+          ${c.gstin?`<div style="margin-top:8px;font-size:10px;color:#aaa;letter-spacing:0.1em;">GSTIN: ${c.gstin}</div>`:''}
+          ${c.pan?`<div style="font-size:10px;color:#aaa;letter-spacing:0.1em;">PAN: ${c.pan}</div>`:''}
+        </div>
+      </div>
+      <div>
+        <div class="addr-label">Delivery Details</div>
+        <div class="addr-block">
+          <div style="font-weight:500;margin-bottom:4px;">${c.deliveryName}</div>
+          ${c.deliveryAddress.replace(/\n/g,'<br/>')}
+          ${c.sameAsDelivery?'<div style="margin-top:6px;font-size:9px;color:#1a5a1a;letter-spacing:0.15em;">Same as billing address</div>':''}
+        </div>
+      </div>
+    </div>
+    <div class="g3">
+      <div class="frow">
+        <div class="lbl">Contact Person</div>
+        <div style="font-size:13px;font-weight:500;">${c.contact}</div>
+      </div>
+      <div class="frow">
+        <div class="lbl">Phone</div>
+        <div style="font-size:13px;">${c.phone}</div>
+      </div>
+      <div class="frow">
+        <div class="lbl">Email</div>
+        <div style="font-size:13px;">${c.email}</div>
+      </div>
+    </div>
+    ${c.notes?`<div class="frow"><div class="lbl">Notes</div><div style="font-size:12px;color:#666;line-height:1.6;background:#f8f7f4;padding:10px 12px;border:1px solid rgba(10,10,10,0.07);">${c.notes}</div></div>`:''}`;
+
+  const runningBillTab = `
+    <div class="panel" style="margin-bottom:0;">
+      <div class="panel-title"><span>Delivery Challans</span><span style="font-size:9px;color:#bbb;">${c.challans.length} challans issued</span></div>
+      ${c.challans.length===0?'<div class="empty" style="padding:24px 0;">No delivery challans yet</div>':`
+      <table class="rb-table">
+        <thead><tr>
+          <th style="width:100px;">Challan No.</th>
+          <th style="width:100px;">Date</th>
+          <th>Material</th>
+          <th class="r" style="width:130px;">Value</th>
+        </tr></thead>
+        <tbody>
+          ${runningBillRows}
+          <tr class="rb-total-row">
+            <td colspan="3" style="font-size:12px;">Total Material Sent to Site</td>
+            <td class="r" style="font-family:'Noto Serif JP',serif;font-size:15px;">${fmtC(t.totalBilled)}</td>
+          </tr>
+        </tbody>
+      </table>`}
+    </div>
+
+    <div class="rb-footer" style="border-top:none;">
+      <div class="rb-footer-row">
+        <span class="rb-footer-label">Total Material Billed</span>
+        <span class="rb-footer-val">${fmtC(t.totalBilled)}</span>
+      </div>
+      <div class="rb-footer-row discount">
+        <span class="rb-footer-label"><i class="ti ti-discount-2" style="font-size:13px;vertical-align:-2px;margin-right:5px;"></i>Less: Post-Sale Discount</span>
+        <span class="rb-footer-val">− ${fmtC(t.discount)}</span>
+      </div>
+      <div class="rb-footer-row" style="background:#f8f7f4;">
+        <span class="rb-footer-label" style="font-weight:500;">Net Payable</span>
+        <span class="rb-footer-val" style="font-size:18px;">${fmtC(t.totalBilled - t.discount)}</span>
+      </div>
+
+      <div style="padding:12px 16px 4px;font-size:8px;letter-spacing:0.4em;text-transform:uppercase;color:#aaa;">Payment Received</div>
+      ${c.payments.length===0?'<div style="padding:6px 16px 12px;font-size:11px;color:#ccc;">No payments recorded</div>':`
+      <table class="rb-table" style="margin:0 16px;width:calc(100% - 32px);">
+        <thead><tr>
+          <th>Date</th><th>Mode</th><th>Reference</th><th class="r">Amount</th>
+        </tr></thead>
+        <tbody>${paymentRows}</tbody>
+      </table>`}
+
+      <div class="rb-footer-row payment" style="border-top:1px solid rgba(10,10,10,0.07);margin-top:4px;">
+        <span class="rb-footer-label"><i class="ti ti-receipt" style="font-size:13px;vertical-align:-2px;margin-right:5px;"></i>Total Payments Received</span>
+        <span class="rb-footer-val">− ${fmtC(t.totalPaid)}</span>
+      </div>
+      <div class="rb-footer-row outstanding">
+        <span class="rb-footer-label">Outstanding Balance</span>
+        <span class="rb-footer-val">${fmtC(Math.max(0,t.outstanding))}</span>
+      </div>
+    </div>`;
+
+  return `
+  <div class="back-row">
+    <button class="btn-ghost" onclick="goList()">← All Customers</button>
+    <span style="font-size:9px;letter-spacing:0.4em;color:#aaa;text-transform:uppercase;">Customer / ${c.id}</span>
+    <div style="margin-left:auto;display:flex;gap:8px;">
+      <button class="btn-ghost btn-sm" onclick="goEdit()"><i class="ti ti-pencil" style="margin-right:4px;font-size:12px;"></i>Edit</button>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="panel">
+    <div class="detail-header">
+      <div class="detail-avatar">${initials(c.name)}</div>
+      <div style="flex:1;">
+        <div class="detail-name">${c.name}</div>
+        <div class="detail-sub">${c.id} · ${c.contact} · ${c.phone}</div>
+        <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
+          <span class="badge badge-${c.status==='active'?'active':'inactive'}">${c.status}</span>
+          ${c.gstin?`<span class="cust-tag">GST ${c.gstin}</span>`:''}
+        </div>
+      </div>
+    </div>
+
+    <!-- Metric summary -->
+    <div class="metric-row">
+      <div class="metric accent">
+        <div class="m-lbl">Total Billed</div>
+        <div class="m-val">${fmtC(t.totalBilled)}</div>
+        <div class="m-sub">${c.challans.length} challans</div>
+      </div>
+      <div class="metric" style="border-left:3px solid #d4c060;">
+        <div class="m-lbl">Post-Sale Discount</div>
+        <div class="m-val" style="color:#7a6010;">− ${fmtC(t.discount)}</div>
+        <div class="m-sub">After order adjustment</div>
+      </div>
+      <div class="metric success">
+        <div class="m-lbl">Total Received</div>
+        <div class="m-val success">${fmtC(t.totalPaid)}</div>
+        <div class="m-sub">${c.payments.length} payment${c.payments.length!==1?'s':''}</div>
+      </div>
+      <div class="metric danger">
+        <div class="m-lbl">Outstanding</div>
+        <div class="m-val danger">${fmtC(Math.max(0,t.outstanding))}</div>
+        <div class="m-sub">${t.outstanding<=0?'Fully settled':'Pending collection'}</div>
+      </div>
+    </div>
+
+    <!-- Quick actions (stubs — modules coming later) -->
+    <div class="sec-divider">Quick Actions</div>
+    <div class="qa-grid">
+      <div class="qa-btn" onclick="alert('Running Bill tab is below')">
+        <i class="ti ti-file-invoice"></i>
+        <div class="qa-btn-count">${c.challans.length}</div>
+        <div class="qa-btn-label">Running Bill</div>
+      </div>
+      <div class="qa-btn coming-soon" title="Payments module coming soon">
+        <i class="ti ti-receipt-2"></i>
+        <div class="qa-btn-count">${c.payments.length}</div>
+        <div class="qa-btn-label">Payments</div>
+      </div>
+      <div class="qa-btn coming-soon" title="Quotes module coming soon">
+        <i class="ti ti-file-text"></i>
+        <div class="qa-btn-count">—</div>
+        <div class="qa-btn-label">Quotes</div>
+      </div>
+      <div class="qa-btn coming-soon" title="Sales Orders module coming soon">
+        <i class="ti ti-clipboard-list"></i>
+        <div class="qa-btn-count">—</div>
+        <div class="qa-btn-label">Sales Orders</div>
+      </div>
+      <div class="qa-btn coming-soon" title="Delivery Challans module coming soon">
+        <i class="ti ti-truck"></i>
+        <div class="qa-btn-count">${c.challans.length}</div>
+        <div class="qa-btn-label">Challans</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tab-strip">
+    <div class="tab ${detailTab==='running'?'active':''}" onclick="setDetailTab('running')">Running Bill</div>
+    <div class="tab ${detailTab==='info'?'active':''}" onclick="setDetailTab('info')">Customer Info</div>
+  </div>
+
+  ${detailTab==='running' ? runningBillTab : `<div class="panel">${infoTab}</div>`}
+  `;
+}
+
+// ── FORM (NEW / EDIT) ──────────────────────────────────────────────────────────
+function renderForm(){
+  const isEdit = view==='edit';
+  const c = isEdit ? selectedCust : {
+    id:'', name:'', status:'active', contact:'', phone:'', email:'',
+    gstin:'', pan:'',
+    billingName:'', billingAddress:'',
+    deliveryName:'', deliveryAddress:'',
+    sameAsDelivery:false, notes:'',
+    challans:[], postSaleDiscount:0, payments:[]
+  };
+
+  return `
+  <div class="back-row">
+    <button class="btn-ghost" onclick="${isEdit?'goDetail(\''+c.id+'\')':'goList()'}">← Cancel</button>
+    <span style="font-size:9px;letter-spacing:0.4em;color:#aaa;text-transform:uppercase;">${isEdit?'Edit Customer / '+c.id:'New Customer'}</span>
+  </div>
+
+  ${isEdit?`<div class="edit-bar">
+    <span style="font-size:10px;color:#7a6010;">✎  Editing — ${c.name}</span>
+    <div style="display:flex;gap:8px;">
+      <button class="btn-ghost btn-sm" onclick="${isEdit?'goDetail(\''+c.id+'\')':'goList()'}">Discard</button>
+      <button class="btn-primary btn-sm" onclick="saveForm()">Save Changes</button>
+    </div>
+  </div>`:''}
+
+  <div class="panel">
+    <div class="panel-title"><span>Customer Identity</span></div>
+    <div class="g3">
+      <div class="frow">
+        <label class="lbl">Customer Name</label>
+        <input class="field-input" id="f-name" value="${c.name}" placeholder="e.g. Rahul Constructions"/>
+      </div>
+      <div class="frow">
+        <label class="lbl">Contact Person</label>
+        <input class="field-input" id="f-contact" value="${c.contact}" placeholder="Person to contact"/>
+      </div>
+      <div class="frow">
+        <label class="lbl">Status</label>
+        <select class="field-select" id="f-status">
+          <option value="active" ${c.status==='active'?'selected':''}>Active</option>
+          <option value="inactive" ${c.status==='inactive'?'selected':''}>Inactive</option>
+        </select>
+      </div>
+      <div class="frow">
+        <label class="lbl">Phone Number</label>
+        <input class="field-input" id="f-phone" value="${c.phone}" placeholder="10-digit mobile"/>
+      </div>
+      <div class="frow">
+        <label class="lbl">Email ID</label>
+        <input class="field-input" id="f-email" value="${c.email}" placeholder="email@example.com"/>
+      </div>
+      <div class="frow">
+        <label class="lbl">GSTIN</label>
+        <input class="field-input" id="f-gstin" value="${c.gstin}" placeholder="27AAAAA0000A1Z5"/>
+      </div>
+      <div class="frow">
+        <label class="lbl">PAN</label>
+        <input class="field-input" id="f-pan" value="${c.pan}" placeholder="AAAAA0000A"/>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">
+      <span>Billing Details</span>
+      <small style="font-size:9px;color:#aaa;letter-spacing:0.15em;font-weight:400;">Can differ from customer name</small>
+    </div>
+    <div class="g2">
+      <div class="frow" style="grid-column:1/-1;">
+        <label class="lbl">Billing Name (as on invoice)</label>
+        <input class="field-input" id="f-billingName" value="${c.billingName}" placeholder="Legal name for billing"/>
+      </div>
+      <div class="frow" style="grid-column:1/-1;">
+        <label class="lbl">Billing Address</label>
+        <textarea class="field-textarea" id="f-billingAddress" placeholder="Full billing address with pin code">${c.billingAddress}</textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">
+      <span>Delivery Details</span>
+      <button class="copy-addr-btn" onclick="copyBillingToDelivery()"><i class="ti ti-copy" style="font-size:12px;margin-right:4px;"></i>Same as Billing</button>
+    </div>
+    <div class="g2">
+      <div class="frow" style="grid-column:1/-1;">
+        <label class="lbl">Delivery Name / Site Name</label>
+        <input class="field-input" id="f-deliveryName" value="${c.deliveryName}" placeholder="Site or delivery location name"/>
+      </div>
+      <div class="frow" style="grid-column:1/-1;">
+        <label class="lbl">Delivery Address</label>
+        <textarea class="field-textarea" id="f-deliveryAddress" placeholder="Full delivery / site address">${c.deliveryAddress}</textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title"><span>Additional</span></div>
+    <div class="frow">
+      <label class="lbl">Internal Notes</label>
+      <textarea class="field-textarea" id="f-notes" placeholder="Delivery preferences, special instructions…">${c.notes}</textarea>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px;margin-bottom:24px;">
+    <button class="btn-ghost" onclick="${isEdit?'goDetail(\''+c.id+'\')':'goList()'}">Cancel</button>
+    <button class="btn-primary" onclick="saveForm()">${isEdit?'Save Changes →':'Create Customer →'}</button>
+  </div>`;
+}
+
+// ── ACTIONS ────────────────────────────────────────────────────────────────────
+function goList(){ view='list'; render(); }
+function goNew(){ view='new'; selectedCust=null; render(); }
+function goDetail(id){
+  selectedCust = customers.find(c=>c.id===id);
+  detailTab='running'; view='detail'; render();
+}
+function goEdit(){
+  view='edit'; render();
+}
+function setDetailTab(t){ detailTab=t; render(); }
+function onSearch(v){ searchText=v.toLowerCase(); render(); }
+function setFilter(f){ filterStatus=f; render(); }
+
+function copyBillingToDelivery(){
+  const bn = document.getElementById('f-billingName');
+  const ba = document.getElementById('f-billingAddress');
+  const dn = document.getElementById('f-deliveryName');
+  const da = document.getElementById('f-deliveryAddress');
+  if(bn&&dn){ dn.value=bn.value; da.value=ba.value; }
+}
+
+function saveForm(){
+  const isEdit = view==='edit';
+  const name    = document.getElementById('f-name').value.trim();
+  const contact = document.getElementById('f-contact').value.trim();
+  const phone   = document.getElementById('f-phone').value.trim();
+  const email   = document.getElementById('f-email').value.trim();
+  const status  = document.getElementById('f-status').value;
+  const gstin   = document.getElementById('f-gstin').value.trim();
+  const pan     = document.getElementById('f-pan').value.trim();
+  const billingName    = document.getElementById('f-billingName').value.trim();
+  const billingAddress = document.getElementById('f-billingAddress').value.trim();
+  const deliveryName   = document.getElementById('f-deliveryName').value.trim();
+  const deliveryAddress= document.getElementById('f-deliveryAddress').value.trim();
+  const notes   = document.getElementById('f-notes').value.trim();
+
+  if(!name){ alert('Customer name is required'); return; }
+  if(!phone){ alert('Phone number is required'); return; }
+
+  if(isEdit){
+    const idx = customers.findIndex(c=>c.id===selectedCust.id);
+    customers[idx] = {...selectedCust, name, contact, phone, email, status, gstin, pan, billingName, billingAddress, deliveryName, deliveryAddress, notes,
+      sameAsDelivery: billingAddress===deliveryAddress && billingName===deliveryName};
+    selectedCust = customers[idx];
+    view='detail'; render();
+  } else {
+    const newId = 'CUST-' + String(customers.length+1).padStart(3,'0');
+    const newC = {id:newId, name, contact, phone, email, status, gstin, pan, billingName:billingName||name, billingAddress, deliveryName:deliveryName||name, deliveryAddress:deliveryAddress||billingAddress,
+      sameAsDelivery: billingAddress===deliveryAddress, notes, challans:[], postSaleDiscount:0, payments:[]};
+    customers.unshift(newC);
+    selectedCust = newC; detailTab='info'; view='detail'; render();
+  }
+}
+
+// ── INIT ───────────────────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>

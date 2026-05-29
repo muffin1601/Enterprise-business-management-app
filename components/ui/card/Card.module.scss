@@ -1,0 +1,10 @@
+.card {
+  background: var(--color-surface);
+  border: var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+
+  &[data-borderless='true'] {
+    border-color: transparent;
+  }
+}

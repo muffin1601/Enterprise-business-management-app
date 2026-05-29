@@ -1,0 +1,216 @@
+@use 'mixins' as *;
+
+// Responsive widget grid: 1 col on mobile → 12-col track on desktop.
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-5);
+
+  @include respond-to(lg) {
+    grid-template-columns: repeat(12, 1fr);
+  }
+}
+
+.spanFull {
+  @include respond-to(lg) {
+    grid-column: span 12;
+  }
+}
+.spanTwoThirds {
+  @include respond-to(lg) {
+    grid-column: span 8;
+  }
+}
+.spanThird {
+  @include respond-to(lg) {
+    grid-column: span 4;
+  }
+}
+.spanHalf {
+  @include respond-to(lg) {
+    grid-column: span 6;
+  }
+}
+
+// ── KPI cards ───────────────────────────────────────────────────────────────
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4);
+
+  @include respond-to(md) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.kpi {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4);
+}
+
+.kpiValue {
+  font-family: var(--font-display);
+  font-size: var(--fs-800);
+  font-weight: var(--fw-semibold);
+  line-height: 1;
+}
+
+.kpiLabel {
+  font-size: var(--fs-200);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  color: var(--color-text-muted);
+}
+
+// ── widget shell ──────────────────────────────────────────────────────────
+.widgetHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.widgetTitle {
+  font-size: var(--fs-500);
+  font-weight: var(--fw-semibold);
+}
+
+.widgetLink {
+  font-size: var(--fs-200);
+  color: var(--color-text-muted);
+  &:hover {
+    color: var(--color-text);
+    text-decoration: underline;
+  }
+}
+
+// ── chart ───────────────────────────────────────────────────────────────────
+.chart {
+  width: 100%;
+  height: 220px;
+}
+
+// ── activity / notices lists ─────────────────────────────────────────────────
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  font-size: var(--fs-300);
+
+  & + & {
+    border-top: var(--border);
+  }
+}
+
+.itemMain {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.itemLabel {
+  font-weight: var(--fw-medium);
+  @include truncate(1);
+}
+
+.itemMeta {
+  font-size: var(--fs-200);
+  color: var(--color-text-muted);
+}
+
+.empty {
+  font-size: var(--fs-300);
+  color: var(--color-text-muted);
+  padding: var(--space-6) 0;
+  text-align: center;
+}
+
+// ── summary facts ─────────────────────────────────────────────────────────
+.facts {
+  display: flex;
+  flex-direction: column;
+}
+
+.fact {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-2) 0;
+  font-size: var(--fs-300);
+  & + & {
+    border-top: var(--border);
+  }
+}
+
+.factLabel {
+  color: var(--color-text-muted);
+}
+
+.roleChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  justify-content: flex-end;
+}
+
+// ── quick actions ─────────────────────────────────────────────────────────
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.action {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border: var(--border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  transition: border-color var(--dur-fast) var(--ease-standard), background var(--dur-fast) var(--ease-standard);
+  @include focus-ring;
+
+  &:hover {
+    background: var(--color-surface-2);
+    border-color: var(--color-border-strong);
+  }
+}
+
+.actionTitle {
+  font-weight: var(--fw-medium);
+  color: var(--color-text);
+}
+
+.actionDesc {
+  font-size: var(--fs-200);
+  color: var(--color-text-muted);
+}
+
+// ── loading skeleton ─────────────────────────────────────────────────────────
+.skeleton {
+  height: var(--space-8);
+  border-radius: var(--radius-md);
+  background: linear-gradient(90deg, var(--color-surface-2), var(--color-surface), var(--color-surface-2));
+  background-size: 200% 100%;
+  animation: shimmer var(--dur-slow) ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton { animation: none; }
+}

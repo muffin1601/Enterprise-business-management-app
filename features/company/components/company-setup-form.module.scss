@@ -1,0 +1,31 @@
+.wrap {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.header {
+  text-align: center;
+}
+
+.title {
+  font-size: var(--fs-700);
+  margin-bottom: var(--space-1);
+}
+
+.subtitle {
+  font-size: var(--fs-300);
+  color: var(--color-text-muted);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.actions {
+  margin-top: var(--space-2);
+}

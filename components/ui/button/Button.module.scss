@@ -1,0 +1,75 @@
+@use 'mixins' as *;
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-sans);
+  font-weight: var(--fw-medium);
+  font-size: var(--fs-400);
+  line-height: 1;
+  padding: var(--space-2) var(--space-4);
+  border: var(--border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  white-space: nowrap;
+  transition:
+    background var(--dur-fast) var(--ease-standard),
+    border-color var(--dur-fast) var(--ease-standard),
+    opacity var(--dur-fast) var(--ease-standard);
+  @include focus-ring;
+
+  &:hover:not(:disabled) {
+    background: var(--color-surface-2);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &[data-full-width='true'] {
+    width: 100%;
+  }
+
+  // Variants
+  &[data-variant='primary'] {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    border-color: var(--color-primary);
+    &:hover:not(:disabled) {
+      background: var(--color-primary-hover);
+      border-color: var(--color-primary-hover);
+    }
+  }
+
+  &[data-variant='ghost'] {
+    background: transparent;
+    border-color: transparent;
+    &:hover:not(:disabled) {
+      background: var(--color-surface-2);
+    }
+  }
+
+  &[data-variant='danger'] {
+    background: var(--color-danger-bg);
+    color: var(--color-danger-fg);
+    border-color: var(--color-danger-fg);
+    &:hover:not(:disabled) {
+      background: var(--color-danger-fg);
+      color: var(--color-on-primary);
+    }
+  }
+
+  // Sizes
+  &[data-size='sm'] {
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--fs-300);
+  }
+  &[data-size='lg'] {
+    padding: var(--space-3) var(--space-5);
+    font-size: var(--fs-500);
+  }
+}

@@ -1,0 +1,12 @@
+// UI primitives barrel (FRONTEND_DESIGN_SYSTEM.md §8). Import from '@/components/ui'.
+export { Button, type ButtonProps, type ButtonVariant, type ButtonSize } from './button/Button'
+export { Input, type InputProps } from './input/Input'
+export { Textarea, type TextareaProps } from './input/Textarea'
+export { Select, type SelectProps } from './input/Select'
+export { FormField, Label, type FormFieldProps } from './field/FormField'
+export { Alert, type AlertProps, type AlertTone } from './alert/Alert'
+export { Badge, type BadgeProps, type BadgeTone } from './badge/Badge'
+export { Spinner, type SpinnerProps } from './spinner/Spinner'
+export { Card, type CardProps } from './card/Card'
+export { Toaster } from './toast/Toaster'
+export { toast, type ToastTone } from './toast/toast-store'

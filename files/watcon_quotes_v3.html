@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>Watcon — Quotes</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200;300;400&family=Zen+Kaku+Gothic+New:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Zen Kaku Gothic New',sans-serif;background:#f8f7f4;color:#0a0a0a;font-size:13px;}
+input,select,button,textarea{font-family:'Zen Kaku Gothic New',sans-serif;}
+input[type=number]{-moz-appearance:textfield;}
+::-webkit-scrollbar{width:4px;height:4px;}::-webkit-scrollbar-thumb{background:#ccc;}
+
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:11px 20px;border-bottom:1px solid rgba(10,10,10,.1);background:#fff;position:sticky;top:0;z-index:200;}
+.brand{font-family:'Noto Serif JP',serif;font-weight:300;font-size:15px;letter-spacing:.2em;}
+.bc{font-size:9px;letter-spacing:.4em;color:#aaa;text-transform:uppercase;margin-left:14px;}
+.main{padding:18px;max-width:1150px;margin:0 auto;}
+
+/* buttons */
+.btn-primary{background:#0a0a0a;color:#f8f7f4;border:none;padding:8px 18px;font-size:10px;letter-spacing:.4em;text-transform:uppercase;cursor:pointer;font-family:inherit;}
+.btn-primary:hover{opacity:.8;}
+.btn-ghost{background:transparent;color:#555;border:1px solid rgba(10,10,10,.2);padding:7px 14px;font-size:10px;letter-spacing:.3em;text-transform:uppercase;cursor:pointer;font-family:inherit;}
+.btn-ghost:hover{border-color:#0a0a0a;color:#0a0a0a;}
+.btn-sm{padding:5px 12px;font-size:9px;letter-spacing:.25em;}
+.btn-icon{background:none;border:none;cursor:pointer;color:#aaa;font-size:16px;padding:3px;}
+.btn-icon:hover{color:#0a0a0a;}
+.btn-add{display:flex;align-items:center;gap:6px;padding:7px 14px;border:1px dashed rgba(10,10,10,.25);background:transparent;font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:#777;cursor:pointer;width:100%;}
+.btn-add:hover{border-color:#0a0a0a;color:#0a0a0a;}
+
+/* panels */
+.panel{background:#fff;border:1px solid rgba(10,10,10,.1);padding:16px;margin-bottom:14px;}
+.pt{font-size:8px;letter-spacing:.45em;text-transform:uppercase;color:#aaa;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(10,10,10,.07);display:flex;align-items:center;justify-content:space-between;}
+
+/* fields */
+.lbl{font-size:8px;letter-spacing:.35em;text-transform:uppercase;color:#aaa;display:block;margin-bottom:5px;}
+.fi{width:100%;background:transparent;border:none;border-bottom:1px solid rgba(10,10,10,.2);padding:7px 0;font-size:12px;color:#0a0a0a;outline:none;}
+.fi:focus{border-bottom-color:#0a0a0a;}
+.fi:disabled{color:#aaa;border-bottom-color:rgba(10,10,10,.08);}
+.fsel{width:100%;background:#fff;border:1px solid rgba(10,10,10,.16);padding:7px 8px;font-size:12px;color:#0a0a0a;outline:none;}
+.fta{width:100%;background:transparent;border:1px solid rgba(10,10,10,.18);padding:8px;font-size:12px;color:#0a0a0a;outline:none;resize:vertical;min-height:56px;line-height:1.5;}
+.fta:focus{border-color:#0a0a0a;}
+.fi-inline{background:transparent;border:none;border-bottom:1px solid rgba(10,10,10,.12);padding:4px 0;font-size:12px;color:#0a0a0a;outline:none;width:100%;}
+.fi-inline:focus{border-bottom-color:#0a0a0a;}
+
+/* layout helpers */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.fr{margin-bottom:12px;}
+.back-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+
+/* quote list */
+.search-wrap{position:relative;flex:1;}
+.search-input{width:100%;border:1px solid rgba(10,10,10,.14);padding:9px 12px 9px 34px;font-size:12px;outline:none;color:#0a0a0a;background:#fff;}
+.search-input:focus{border-color:#0a0a0a;}
+.si{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:15px;color:#bbb;}
+.q-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px;}
+.q-card{background:#fff;border:1px solid rgba(10,10,10,.1);padding:15px;cursor:pointer;transition:border-color .15s;}
+.q-card:hover{border-color:#0a0a0a;}
+.q-ref{font-size:9px;letter-spacing:.3em;color:#bbb;text-transform:uppercase;margin-bottom:3px;}
+.q-name{font-size:13px;font-weight:500;margin-bottom:3px;}
+.q-sub{font-size:11px;color:#888;margin-bottom:6px;}
+.q-total{font-family:'Noto Serif JP',serif;font-size:16px;font-weight:300;}
+.q-date{font-size:10px;color:#aaa;}
+.qs{display:inline-block;font-size:8px;letter-spacing:.2em;text-transform:uppercase;padding:2px 8px;}
+.qs-draft{background:#888;color:#fff;}.qs-sent{background:#185fa5;color:#fff;}.qs-accepted{background:#1a5a1a;color:#fff;}.qs-revised{background:#ba7517;color:#fff;}.qs-cancelled{background:#7a2020;color:#fff;}
+.rev-b{font-size:8px;letter-spacing:.2em;padding:2px 7px;border:1px solid rgba(10,10,10,.15);color:#888;margin-left:6px;}
+
+/* builder */
+.qb-hdr{display:grid;grid-template-columns:1fr 260px;gap:14px;margin-bottom:12px;}
+.logo-box{height:62px;border:1px dashed rgba(10,10,10,.2);background:#f8f7f4;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;margin-bottom:10px;}
+.logo-box img{max-width:100%;max-height:100%;object-fit:contain;}
+
+/* location block */
+.loc-block{border:1px solid rgba(10,10,10,.1);margin-bottom:12px;background:#fff;}
+.loc-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;border-bottom:1px solid rgba(10,10,10,.07);background:#f8f7f4;}
+.loc-num{font-size:8px;letter-spacing:.35em;text-transform:uppercase;color:#aaa;margin-right:8px;flex-shrink:0;}
+.loc-body{padding:13px;}
+
+/* line item table */
+.li-table{width:100%;border-collapse:collapse;font-size:11px;}
+.li-table th{padding:6px 4px;font-size:8px;letter-spacing:.3em;text-transform:uppercase;color:#aaa;font-weight:400;border-bottom:1px solid rgba(10,10,10,.1);text-align:left;white-space:nowrap;}
+.li-table th.r,.li-table td.r{text-align:right;}
+.li-table td{padding:6px 4px;border-bottom:1px solid rgba(10,10,10,.05);vertical-align:middle;}
+.li-img{width:38px;height:38px;background:#f3f2ef;border:1px solid rgba(10,10,10,.08);display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;flex-shrink:0;}
+.li-img img{width:100%;height:100%;object-fit:cover;}
+.li-subtotal{font-family:'Noto Serif JP',serif;font-size:13px;font-weight:300;white-space:nowrap;}
+.li-disc{color:#1a5a1a;font-size:10px;}
+.loc-sub-row{background:#f8f7f4;border-top:2px solid rgba(10,10,10,.12);}
+.loc-sub-row td{padding:8px 4px;font-weight:500;font-size:12px;}
+
+/* summary */
+.sum-grid{display:grid;grid-template-columns:1fr 300px;gap:14px;margin-top:12px;}
+.sum-row{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;border-bottom:1px solid rgba(10,10,10,.06);font-size:12px;}
+.sum-row:last-child{border-bottom:none;}
+.sum-label{color:#555;}
+.sum-val{font-family:'Noto Serif JP',serif;font-size:14px;font-weight:300;}
+.sum-row.gst .sum-val{color:#185fa5;}
+.sum-row.grand{border-top:2px solid #0a0a0a;padding-top:10px;margin-top:4px;}
+.sum-row.grand .sum-label{font-weight:500;font-size:13px;}
+.sum-row.grand .sum-val{font-size:20px;}
+
+/* gst mode toggle */
+.gst-mode-wrap{display:flex;border:1px solid rgba(10,10,10,.2);margin-bottom:10px;}
+.gst-mode-btn{flex:1;padding:7px 5px;font-size:9px;letter-spacing:.15em;text-align:center;border:none;background:transparent;color:#888;cursor:pointer;font-family:inherit;line-height:1.3;}
+.gst-mode-btn.active{background:#0a0a0a;color:#f8f7f4;}
+
+/* terms */
+.term-row{display:flex;gap:7px;align-items:flex-start;margin-bottom:7px;}
+.term-cat-b{font-size:9px;letter-spacing:.25em;text-transform:uppercase;background:#f8f7f4;border:1px solid rgba(10,10,10,.12);padding:4px 8px;color:#555;white-space:nowrap;cursor:default;flex-shrink:0;}
+.term-add-b{font-size:9px;letter-spacing:.2em;text-transform:uppercase;background:#f8f7f4;border:1px solid rgba(10,10,10,.12);padding:4px 10px;color:#555;cursor:pointer;font-family:inherit;}
+.term-add-b:hover{border-color:#0a0a0a;color:#0a0a0a;}
+
+/* filter tabs */
+.ftabs{display:flex;border:1px solid rgba(10,10,10,.14);flex-shrink:0;flex-wrap:wrap;}
+.ftab{padding:7px 11px;font-size:10px;letter-spacing:.18em;background:#fff;color:#888;border:none;cursor:pointer;font-family:inherit;white-space:nowrap;}
+.ftab.active{background:#0a0a0a;color:#f8f7f4;}
+
+/* modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:999;}
+.modal{background:#fff;border:1px solid rgba(10,10,10,.15);padding:22px;width:480px;max-width:96vw;max-height:88vh;overflow-y:auto;}
+.modal-title{font-family:'Noto Serif JP',serif;font-size:18px;font-weight:300;margin-bottom:14px;}
+.ip-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;max-height:260px;overflow-y:auto;margin-bottom:12px;}
+.ip-card{border:1px solid rgba(10,10,10,.1);padding:9px;cursor:pointer;display:flex;gap:7px;align-items:center;transition:border-color .15s;}
+.ip-card:hover{border-color:#0a0a0a;}
+.ip-card.sel{border-color:#0a0a0a;background:#f8f7f4;}
+.ip-thumb{width:34px;height:34px;background:#f3f2ef;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ip-name{font-size:11px;font-weight:500;line-height:1.3;}
+.ip-sub{font-size:9px;color:#aaa;}
+
+/* preview */
+.pv-wrap{background:#fff;border:1px solid rgba(10,10,10,.1);padding:28px;font-size:12px;margin-bottom:14px;}
+.pv-brand{font-family:'Noto Serif JP',serif;font-size:22px;font-weight:300;letter-spacing:.15em;}
+.pv-loc-head{background:#0a0a0a;color:#f8f7f4;padding:6px 10px;font-size:9px;letter-spacing:.4em;text-transform:uppercase;margin:14px 0 7px;}
+.pv-table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:4px;}
+.pv-table th{padding:6px 4px;font-size:8px;letter-spacing:.3em;text-transform:uppercase;color:#aaa;font-weight:400;border-bottom:1px solid rgba(10,10,10,.12);text-align:left;}
+.pv-table th.r,.pv-table td.r{text-align:right;}
+.pv-table td{padding:8px 4px;border-bottom:1px solid rgba(10,10,10,.05);}
+.pv-sub-row td{background:#f8f7f4;font-weight:500;border-top:1px solid rgba(10,10,10,.12);}
+.pv-terms{margin-top:18px;border-top:1px solid rgba(10,10,10,.1);padding-top:12px;}
+.pv-term-cat{font-size:8px;letter-spacing:.4em;text-transform:uppercase;color:#aaa;margin-bottom:3px;margin-top:10px;}
+.empty{text-align:center;padding:40px 0;font-size:10px;color:#ccc;letter-spacing:.3em;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div style="display:flex;align-items:center;"><span class="brand">WATCON</span><span class="bc">/ Quotes</span></div>
+  <div id="ta" style="display:flex;gap:8px;align-items:center;"></div>
+</div>
+<div class="main" id="app"></div>
+<div id="modal-root"></div>
+
+<script>
+const fmt=n=>new Intl.NumberFormat('en-IN',{maximumFractionDigits:2}).format(n||0);
+const fmtC=n=>'Rs. '+fmt(n);  // use Rs. in PDF (avoids rupee symbol rendering issues)
+const fmtD=n=>'₹ '+fmt(n);   // use ₹ in screen
+const today=new Date().toISOString().split('T')[0];
+let _uid=200; const uid=()=>++_uid;
+
+// ── Catalogue & Customers ─────────────────────────────────────────────────────
+const CAT=[
+  {id:'PIPE-001',name:'GI Pipe 20mm · Medium Duty',brand:'Jindal',unit:'MTR',price:280},
+  {id:'PIPE-002',name:'GI Pipe 25mm · Medium Duty',brand:'Jindal',unit:'MTR',price:340},
+  {id:'PIPE-003',name:'GI Pipe 32mm · Heavy Duty',brand:'Tata Steel',unit:'MTR',price:480},
+  {id:'TILE-001',name:'Porcelain Floor Tile 600×600 Matte',brand:'Kajaria',unit:'SQM',price:680},
+  {id:'TILE-002',name:'Porcelain Floor Tile 600×600 Gloss',brand:'Kajaria',unit:'SQM',price:720},
+  {id:'TILE-003',name:'Vitrified Tile 800×800 Matte',brand:'Somany',unit:'SQM',price:920},
+  {id:'MARB-001',name:'Italian Marble Slab 2400x1200 Polished',brand:'Carrara',unit:'SQM',price:6200},
+  {id:'WOOD-001',name:'Engineered Wood Plank Oak Matte',brand:'Pergo',unit:'SQF',price:380},
+  {id:'WOOD-002',name:'Engineered Wood Plank Walnut Gloss',brand:'Pergo',unit:'SQF',price:410},
+  {id:'FP-001',name:'Fireplace XL900 Electric',brand:'Dimplex',unit:'NOS',price:185000},
+  {id:'FP-002',name:'Fireplace S600 Gas',brand:'Valor',unit:'NOS',price:95000},
+];
+const DTERMS=[
+  {cat:'Delivery',text:'Delivery within 4–6 weeks from order confirmation and advance payment.'},
+  {cat:'GST',text:'GST as applicable will be charged extra on the above prices.'},
+  {cat:'Payment',text:'50% advance with order, balance before dispatch.'},
+  {cat:'Warranty',text:'Manufacturer warranty applicable as per product specifications.'},
+  {cat:'Exclusion',text:'Civil work, installation, and site preparation are excluded from this quote.'},
+];
+let custs=[
+  {id:'CUST-001',name:'Rahul Constructions',contact:'Rahul Mehta',phone:'9820012345',email:'rahul@rahulconstructions.in',billingAddress:'Plot 14, MIDC Industrial Area, Andheri East, Mumbai - 400093'},
+  {id:'CUST-002',name:'Elite Residences',contact:'Priya Shah',phone:'9867543210',email:'priya.shah@eliteresidences.com',billingAddress:'1201, Lotus Business Park, Malad West, Mumbai - 400064'},
+  {id:'CUST-003',name:'Metro Interiors',contact:'Anil Kumar',phone:'9821987654',email:'anil@metrointeriors.in',billingAddress:'Shop 4-5, Maratha Mandir Building, Dadar West, Mumbai - 400028'},
+  {id:'CUST-005',name:'The Arch Studio',contact:'Neha Patel',phone:'9823456780',email:'neha@thearchstudio.in',billingAddress:'301, Maker Chambers V, Nariman Point, Mumbai - 400021'},
+];
+// gstMode: 'included' = prices include GST (show in summary)
+//          'extra'    = GST charged separately (show in summary)
+//          'terms'    = GST extra, note in terms only (hide from summary)
+let quotes=[
+  {id:'QT-2026-001',rev:0,status:'sent',date:'2026-05-10',subject:'Supply of Flooring Material',custId:'CUST-001',companyLogo:null,
+   gstPct:18,gstMode:'extra',transport:5000,transportNote:'Ex-Mumbai',
+   locations:[
+     {id:1,name:'Ground Floor',items:[
+       {id:10,name:'Porcelain Floor Tile 600×600 Matte',brand:'Kajaria',unit:'SQM',rate:680,qty:400,disc:5,image:null},
+       {id:11,name:'Vitrified Tile 800×800 Matte',brand:'Somany',unit:'SQM',rate:920,qty:120,disc:0,image:null},
+     ]},
+     {id:2,name:'First Floor',items:[
+       {id:12,name:'Porcelain Floor Tile 600×600 Gloss',brand:'Kajaria',unit:'SQM',rate:720,qty:200,disc:5,image:null},
+     ]},
+   ],terms:JSON.parse(JSON.stringify(DTERMS))},
+  {id:'QT-2026-002',rev:1,status:'accepted',date:'2026-04-22',subject:'Fireplace Supply — Bungalow Project',custId:'CUST-002',companyLogo:null,
+   gstPct:18,gstMode:'terms',transport:2500,transportNote:'',
+   locations:[
+     {id:3,name:'Living Room',items:[{id:20,name:'Fireplace XL900 Electric',brand:'Dimplex',unit:'NOS',rate:185000,qty:1,disc:10,image:null}]},
+     {id:4,name:'Master Bedroom',items:[{id:21,name:'Fireplace S600 Gas',brand:'Valor',unit:'NOS',rate:95000,qty:1,disc:8,image:null}]},
+   ],terms:JSON.parse(JSON.stringify(DTERMS))},
+];
+
+// ── Totals ────────────────────────────────────────────────────────────────────
+const lt  = it => it.rate * it.qty * (1 - (it.disc||0)/100);
+const lSub= loc=> loc.items.reduce((s,it)=>s+lt(it),0);
+const qSub= q  => q.locations.reduce((s,l)=>s+lSub(l),0);
+const qGST= q  => q.gstMode==='terms' ? 0 : qSub(q)*(q.gstPct||0)/100;
+const qGrand=q => qSub(q)+qGST(q)+(parseFloat(q.transport)||0);
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let view='list', editingQ=null, selQ=null, search='', filt='all';
+
+// ── Main render ───────────────────────────────────────────────────────────────
+function render(){
+  const app=document.getElementById('app'), ta=document.getElementById('ta');
+  if(view==='list'){
+    ta.innerHTML=`<button class="btn-primary" onclick="goNew()">+ New Quote</button>`;
+    app.innerHTML=renderList();
+  } else if(view==='builder'){
+    ta.innerHTML=`<button class="btn-ghost btn-sm" onclick="goPreview()"><i class="ti ti-eye" style="margin-right:4px;font-size:12px;vertical-align:-2px;"></i>Preview</button>
+      <button class="btn-ghost btn-sm" onclick="saveList()">Save & Exit</button>`;
+    app.innerHTML=renderBuilder();
+  } else {
+    ta.innerHTML=`<button class="btn-ghost btn-sm" onclick="doPrint()"><i class="ti ti-printer" style="margin-right:4px;font-size:12px;vertical-align:-2px;"></i>Print / PDF</button>
+      <button class="btn-ghost btn-sm" onclick="view='builder';render()"><i class="ti ti-pencil" style="margin-right:4px;font-size:12px;vertical-align:-2px;"></i>Edit</button>
+      <button class="btn-ghost btn-sm" onclick="saveList()">← All Quotes</button>`;
+    app.innerHTML=renderPreview();
+  }
+}
+
+// ── List ──────────────────────────────────────────────────────────────────────
+function renderList(){
+  const ff=quotes.filter(q=>{
+    const c=custs.find(x=>x.id===q.custId);
+    return (q.id+' '+(c?c.name:'')+' '+q.subject).toLowerCase().includes(search)&&(filt==='all'||q.status===filt);
+  });
+  return `<div style="display:flex;gap:10px;margin-bottom:16px;align-items:center;flex-wrap:wrap;">
+    <div class="search-wrap"><i class="ti ti-search si"></i>
+      <input class="search-input" placeholder="Search by quote #, customer, subject…" value="${search}" oninput="search=this.value.toLowerCase();render()"/>
+    </div>
+    <div class="ftabs">${['all','draft','sent','accepted','revised','cancelled'].map(s=>`<button class="ftab ${filt===s?'active':''}" onclick="filt='${s}';render()">${s==='all'?'All':s.charAt(0).toUpperCase()+s.slice(1)}</button>`).join('')}</div>
+    <span style="font-size:10px;color:#aaa;white-space:nowrap;">${ff.length} quotes</span>
+  </div>
+  ${ff.length===0?'<div class="empty">No quotes found</div>':'<div class="q-grid">'+ff.map(q=>{
+    const c=custs.find(x=>x.id===q.custId);
+    return `<div class="q-card" onclick="openQ('${q.id}',${q.rev})">
+      <div class="q-ref">${q.id}${q.rev>0?` <span class="rev-b">Rev ${q.rev}</span>`:''}</div>
+      <div class="q-name">${c?c.name:'Unknown'}</div>
+      <div class="q-sub">${q.subject||'—'}</div>
+      <div style="font-size:10px;color:#aaa;margin-bottom:6px;">${q.locations.length} location${q.locations.length!==1?'s':''} · ${q.locations.reduce((s,l)=>s+l.items.length,0)} items</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;">
+        <span class="qs qs-${q.status}">${q.status}</span>
+        ${q.locations.map(l=>`<span style="font-size:9px;border:1px solid rgba(10,10,10,.12);padding:2px 7px;color:#777;">${l.name}</span>`).join('')}
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;">
+        <span class="q-total">${fmtD(qGrand(q))}</span>
+        <span class="q-date">${q.date}</span>
+      </div>
+    </div>`;}).join('')+'</div>'}`;
+}
+
+// ── Builder ───────────────────────────────────────────────────────────────────
+function renderBuilder(){
+  const q=editingQ;
+  const locHtml=q.locations.map((loc,li)=>renderLocBlock(loc,li)).join('');
+  const termHtml=q.terms.map((t,i)=>`<div class="term-row" id="tr-${i}">
+    <span class="term-cat-b">${t.cat}</span>
+    <input class="fi-inline" value="${escH(t.text)}" style="flex:1;" oninput="editingQ.terms[${i}].text=this.value" placeholder="Term text…"/>
+    <button class="btn-icon" onclick="rmTerm(${i})"><i class="ti ti-x"></i></button>
+  </div>`).join('');
+
+  return `<div class="back-row">
+    <button class="btn-ghost" onclick="saveList()">← Save & Exit</button>
+    <span style="font-size:9px;letter-spacing:.4em;color:#aaa;text-transform:uppercase;">${q.id}${q.rev>0?' Rev '+q.rev:''}</span>
+    <div style="margin-left:auto;display:flex;gap:8px;">
+      <button class="btn-ghost btn-sm" onclick="doRevise()"><i class="ti ti-git-branch" style="margin-right:4px;font-size:12px;vertical-align:-2px;"></i>Revise</button>
+      <button class="btn-ghost btn-sm" onclick="goPreview()"><i class="ti ti-eye" style="margin-right:4px;font-size:12px;vertical-align:-2px;"></i>Preview</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="pt"><span>Quote Details</span>
+      <select class="fsel" style="width:120px;" onchange="editingQ.status=this.value">
+        ${['draft','sent','accepted','revised','cancelled'].map(s=>`<option value="${s}" ${q.status===s?'selected':''}>${s.charAt(0).toUpperCase()+s.slice(1)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="qb-hdr">
+      <div>
+        <div class="g3" style="margin-bottom:12px;">
+          <div class="fr"><label class="lbl">Quote Ref</label><input class="fi" value="${q.id}" disabled/></div>
+          <div class="fr"><label class="lbl">Revision No.</label><input class="fi" value="${q.rev}" disabled/></div>
+          <div class="fr"><label class="lbl">Date</label><input class="fi" type="date" value="${q.date}" onchange="editingQ.date=this.value"/></div>
+        </div>
+        <div class="fr"><label class="lbl">Subject / Project Name</label>
+          <input class="fi" value="${escH(q.subject)}" placeholder="e.g. Supply of Flooring — Bungalow Project" oninput="editingQ.subject=this.value"/>
+        </div>
+        <div class="pt" style="margin-bottom:10px;"><span>Customer</span>
+          <button class="btn-ghost btn-sm" onclick="showNewCust()">+ New Customer</button>
+        </div>
+        <div class="g3">
+          <div class="fr"><label class="lbl">Select Customer</label>
+            <select class="fsel" onchange="editingQ.custId=this.value;render()">
+              <option value="">— Select —</option>
+              ${custs.map(c=>`<option value="${c.id}" ${q.custId===c.id?'selected':''}>${escH(c.name)}</option>`).join('')}
+            </select>
+          </div>
+          ${(()=>{const c=custs.find(x=>x.id===q.custId);if(!c)return'<div></div><div></div>';
+          return `<div class="fr"><label class="lbl">Contact</label><div style="font-size:12px;padding-top:6px;">${escH(c.contact)} · ${c.phone}</div></div>
+            <div class="fr"><label class="lbl">Address</label><div style="font-size:11px;color:#888;padding-top:5px;line-height:1.5;">${escH(c.billingAddress)}</div></div>`;})()}
+        </div>
+      </div>
+      <div>
+        <div class="logo-box" id="logo-box" onclick="document.getElementById('logo-up').click()">
+          ${q.companyLogo?`<img src="${q.companyLogo}"/>`:'<div style="text-align:center;font-size:9px;color:#ccc;letter-spacing:.2em;text-transform:uppercase;"><i class="ti ti-building" style="font-size:20px;display:block;margin-bottom:4px;"></i>Company Logo</div>'}
+        </div>
+        <input type="file" id="logo-up" accept="image/*" style="display:none;" onchange="upLogo(this)"/>
+
+        <div class="fr"><label class="lbl">GST Mode</label>
+          <div class="gst-mode-wrap">
+            <button class="gst-mode-btn ${q.gstMode==='included'?'active':''}" onclick="editingQ.gstMode='included';rerenderSum()">Incl. in Price</button>
+            <button class="gst-mode-btn ${q.gstMode==='extra'?'active':''}" onclick="editingQ.gstMode='extra';rerenderSum()">Add to Total</button>
+            <button class="gst-mode-btn ${q.gstMode==='terms'?'active':''}" onclick="editingQ.gstMode='terms';rerenderSum()">Terms Only</button>
+          </div>
+        </div>
+        ${q.gstMode!=='terms'?`<div class="fr"><label class="lbl">GST %</label>
+          <input class="fi" type="number" value="${q.gstPct}" min="0" max="28" oninput="editingQ.gstPct=parseFloat(this.value)||0;rerenderSum()"/>
+        </div>`:`<div style="background:#f8f4e0;border:1px solid #d4c060;padding:8px 10px;font-size:10px;color:#7a6010;margin-bottom:10px;">GST will appear in Terms &amp; Conditions only</div>`}
+
+        <div class="fr"><label class="lbl">Transport (₹)</label>
+          <input class="fi" type="number" value="${q.transport||0}" oninput="editingQ.transport=parseFloat(this.value)||0;rerenderSum()"/>
+        </div>
+        <div class="fr"><label class="lbl">Transport Note</label>
+          <input class="fi" value="${escH(q.transportNote)}" placeholder="Ex-Mumbai, included…" oninput="editingQ.transportNote=this.value"/>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="locs">${locHtml}</div>
+  <button class="btn-add" style="margin-bottom:14px;" onclick="addLoc()">
+    <i class="ti ti-map-pin" style="font-size:15px;"></i> Add Location / Area
+  </button>
+
+  <div id="sum-sec">${buildSumHTML(q)}</div>
+
+  <div class="panel">
+    <div class="pt"><span>Terms &amp; Conditions</span></div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
+      ${['Delivery','GST','Payment','Warranty','Exclusion','Other'].map(c=>`<button class="term-add-b" onclick="addTerm('${c}')">${c}</button>`).join('')}
+    </div>
+    <div id="terms-c">${termHtml}</div>
+  </div>`;
+}
+
+function renderLocBlock(loc,li){
+  const sub=lSub(loc);
+  const rows=loc.items.map(it=>{
+    const ltv=lt(it), discAmt=it.rate*it.qty*(it.disc||0)/100;
+    return `<tr id="row-${it.id}">
+      <td><div class="li-img" onclick="pickImg(${it.id})" title="Click to add image">
+        ${it.image?`<img src="${it.image}"/>`:`<i class="ti ti-photo" style="font-size:14px;color:#ccc;"></i>`}
+      </div></td>
+      <td><input class="fi-inline" style="font-weight:500;" value="${escH(it.name)}" oninput="upIt(${it.id},'name',this.value)"/></td>
+      <td><input class="fi-inline" value="${escH(it.brand||'')}" oninput="upIt(${it.id},'brand',this.value)"/></td>
+      <td><input class="fi-inline" value="${it.unit}" style="width:46px;" oninput="upIt(${it.id},'unit',this.value)"/></td>
+      <td><input class="fi-inline" type="number" value="${it.rate}" style="text-align:right;" oninput="upIt(${it.id},'rate',parseFloat(this.value)||0)"/></td>
+      <td><input class="fi-inline" type="number" value="${it.qty}" style="text-align:right;" oninput="upIt(${it.id},'qty',parseFloat(this.value)||0)"/></td>
+      <td>
+        <input class="fi-inline" type="number" value="${it.disc||0}" min="0" max="100" style="text-align:right;" oninput="upIt(${it.id},'disc',parseFloat(this.value)||0)"/>
+        ${discAmt>0?`<div class="li-disc" id="disc-lbl-${it.id}" style="text-align:right;">− ${fmtD(discAmt)}</div>`:`<div id="disc-lbl-${it.id}"></div>`}
+      </td>
+      <td class="r"><span class="li-subtotal" id="lt-${it.id}">${fmtD(ltv)}</span></td>
+      <td><button class="btn-icon" onclick="rmIt(${it.id})"><i class="ti ti-x"></i></button></td>
+    </tr>`;}).join('');
+  return `<div class="loc-block" id="loc-${loc.id}">
+    <div class="loc-hdr">
+      <div style="display:flex;align-items:center;gap:7px;flex:1;">
+        <span class="loc-num">Location ${li+1}</span>
+        <input class="fi-inline" style="flex:1;font-weight:500;" value="${escH(loc.name)}" placeholder="e.g. Ground Floor…" oninput="editingQ.locations[${li}].name=this.value"/>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-family:'Noto Serif JP',serif;font-size:13px;" id="loc-hd-${loc.id}">${fmtD(sub)}</span>
+        ${li>0?`<button class="btn-icon" onclick="rmLoc(${loc.id})"><i class="ti ti-trash"></i></button>`:''}
+      </div>
+    </div>
+    <div class="loc-body">
+      <table class="li-table">
+        <thead><tr>
+          <th style="width:46px;"></th>
+          <th>Item / Description</th>
+          <th style="width:80px;">Brand</th>
+          <th style="width:50px;">Unit</th>
+          <th style="width:110px;text-align:right;">Rate (₹)</th>
+          <th style="width:72px;text-align:right;">Qty</th>
+          <th style="width:78px;text-align:right;">Disc %</th>
+          <th class="r" style="width:120px;">Total (₹)</th>
+          <th style="width:32px;"></th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+        <tfoot><tr class="loc-sub-row">
+          <td colspan="7">Subtotal — ${escH(loc.name)}</td>
+          <td class="r" style="font-family:'Noto Serif JP',serif;font-size:13px;" id="loc-sub-${loc.id}">${fmtD(sub)}</td>
+          <td></td>
+        </tr></tfoot>
+      </table>
+      <button class="btn-add" style="margin-top:9px;" onclick="showPicker(${loc.id})">
+        <i class="ti ti-plus" style="font-size:14px;"></i> Add Item
+      </button>
+    </div>
+  </div>`;
+}
+
+function buildSumHTML(q){
+  const sub=qSub(q), gstA=qGST(q), trans=parseFloat(q.transport)||0, grand=sub+gstA+trans;
+  return `<div class="sum-grid">
+    <div></div>
+    <div>
+      <div class="sum-row"><span class="sum-label">Subtotal (ex-GST)</span><span class="sum-val">${fmtD(sub)}</span></div>
+      ${q.gstMode==='terms'
+        ? `<div class="sum-row" style="background:#f8f4e0;padding:8px;margin:4px 0;">
+            <span class="sum-label" style="color:#7a6010;font-size:11px;"><i class="ti ti-info-circle" style="vertical-align:-2px;margin-right:4px;font-size:13px;"></i>GST extra as per applicable rate — see Terms</span>
+            <span class="sum-val" style="color:#7a6010;font-size:12px;">+GST</span>
+           </div>`
+        : `<div class="sum-row gst">
+            <span class="sum-label">GST @ <input class="fi-inline" type="number" value="${q.gstPct}" min="0" max="28" style="width:38px;text-align:center;" oninput="editingQ.gstPct=parseFloat(this.value)||0;rerenderSum()"/>%
+              ${q.gstMode==='included'?'<span style="font-size:9px;color:#888;margin-left:4px;">(incl. in prices above)</span>':''}
+            </span>
+            <span class="sum-val">${q.gstMode==='included'?'Included':fmtD(gstA)}</span>
+           </div>`}
+      <div class="sum-row"><span class="sum-label">Transport ${q.transportNote?'('+q.transportNote+')':''}</span><span class="sum-val">${fmtD(trans)}</span></div>
+      <div class="sum-row grand">
+        <span class="sum-label">Grand Total${q.gstMode==='terms'?' (excl. GST)':''}</span>
+        <span class="sum-val">${fmtD(grand)}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function rerenderSum(){ const s=document.getElementById('sum-sec'); if(s) s.innerHTML=buildSumHTML(editingQ); }
+
+// ── Live item updates ─────────────────────────────────────────────────────────
+function upIt(id,key,val){
+  for(const loc of editingQ.locations){
+    const it=loc.items.find(x=>x.id===id); if(!it) continue;
+    it[key]=val;
+    const ltv=lt(it), discA=it.rate*it.qty*(it.disc||0)/100;
+    const le=document.getElementById('lt-'+id); if(le) le.textContent=fmtD(ltv);
+    const de=document.getElementById('disc-lbl-'+id);
+    if(de){ de.textContent=discA>0?'− '+fmtD(discA):''; de.className=discA>0?'li-disc':''; }
+    const lse=document.getElementById('loc-sub-'+loc.id); if(lse) lse.textContent=fmtD(lSub(loc));
+    const lhe=document.getElementById('loc-hd-'+loc.id);  if(lhe) lhe.textContent=fmtD(lSub(loc));
+    rerenderSum(); break;
+  }
+}
+
+// ── Location / Term actions ───────────────────────────────────────────────────
+function addLoc(){ editingQ.locations.push({id:uid(),name:'Location '+(editingQ.locations.length+1),items:[]}); render(); }
+function rmLoc(id){ if(editingQ.locations.length<=1){alert('Need at least one location');return;} editingQ.locations=editingQ.locations.filter(l=>l.id!==id); render(); }
+function rmIt(id){ for(const l of editingQ.locations){const i=l.items.findIndex(x=>x.id===id);if(i>-1){l.items.splice(i,1);break;}} render(); }
+function addTerm(cat){ editingQ.terms.push({cat,text:''}); render(); }
+function rmTerm(i){ editingQ.terms.splice(i,1); render(); }
+function upLogo(inp){ const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{editingQ.companyLogo=e.target.result;const b=document.getElementById('logo-box');if(b)b.innerHTML=`<img src="${e.target.result}" style="max-width:100%;max-height:100%;object-fit:contain;"/>`;};r.readAsDataURL(f); }
+function pickImg(id){ const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{for(const l of editingQ.locations){const it=l.items.find(x=>x.id===id);if(it){it.image=ev.target.result;const b=document.querySelector('#row-'+id+' .li-img');if(b)b.innerHTML=`<img src="${ev.target.result}"/>`;break;}}};r.readAsDataURL(f);};inp.click(); }
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+function goNew(){
+  const n='QT-2026-'+String(quotes.length+1).padStart(3,'0');
+  editingQ={id:n,rev:0,status:'draft',date:today,subject:'',custId:'',companyLogo:null,gstPct:18,gstMode:'extra',transport:0,transportNote:'',locations:[{id:uid(),name:'Location 1',items:[]}],terms:JSON.parse(JSON.stringify(DTERMS))};
+  view='builder'; render();
+}
+function openQ(id,rev){ editingQ=JSON.parse(JSON.stringify(quotes.find(q=>q.id===id&&q.rev===rev))); selQ=editingQ; view='preview'; render(); }
+function saveList(){ const idx=quotes.findIndex(q=>q.id===editingQ.id&&q.rev===editingQ.rev); if(idx>-1) quotes[idx]=editingQ; else quotes.unshift(editingQ); view='list'; render(); }
+function goPreview(){ const idx=quotes.findIndex(q=>q.id===editingQ.id&&q.rev===editingQ.rev); if(idx>-1) quotes[idx]=editingQ; else quotes.unshift(editingQ); selQ=editingQ; view='preview'; render(); }
+function doRevise(){ const nq=JSON.parse(JSON.stringify(editingQ)); nq.rev=(editingQ.rev||0)+1; nq.status='revised'; quotes=quotes.filter(q=>!(q.id===editingQ.id&&q.rev===editingQ.rev)); quotes.unshift(nq); editingQ=nq; render(); }
+
+// ── Item picker modal ─────────────────────────────────────────────────────────
+let _pLocId=null, _pSel=new Set();
+function showPicker(locId){
+  _pLocId=locId; _pSel=new Set();
+  document.getElementById('modal-root').innerHTML=`<div class="modal-overlay" onclick="if(event.target===this)closeM()">
+    <div class="modal">
+      <div class="modal-title">Add Items</div>
+      <div style="position:relative;margin-bottom:10px;"><i class="ti ti-search si" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:14px;color:#bbb;"></i>
+        <input class="search-input" placeholder="Search catalogue…" style="padding-left:32px;" oninput="fpI(this.value)"/>
+      </div>
+      <div class="ip-grid" id="pg">${pickItems('')}</div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button class="btn-ghost btn-sm" onclick="closeM()">Cancel</button>
+        <button class="btn-primary btn-sm" onclick="confirmPick()">Add Selected →</button>
+      </div>
+    </div>
+  </div>`;
+}
+function pickItems(s){ return CAT.filter(it=>(it.name+it.brand).toLowerCase().includes(s.toLowerCase())).map(it=>`
+  <div class="ip-card ${_pSel.has(it.id)?'sel':''}" onclick="tPick('${it.id}',this)">
+    <div class="ip-thumb"><i class="ti ti-package" style="font-size:15px;color:#ccc;"></i></div>
+    <div><div class="ip-name">${it.name}</div><div class="ip-sub">${it.brand} · ${it.unit} · ${fmtD(it.price)}</div></div>
+  </div>`).join(''); }
+function fpI(s){ const g=document.getElementById('pg'); if(g) g.innerHTML=pickItems(s); }
+function tPick(id,el){ _pSel.has(id)?(_pSel.delete(id),el.classList.remove('sel')):(_pSel.add(id),el.classList.add('sel')); }
+function confirmPick(){ const loc=editingQ.locations.find(l=>l.id===_pLocId); if(!loc) return; _pSel.forEach(cid=>{const c=CAT.find(x=>x.id===cid); if(c) loc.items.push({id:uid(),name:c.name,brand:c.brand,unit:c.unit,rate:c.price,qty:1,disc:0,image:null});}); closeM(); render(); }
+function closeM(){ document.getElementById('modal-root').innerHTML=''; }
+
+// ── New customer modal ────────────────────────────────────────────────────────
+function showNewCust(){
+  document.getElementById('modal-root').innerHTML=`<div class="modal-overlay" onclick="if(event.target===this)closeM()">
+    <div class="modal">
+      <div class="modal-title">New Customer</div>
+      <div class="fr"><label class="lbl">Name *</label><input class="fi" id="nc-name" placeholder="Company / Person name"/></div>
+      <div class="fr"><label class="lbl">Contact Person</label><input class="fi" id="nc-con" placeholder="Contact name"/></div>
+      <div class="g2"><div class="fr"><label class="lbl">Phone *</label><input class="fi" id="nc-ph" placeholder="10-digit"/></div>
+        <div class="fr"><label class="lbl">Email</label><input class="fi" id="nc-em" placeholder="email@…"/></div></div>
+      <div class="fr"><label class="lbl">GSTIN</label><input class="fi" id="nc-gst" placeholder="27AAAAA0000A1Z5"/></div>
+      <div class="fr"><label class="lbl">Billing Address</label><textarea class="fta" id="nc-addr" style="min-height:50px;" placeholder="Full address"></textarea></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
+        <button class="btn-ghost btn-sm" onclick="closeM()">Cancel</button>
+        <button class="btn-primary btn-sm" onclick="saveNC()">Create & Select →</button>
+      </div>
+    </div>
+  </div>`;
+}
+function saveNC(){ const name=document.getElementById('nc-name').value.trim(),phone=document.getElementById('nc-ph').value.trim(); if(!name)return alert('Name required'); if(!phone)return alert('Phone required'); const id='CUST-'+String(custs.length+1).padStart(3,'0'); custs.push({id,name,contact:document.getElementById('nc-con').value.trim(),phone,email:document.getElementById('nc-em').value.trim(),billingAddress:document.getElementById('nc-addr').value.trim()}); editingQ.custId=id; closeM(); render(); }
+
+// ── Screen preview ────────────────────────────────────────────────────────────
+function renderPreview(){
+  const q=selQ||editingQ, c=custs.find(x=>x.id===q.custId)||{name:'—',contact:'—',billingAddress:'—'};
+  const sub=qSub(q), gstA=qGST(q), trans=parseFloat(q.transport)||0, grand=sub+gstA+trans;
+  const tByCat={}; q.terms.forEach(t=>{if(!tByCat[t.cat])tByCat[t.cat]=[];tByCat[t.cat].push(t.text);});
+  return `<div class="back-row">
+    <button class="btn-ghost" onclick="view='builder';render()"><i class="ti ti-pencil" style="margin-right:4px;font-size:12px;vertical-align:-2px;"></i>Edit</button>
+    <span style="font-size:9px;letter-spacing:.4em;color:#aaa;text-transform:uppercase;">${q.id} — Preview</span>
+    <div style="margin-left:auto;"><button class="btn-ghost btn-sm" onclick="doPrint()"><i class="ti ti-printer" style="margin-right:4px;font-size:12px;vertical-align:-2px;"></i>Print / PDF</button></div>
+  </div>
+  <div class="pv-wrap">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid #0a0a0a;">
+      <div>${q.companyLogo?`<img src="${q.companyLogo}" style="max-height:55px;max-width:150px;object-fit:contain;margin-bottom:6px;display:block;"/>`:'<div class="pv-brand">WATCON</div>'}
+        <div style="font-size:10px;color:#aaa;letter-spacing:.2em;margin-top:3px;">Management Software</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:9px;letter-spacing:.4em;text-transform:uppercase;color:#aaa;margin-bottom:3px;">Quotation</div>
+        <div style="font-family:'Noto Serif JP',serif;font-size:20px;font-weight:300;">${q.id}</div>
+        ${q.rev>0?`<div style="font-size:10px;color:#ba7517;letter-spacing:.2em;margin-top:2px;">Revision ${q.rev}</div>`:''}
+        <div style="font-size:11px;color:#888;margin-top:3px;">Date: ${q.date}</div>
+        <span class="qs qs-${q.status}" style="margin-top:5px;display:inline-block;">${q.status}</span>
+      </div>
+    </div>
+    <div class="g2" style="margin-bottom:18px;">
+      <div><div style="font-size:8px;letter-spacing:.4em;text-transform:uppercase;color:#aaa;margin-bottom:5px;">Customer</div>
+        <div style="font-weight:500;font-size:14px;margin-bottom:2px;">${escH(c.name)}</div>
+        <div style="font-size:11px;color:#777;line-height:1.6;">${escH(c.contact)}<br/>${escH(c.billingAddress)}</div>
+      </div>
+      <div><div style="font-size:8px;letter-spacing:.4em;text-transform:uppercase;color:#aaa;margin-bottom:5px;">Subject</div>
+        <div style="font-size:13px;font-weight:500;margin-bottom:7px;">${escH(q.subject||'—')}</div>
+        <div style="font-size:11px;color:#777;">${q.locations.length} location${q.locations.length!==1?'s':''}: ${q.locations.map(l=>escH(l.name)).join(' · ')}</div>
+      </div>
+    </div>
+    ${q.locations.map(loc=>{const lsub=lSub(loc);return `
+      <div class="pv-loc-head"><i class="ti ti-map-pin" style="margin-right:5px;font-size:12px;"></i>${escH(loc.name)}</div>
+      <table class="pv-table"><thead><tr>
+        <th style="width:42px;"></th><th>Item</th><th>Brand</th><th>Unit</th>
+        <th class="r">Rate</th><th class="r">Qty</th><th class="r">Disc</th><th class="r">Total</th>
+      </tr></thead><tbody>
+      ${loc.items.map(it=>{const ltv=lt(it),discA=it.rate*it.qty*(it.disc||0)/100;return `<tr>
+        <td>${it.image?`<img src="${it.image}" style="width:34px;height:34px;object-fit:cover;border:1px solid rgba(10,10,10,.08);"/>`:
+          `<div style="width:34px;height:34px;background:#f3f2ef;display:flex;align-items:center;justify-content:center;"><i class="ti ti-package" style="font-size:14px;color:#ccc;"></i></div>`}</td>
+        <td style="font-weight:500;">${escH(it.name)}</td>
+        <td>${escH(it.brand||'—')}</td><td>${it.unit}</td>
+        <td class="r">${fmtD(it.rate)}</td><td class="r">${fmt(it.qty)}</td>
+        <td class="r">${it.disc?it.disc+'%':'—'}${discA>0?`<br/><span style="color:#1a5a1a;font-size:10px;">− ${fmtD(discA)}</span>`:''}</td>
+        <td class="r" style="font-family:'Noto Serif JP',serif;font-size:13px;">${fmtD(ltv)}</td></tr>`;}).join('')}
+      </tbody><tfoot><tr class="pv-sub-row">
+        <td colspan="7">Subtotal — ${escH(loc.name)}</td>
+        <td class="r" style="font-family:'Noto Serif JP',serif;font-size:13px;">${fmtD(lsub)}</td>
+      </tr></tfoot></table>`;}).join('')}
+    <div style="display:grid;grid-template-columns:1fr 280px;gap:14px;margin-top:18px;border-top:2px solid #0a0a0a;padding-top:12px;">
+      <div></div>
+      <div>
+        <div class="sum-row"><span class="sum-label">Subtotal</span><span class="sum-val">${fmtD(sub)}</span></div>
+        ${q.gstMode==='terms'?`<div class="sum-row" style="color:#7a6010;"><span class="sum-label">GST</span><span class="sum-val" style="font-size:13px;">As applicable — see Terms</span></div>`:
+          `<div class="sum-row gst"><span class="sum-label">GST @ ${q.gstPct}%${q.gstMode==='included'?' (included)':''}</span><span class="sum-val">${q.gstMode==='included'?'Included':fmtD(gstA)}</span></div>`}
+        <div class="sum-row"><span class="sum-label">Transport ${q.transportNote?'('+q.transportNote+')':''}</span><span class="sum-val">${fmtD(trans)}</span></div>
+        <div class="sum-row grand"><span class="sum-label">Grand Total${q.gstMode==='terms'?' (excl. GST)':''}</span><span class="sum-val">${fmtD(grand)}</span></div>
+      </div>
+    </div>
+    <div class="pv-terms">
+      <div style="font-size:9px;letter-spacing:.4em;text-transform:uppercase;color:#aaa;margin-bottom:8px;">Terms &amp; Conditions</div>
+      ${Object.entries(tByCat).map(([cat,txts])=>
+        `<div class="pv-term-cat">${cat}</div>${txts.map(t=>`<div style="font-size:11px;color:#555;margin-bottom:4px;padding-left:8px;border-left:2px solid rgba(10,10,10,.1);line-height:1.6;">${escH(t)}</div>`).join('')}`).join('')}
+    </div>
+    <div style="margin-top:18px;border-top:1px solid rgba(10,10,10,.08);padding-top:10px;font-size:9px;color:#bbb;">Watcon Management Software · ${q.id} · ${q.date}</div>
+  </div>`;
+}
+
+// ── PRINT / PDF — built purely from data, never copies innerHTML ──────────────
+function doPrint(){
+  const q=selQ||editingQ;
+  const c=custs.find(x=>x.id===q.custId)||{name:'—',contact:'—',billingAddress:'—'};
+  const sub=qSub(q), gstA=qGST(q), trans=parseFloat(q.transport)||0, grand=sub+gstA+trans;
+
+  // Column widths in mm (A4 content ~174mm)
+  const COL={img:12,item:52,brand:20,unit:10,rate:20,qty:14,disc:16,total:24};
+
+  function tblStyle(){ return `style="width:100%;border-collapse:collapse;font-size:10pt;table-layout:fixed;"`; }
+  function th(w,align,txt){ return `<th style="width:${w}mm;text-align:${align};padding:5px 4px;font-size:7pt;letter-spacing:2px;text-transform:uppercase;color:#888;font-weight:400;border-bottom:1.5px solid #0a0a0a;background:#fff;">${txt}</th>`; }
+  function td(w,align,content,extra){
+    return `<td style="width:${w}mm;text-align:${align};padding:7px 4px;border-bottom:0.5px solid #eee;vertical-align:top;${extra||''}">${content}</td>`;
+  }
+
+  const locSections=q.locations.map(loc=>{
+    const lsub=lSub(loc);
+    const rows=loc.items.map(it=>{
+      const ltv=lt(it), discA=it.rate*it.qty*(it.disc||0)/100;
+      const imgCell=it.image
+        ?`<img src="${it.image}" style="width:28px;height:28px;object-fit:cover;border:0.5px solid #ddd;display:block;"/>`
+        :`<div style="width:28px;height:28px;background:#f3f2ef;border:0.5px solid #ddd;"></div>`;
+      return `<tr>
+        ${td(COL.img,'center',imgCell)}
+        ${td(COL.item,'left',`<span style="font-weight:600;">${escH(it.name)}</span>`)}
+        ${td(COL.brand,'left',escH(it.brand||'—'))}
+        ${td(COL.unit,'center',it.unit)}
+        ${td(COL.rate,'right',fmtC(it.rate))}
+        ${td(COL.qty,'right',fmt(it.qty))}
+        ${td(COL.disc,'right',it.disc?it.disc+'%<br/><span style="color:#1a5a1a;font-size:8pt;">−'+fmtC(discA)+'</span>':'—')}
+        ${td(COL.total,'right',`<span style="font-size:11pt;">${fmtC(ltv)}</span>`,'font-weight:600;')}
+      </tr>`;}).join('');
+
+    return `
+    <div style="background:#0a0a0a;color:#fff;padding:5px 8px;font-size:8pt;letter-spacing:3px;text-transform:uppercase;margin-top:14px;margin-bottom:0;">
+      Location: ${escH(loc.name)}
+    </div>
+    <table ${tblStyle()}>
+      <colgroup>
+        <col style="width:${COL.img}mm"/><col style="width:${COL.item}mm"/><col style="width:${COL.brand}mm"/>
+        <col style="width:${COL.unit}mm"/><col style="width:${COL.rate}mm"/><col style="width:${COL.qty}mm"/>
+        <col style="width:${COL.disc}mm"/><col style="width:${COL.total}mm"/>
+      </colgroup>
+      <thead><tr>
+        ${th(COL.img,'center','')}
+        ${th(COL.item,'left','Item / Description')}
+        ${th(COL.brand,'left','Brand')}
+        ${th(COL.unit,'center','Unit')}
+        ${th(COL.rate,'right','Rate (Rs.)')}
+        ${th(COL.qty,'right','Qty')}
+        ${th(COL.disc,'right','Disc')}
+        ${th(COL.total,'right','Total (Rs.)')}
+      </tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot><tr>
+        <td colspan="7" style="padding:8px 4px;border-top:1.5px solid #0a0a0a;font-weight:600;background:#f8f7f4;font-size:10pt;">
+          Location Subtotal — ${escH(loc.name)}
+        </td>
+        <td style="padding:8px 4px;border-top:1.5px solid #0a0a0a;text-align:right;font-size:12pt;background:#f8f7f4;">${fmtC(lsub)}</td>
+      </tr></tfoot>
+    </table>`;}).join('');
+
+  const tByCat={};
+  q.terms.forEach(t=>{if(!tByCat[t.cat])tByCat[t.cat]=[];tByCat[t.cat].push(t.text);});
+  const termsSection=Object.entries(tByCat).map(([cat,txts])=>`
+    <div style="font-size:7pt;letter-spacing:2px;text-transform:uppercase;color:#999;margin-top:10px;margin-bottom:3px;">${escH(cat)}</div>
+    ${txts.map(t=>`<div style="font-size:9pt;color:#444;padding-left:8px;border-left:2px solid #ddd;margin-bottom:4px;line-height:1.6;">${escH(t)}</div>`).join('')}`).join('');
+
+  const summarySection=`
+    <table style="width:100%;border-collapse:collapse;font-size:10pt;margin-top:16px;border-top:2px solid #0a0a0a;">
+      <tr><td style="padding:8px 4px;color:#555;">Subtotal (excl. GST)</td>
+          <td style="padding:8px 4px;text-align:right;font-size:12pt;">${fmtC(sub)}</td></tr>
+      ${q.gstMode==='terms'
+        ?`<tr style="background:#fffdf0;"><td style="padding:8px 4px;color:#7a6010;">GST</td><td style="padding:8px 4px;text-align:right;color:#7a6010;font-size:10pt;">As applicable — see Terms below</td></tr>`
+        :`<tr style="background:#f0f4ff;"><td style="padding:8px 4px;color:#185fa5;">GST @ ${q.gstPct}%${q.gstMode==='included'?' (included in above prices)':''}</td>
+           <td style="padding:8px 4px;text-align:right;color:#185fa5;font-size:12pt;">${q.gstMode==='included'?'Included':fmtC(gstA)}</td></tr>`}
+      <tr><td style="padding:8px 4px;color:#555;">Transport ${q.transportNote?'('+escH(q.transportNote)+')':''}</td>
+          <td style="padding:8px 4px;text-align:right;font-size:12pt;">${fmtC(trans)}</td></tr>
+      <tr style="border-top:2px solid #0a0a0a;background:#f8f7f4;">
+        <td style="padding:10px 4px;font-weight:700;font-size:12pt;">Grand Total${q.gstMode==='terms'?' (excl. GST)':''}</td>
+        <td style="padding:10px 4px;text-align:right;font-size:16pt;font-weight:700;">${fmtC(grand)}</td>
+      </tr>
+    </table>`;
+
+  const logoHTML=q.companyLogo
+    ?`<img src="${q.companyLogo}" style="max-height:55px;max-width:150px;object-fit:contain;display:block;margin-bottom:6px;"/>`
+    :`<div style="font-size:20pt;font-weight:300;letter-spacing:3px;">WATCON</div>`;
+
+  const html=`<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>${q.id} — Quotation</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200;300;400&family=Zen+Kaku+Gothic+New:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+@page { margin:15mm 14mm; size:A4 portrait; }
+* { box-sizing:border-box; }
+body { font-family:'Zen Kaku Gothic New','Arial',sans-serif; font-size:10pt; color:#0a0a0a; background:#fff; line-height:1.5; }
+.no-print { display:flex; gap:10px; padding:10px 16px; border-bottom:2px solid #0a0a0a; background:#fff; align-items:center; position:sticky; top:0; z-index:100; }
+.no-print button { padding:7px 18px; font-size:10pt; letter-spacing:2px; text-transform:uppercase; cursor:pointer; border:none; font-family:inherit; }
+.pb { background:#0a0a0a; color:#fff; }
+.pc { background:transparent; border:1px solid #aaa !important; color:#555; }
+.hint { font-size:8pt; color:#888; letter-spacing:1px; }
+@media print { .no-print { display:none !important; } body { font-size:10pt; } }
+</style>
+</head>
+<body>
+<div class="no-print">
+  <button class="pb" onclick="window.print()">Print / Save as PDF</button>
+  <button class="pc" onclick="window.close()">Close</button>
+  <span class="hint">To save PDF: File → Print → Destination → Save as PDF</span>
+</div>
+
+<div style="padding:20px 16px;">
+
+  <!-- Header -->
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #0a0a0a;padding-bottom:14px;margin-bottom:16px;">
+    <div>
+      ${logoHTML}
+      <div style="font-size:8pt;color:#aaa;letter-spacing:2px;margin-top:3px;">Management Software</div>
+    </div>
+    <div style="text-align:right;">
+      <div style="font-size:8pt;letter-spacing:3px;text-transform:uppercase;color:#aaa;margin-bottom:2px;">Quotation</div>
+      <div style="font-size:18pt;font-weight:300;letter-spacing:1px;">${q.id}</div>
+      ${q.rev>0?`<div style="font-size:8pt;color:#ba7517;letter-spacing:2px;margin-top:2px;">Revision ${q.rev}</div>`:''}
+      <div style="font-size:9pt;color:#888;margin-top:3px;">Date: ${q.date}</div>
+    </div>
+  </div>
+
+  <!-- Customer & Subject -->
+  <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
+    <tr>
+      <td style="width:50%;vertical-align:top;padding-right:16px;">
+        <div style="font-size:7pt;letter-spacing:3px;text-transform:uppercase;color:#aaa;margin-bottom:5px;">Customer</div>
+        <div style="font-weight:700;font-size:12pt;margin-bottom:3px;">${escH(c.name)}</div>
+        <div style="font-size:9pt;color:#666;line-height:1.6;">${escH(c.contact)}<br/>${escH(c.billingAddress)}</div>
+      </td>
+      <td style="width:50%;vertical-align:top;padding-left:16px;border-left:1px solid #eee;">
+        <div style="font-size:7pt;letter-spacing:3px;text-transform:uppercase;color:#aaa;margin-bottom:5px;">Subject</div>
+        <div style="font-weight:700;font-size:11pt;margin-bottom:6px;">${escH(q.subject||'—')}</div>
+        <div style="font-size:9pt;color:#666;">${q.locations.length} location${q.locations.length!==1?'s':''}: ${q.locations.map(l=>escH(l.name)).join(', ')}</div>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Location sections -->
+  ${locSections}
+
+  <!-- Summary -->
+  ${summarySection}
+
+  <!-- Terms -->
+  <div style="margin-top:20px;border-top:1px solid #ddd;padding-top:12px;">
+    <div style="font-size:8pt;letter-spacing:3px;text-transform:uppercase;color:#aaa;margin-bottom:8px;">Terms &amp; Conditions</div>
+    ${termsSection}
+  </div>
+
+  <div style="margin-top:18px;border-top:1px solid #eee;padding-top:8px;font-size:8pt;color:#bbb;display:flex;justify-content:space-between;">
+    <span>Watcon Management Software · Quotation · ${q.id} · ${q.date}</span>
+    <span>Confidential</span>
+  </div>
+
+</div>
+</body>
+</html>`;
+
+  const w=window.open('','_blank');
+  w.document.write(html);
+  w.document.close();
+  setTimeout(()=>w.print(),700);
+}
+
+// ── Utility ───────────────────────────────────────────────────────────────────
+function escH(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+// Base element styles consuming the design tokens. Imported once via
+// app/globals.scss. Japanese-minimal: serif display, sans body, monochrome.
+
+html {
+  font-size: 100%; // 16px root; tokens scale from here
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--fs-400); // 14px enterprise body default
+  font-weight: var(--fw-regular);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-tight);
+}
+
+h1 {
+  font-size: var(--fs-800);
+}
+h2 {
+  font-size: var(--fs-700);
+}
+h3 {
+  font-size: var(--fs-600);
+}
+
+h4,
+h5,
+h6 {
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-snug);
+}
+
+a {
+  color: var(--color-primary);
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+code,
+pre,
+kbd,
+samp {
+  font-family: var(--font-mono);
+  font-size: 0.95em;
+}
+
+::selection {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}

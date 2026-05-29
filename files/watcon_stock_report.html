@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>Watcon Stock Reports</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200;300;400&family=Zen+Kaku+Gothic+New:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Zen Kaku Gothic New',sans-serif;background:#f8f7f4;color:#0a0a0a;font-size:13px;}
+input,select,button{font-family:'Zen Kaku Gothic New',sans-serif;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:11px 20px;border-bottom:1px solid rgba(10,10,10,0.1);background:#fff;position:sticky;top:0;z-index:100;}
+.brand{font-family:'Noto Serif JP',serif;font-weight:300;font-size:15px;letter-spacing:0.2em;}
+.bc{font-size:9px;letter-spacing:0.4em;color:#aaa;text-transform:uppercase;margin-left:14px;}
+.main{padding:20px;max-width:1100px;margin:0 auto;}
+.lbl{font-size:8px;letter-spacing:0.4em;text-transform:uppercase;color:#aaa;display:block;margin-bottom:6px;}
+.panel{background:#fff;border:1px solid rgba(10,10,10,0.1);padding:16px;margin-bottom:14px;}
+.pt{font-size:8px;letter-spacing:0.45em;text-transform:uppercase;color:#aaa;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(10,10,10,0.07);}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.metric{background:#f8f7f4;padding:11px 13px;border:1px solid rgba(10,10,10,0.06);}
+.ml{font-size:8px;letter-spacing:0.4em;text-transform:uppercase;color:#aaa;margin-bottom:5px;}
+.mv{font-family:'Noto Serif JP',serif;font-size:17px;font-weight:300;}
+table{width:100%;border-collapse:collapse;font-size:11px;}
+th{text-align:left;padding:7px 0;font-size:8px;letter-spacing:0.3em;text-transform:uppercase;color:#aaa;font-weight:400;border-bottom:1px solid rgba(10,10,10,0.1);}
+th.r,td.r{text-align:right;}
+td{padding:8px 0;border-bottom:1px solid rgba(10,10,10,0.05);color:#444;}
+.share-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;}
+.share-btn{display:flex;align-items:center;gap:8px;padding:9px 16px;border:1px solid rgba(10,10,10,0.18);background:#fff;font-size:10px;letter-spacing:0.25em;text-transform:uppercase;cursor:pointer;color:#333;transition:all 0.15s;}
+.share-btn:hover{border-color:#0a0a0a;color:#0a0a0a;}
+.share-btn.primary{background:#0a0a0a;color:#f8f7f4;border-color:#0a0a0a;}
+.share-btn.primary:hover{opacity:0.82;}
+.share-btn.whatsapp{border-color:#1a7a3a;color:#1a7a3a;}
+.share-btn.whatsapp:hover{background:#1a7a3a;color:#fff;}
+.share-btn.email{border-color:#185fa5;color:#185fa5;}
+.share-btn.email:hover{background:#185fa5;color:#fff;}
+.share-btn i{font-size:16px;}
+.item-toggle{display:flex;align-items:center;gap:8px;padding:7px 12px;border:1px solid rgba(10,10,10,0.1);background:#fff;font-size:10px;cursor:pointer;transition:all 0.15s;}
+.item-toggle:hover{border-color:#0a0a0a;}
+.item-toggle.active{border-color:#0a0a0a;background:#0a0a0a;color:#f8f7f4;}
+.item-grid-sel{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
+.report-type-tabs{display:flex;border:1px solid rgba(10,10,10,0.15);margin-bottom:16px;}
+.rt-tab{flex:1;padding:9px 0;font-size:10px;letter-spacing:0.25em;text-align:center;border:none;background:transparent;color:#888;cursor:pointer;}
+.rt-tab.active{background:#0a0a0a;color:#f8f7f4;}
+.date-row{display:flex;gap:10px;align-items:center;margin-bottom:14px;}
+.date-row input{border:1px solid rgba(10,10,10,0.15);padding:6px 10px;font-size:11px;outline:none;color:#0a0a0a;background:#fff;}
+.select-input{border:1px solid rgba(10,10,10,0.16);padding:7px 10px;font-size:12px;outline:none;color:#0a0a0a;background:#fff;width:100%;}
+#action-feedback{font-size:10px;color:#3a6a3a;letter-spacing:0.15em;display:none;padding:6px 0;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div style="display:flex;align-items:center;">
+    <span class="brand">WATCON</span>
+    <span class="bc">/ Stock Reports</span>
+  </div>
+</div>
+<div class="main">
+
+  <div class="panel">
+    <div class="pt">Report Type</div>
+    <div class="report-type-tabs" id="rtype-tabs">
+      <button class="rt-tab active" onclick="setRtype('complete',this)">Complete Stock Report</button>
+      <button class="rt-tab" onclick="setRtype('individual',this)">Individual Item Report</button>
+    </div>
+    <div id="complete-opts">
+      <div class="date-row">
+        <span style="font-size:10px;color:#aaa;letter-spacing:0.2em;">Period:</span>
+        <input type="date" id="c-from" value="2026-03-01"/>
+        <span style="font-size:10px;color:#aaa;">to</span>
+        <input type="date" id="c-to" value="2026-05-24"/>
+      </div>
+      <div class="lbl" style="margin-bottom:8px;">Select items to include</div>
+      <div class="item-grid-sel" id="item-sel-grid"></div>
+    </div>
+    <div id="individual-opts" style="display:none;">
+      <div style="margin-bottom:14px;">
+        <div class="lbl">Select Item</div>
+        <select class="select-input" id="single-item-sel"></select>
+      </div>
+      <div class="date-row">
+        <span style="font-size:10px;color:#aaa;letter-spacing:0.2em;">Period:</span>
+        <input type="date" id="i-from" value="2026-03-01"/>
+        <span style="font-size:10px;color:#aaa;">to</span>
+        <input type="date" id="i-to" value="2026-05-24"/>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="pt">Export &amp; Share</div>
+    <div class="share-row">
+      <button class="share-btn primary" onclick="doAction('print')"><i class="ti ti-printer"></i> Print</button>
+      <button class="share-btn primary" onclick="doAction('pdf')"><i class="ti ti-file-type-pdf"></i> Save PDF</button>
+      <button class="share-btn whatsapp" onclick="doAction('whatsapp')"><i class="ti ti-brand-whatsapp"></i> WhatsApp</button>
+      <button class="share-btn email" onclick="doAction('email')"><i class="ti ti-mail"></i> Email</button>
+      <button class="share-btn" onclick="doAction('copy')"><i class="ti ti-copy"></i> Copy Text</button>
+    </div>
+    <div id="action-feedback"></div>
+  </div>
+
+  <div class="panel">
+    <div class="pt" style="display:flex;justify-content:space-between;"><span>Report Preview</span><span style="font-size:9px;color:#bbb;letter-spacing:0.2em;">Updates live</span></div>
+    <div id="preview-body"></div>
+  </div>
+
+</div>
+<script>
+const ITEMS=[
+  {id:'ITM-001',name:'Porcelain Floor Tile 600×600',variantLabel:'',unit:'SQM',purchasePrice:420,sellingPrice:680,stock:1240,brand:'Kajaria',isImported:false,
+   history:[{date:'2026-05-10',qty:400,customer:'Rahul Constructions',value:272000},{date:'2026-04-22',qty:250,customer:'GreenBuild Pvt Ltd',value:170000},{date:'2026-04-01',qty:590,customer:'Metro Interiors',value:401200},{date:'2026-03-15',qty:180,customer:'Rahul Constructions',value:122400}],
+   stockLog:[{date:'2026-05-01',type:'add',qty:500,reason:'Purchase receipt'}]},
+  {id:'ITM-002',name:'Italian Marble Slab 2400×1200',variantLabel:'',unit:'SQM',purchasePrice:3800,sellingPrice:6200,stock:88,brand:'Carrara',isImported:true,
+   history:[{date:'2026-05-12',qty:18,customer:'Elite Residences',value:111600},{date:'2026-04-28',qty:22,customer:'The Arch Studio',value:136400},{date:'2026-03-30',qty:30,customer:'Peninsula Hotels',value:186000}],
+   stockLog:[{date:'2026-04-20',type:'add',qty:100,reason:'Container arrival'}]},
+  {id:'ITM-003',name:'Vitrified Tile 800×800',variantLabel:'',unit:'SQM',purchasePrice:580,sellingPrice:920,stock:620,brand:'Somany',isImported:false,
+   history:[{date:'2026-05-08',qty:200,customer:'Skyline Developers',value:184000},{date:'2026-04-15',qty:180,customer:'Rahul Constructions',value:165600}],
+   stockLog:[]},
+  {id:'ITM-004-V1',name:'Engineered Wood Plank 1200×120',variantLabel:'Oak · Matte',unit:'SQF',purchasePrice:240,sellingPrice:380,stock:860,brand:'Pergo',isImported:false,
+   history:[{date:'2026-05-02',qty:300,customer:'Metro Interiors',value:114000}],stockLog:[]},
+  {id:'ITM-004-V2',name:'Engineered Wood Plank 1200×120',variantLabel:'Walnut · Gloss',unit:'SQF',purchasePrice:260,sellingPrice:410,stock:420,brand:'Pergo',isImported:false,
+   history:[{date:'2026-04-10',qty:200,customer:'The Arch Studio',value:82000}],stockLog:[]},
+];
+
+const fmt=n=>new Intl.NumberFormat('en-IN',{maximumFractionDigits:2}).format(n);
+const fmtC=n=>'Rs. '+fmt(n);
+let rtype='complete';
+let selectedIds=new Set(ITEMS.map(i=>i.id));
+
+function setRtype(t,btn){
+  rtype=t;
+  document.querySelectorAll('.rt-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('complete-opts').style.display=t==='complete'?'block':'none';
+  document.getElementById('individual-opts').style.display=t==='individual'?'block':'none';
+  renderPreview();
+}
+
+function buildItemSelGrid(){
+  const g=document.getElementById('item-sel-grid');
+  g.innerHTML='';
+  ITEMS.forEach(item=>{
+    const label=item.name+(item.variantLabel?' · '+item.variantLabel:'');
+    const btn=document.createElement('button');
+    btn.className='item-toggle active';
+    btn.textContent=label;
+    btn.onclick=()=>{
+      if(selectedIds.has(item.id)){selectedIds.delete(item.id);btn.classList.remove('active');}
+      else{selectedIds.add(item.id);btn.classList.add('active');}
+      renderPreview();
+    };
+    g.appendChild(btn);
+  });
+}
+
+function buildSingleSel(){
+  const sel=document.getElementById('single-item-sel');
+  sel.innerHTML='';
+  ITEMS.forEach(item=>{
+    const o=document.createElement('option');
+    o.value=item.id;
+    o.textContent=item.id+' — '+item.name+(item.variantLabel?' ('+item.variantLabel+')':'');
+    sel.appendChild(o);
+  });
+  sel.onchange=renderPreview;
+}
+
+function getDateRange(prefix){
+  return{from:document.getElementById(prefix+'-from').value,to:document.getElementById(prefix+'-to').value};
+}
+
+function filterHistory(item,from,to){
+  return item.history.filter(h=>h.date>=from&&h.date<=to);
+}
+
+function reportTitle(){
+  if(rtype==='complete'){
+    const{from,to}=getDateRange('c');
+    return'Watcon Management Software — Complete Stock Report ('+from+' to '+to+')';
+  }
+  const id=document.getElementById('single-item-sel').value;
+  const item=ITEMS.find(i=>i.id===id);
+  const{from,to}=getDateRange('i');
+  return'Watcon — Item Report: '+(item?item.name+' ('+item.id+')':'')+' ('+from+' to '+to+')';
+}
+
+function buildReportHTML(forPrint){
+  const ts=new Date().toLocaleString('en-IN');
+  const sf=forPrint?'font-family:Georgia,serif;':'font-family:"Noto Serif JP",Georgia,serif;';
+  const bf=forPrint?'font-family:Arial,sans-serif;':'font-family:"Zen Kaku Gothic New",Arial,sans-serif;';
+
+  const hdr=`<div style="${sf}font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#999;margin-bottom:4px;">Watcon Management Software</div>
+<div style="${sf}font-size:22px;font-weight:300;color:#0a0a0a;margin-bottom:4px;">${rtype==='complete'?'Complete Stock Report':'Item Stock Report'}</div>
+<div style="${bf}color:#aaa;font-size:10px;margin-bottom:20px;">Generated: ${ts}</div>
+<hr style="border:none;border-top:2px solid #0a0a0a;margin-bottom:20px;"/>`;
+
+  if(rtype==='complete'){
+    const{from,to}=getDateRange('c');
+    const items=ITEMS.filter(i=>selectedIds.has(i.id));
+    const totalVal=items.reduce((s,i)=>s+i.stock*i.purchasePrice,0);
+    const totalSellVal=items.reduce((s,i)=>s+i.stock*i.sellingPrice,0);
+    const allSales=items.flatMap(i=>filterHistory(i,from,to));
+    const totalSales=allSales.reduce((s,h)=>s+h.value,0);
+
+    let h=hdr;
+    h+=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;">
+${[['Total Items',items.length],['Period',from+' to '+to],['Stock Cost Value',fmtC(totalVal)],['Potential Revenue',fmtC(totalSellVal)]].map(([l,v])=>`<div style="background:#f8f7f4;padding:12px;border:1px solid #e8e6e0;"><div style="${bf}font-size:8px;letter-spacing:3px;text-transform:uppercase;color:#aaa;margin-bottom:6px;">${l}</div><div style="${sf}font-size:16px;font-weight:300;">${v}</div></div>`).join('')}
+</div>`;
+
+    h+=`<div style="${bf}font-size:8px;letter-spacing:3px;text-transform:uppercase;color:#aaa;margin-bottom:8px;">Current Stock Position</div>
+<table style="width:100%;border-collapse:collapse;${bf}font-size:11px;margin-bottom:24px;table-layout:fixed;">
+<colgroup><col style="width:30%"><col style="width:12%"><col style="width:12%"><col style="width:13%"><col style="width:13%"><col style="width:13%"><col style="width:7%"></colgroup>
+<thead><tr style="border-bottom:2px solid #0a0a0a;">
+<th style="text-align:left;padding:7px 0;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#aaa;font-weight:400;">Item</th>
+<th style="text-align:left;padding:7px 0;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#aaa;font-weight:400;">Brand</th>
+<th style="text-align:right;padding:7px 0;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#aaa;font-weight:400;">Stock</th>
+<th style="text-align:right;padding:7px 0;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#aaa;font-weight:400;">Purchase</th>
+<th style="text-align:right;padding:7px 0;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#aaa;font-weight:400;">Selling</th>
+<th style="text-align:right;padding:7px 0;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#aaa;font-weight:400;">Stock Value</th>
+<th style="text-align:center;padding:7px 0;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#aaa;font-weight:400;">Status</th>
+</tr></thead><tbody>
+${items.map(i=>`<tr style="border-bottom:1px solid #f0efe9;">
+<td style="padding:9px 0;"><div style="font-weight:500;word-break:break-word;">${i.name}${i.variantLabel?'<br/><span style="font-size:9px;color:#aaa;font-weight:400;">'+i.variantLabel+'</span>':''}</div><div style="font-size:9px;color:#bbb;letter-spacing:1px;">${i.id}</div></td>
+<td style="padding:9px 0;color:#777;">${i.brand||'—'}</td>
+<td style="padding:9px 0;text-align:right;${sf}font-size:13px;">${fmt(i.stock)}<br/><span style="font-size:9px;color:#aaa;">${i.unit}</span></td>
+<td style="padding:9px 0;text-align:right;">${fmtC(i.purchasePrice)}</td>
+<td style="padding:9px 0;text-align:right;">${fmtC(i.sellingPrice)}</td>
+<td style="padding:9px 0;text-align:right;${sf}font-size:13px;">${fmtC(i.stock*i.purchasePrice)}</td>
+<td style="padding:9px 0;text-align:center;"><span style="font-size:8px;padding:2px 6px;letter-spacing:1px;${i.stock<100?'background:#4a1a1a;color:#fff;':'background:#1a4a1a;color:#fff;'}">${i.stock<100?'LOW':'OK'}</span></td>
+</tr>`).join('')}
+<tr style="border-top:2px solid #0a0a0a;">
+<td colspan="5" style="padding:10px 0;font-weight:500;">Total Stock Cost Value</td>
+<td style="padding:10px 0;text-align:right;${sf}font-size:15px;font-weight:300;">${fmtC(totalVal)}</td><td></td>
+</tr></tbody></table>`;
+
+    const salesRows=items.flatMap(i=>filterHistory(i,from,to).map(h2=>({...h2,item:i}))).sort((a,b)=>b.date.localeCompare(a.date));
+    h+=`<div style="${bf}font-size:8px;letter-spacing:3px;text-transform:uppercase;color:#aaa;margin-bottom:8px;">Sales Movement (${from} to ${to})</div>`;
+    if(salesRows.length===0){
+      h+=`<div style="padding:20px;text-align:center;color:#bbb;font-size:11px;border:1px solid #f0efe9;">No sales transactions in selected period</div>`;
+    } else {
+      h+=`<table style="width:100%;border-collapse:collapse;${bf}font-size:11px;margin-bottom:24px;">
+<thead><tr style="border-bottom:2px solid #0a0a0a;">
+<th style="text-align:left;padding:7px 0;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#aaa;font-weight:400;">Date</th>
+<th style="text-align:left;padding:7px 0;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#aaa;font-weight:400;">Item</th>
+<th style="text-align:left;padding:7px 0;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#aaa;font-weight:400;">Customer</th>
+<th style="text-align:right;padding:7px 0;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#aaa;font-weight:400;">Qty</th>
+<th style="text-align:right;padding:7px 0;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#aaa;font-weight:400;">Value</th>
+</tr></thead><tbody>
+${salesRows.map(h2=>`<tr style="border-bottom:1px solid #f0efe9;">
+<td style="padding:8px 0;color:#999;white-space:nowrap;">${h2.date}</td>
+<td style="padding:8px 0;">${h2.item.name}${h2.item.variantLabel?' <span style="color:#aaa;font-size:10px;">('+h2.item.variantLabel+')</span>':''}</td>
+<td style="padding:8px 0;">${h2.customer}</td>
+<td style="padding:8px 0;text-align:right;">${fmt(h2.qty)} ${h2.item.unit}</td>
+<td style="padding:8px 0;text-align:right;${sf}font-size:13px;">${fmtC(h2.value)}</td>
+</tr>`).join('')}
+<tr style="border-top:2px solid #0a0a0a;">
+<td colspan="4" style="padding:10px 0;font-weight:500;">Total Sales Revenue</td>
+<td style="padding:10px 0;text-align:right;${sf}font-size:15px;font-weight:300;">${fmtC(totalSales)}</td>
+</tr></tbody></table>`;
+    }
+    h+=`<div style="margin-top:24px;border-top:1px solid #e8e6e0;padding-top:12px;${bf}font-size:9px;color:#bbb;letter-spacing:1px;">Watcon Management Software · Confidential · ${ts}</div>`;
+    return h;
+
+  } else {
+    const id=document.getElementById('single-item-sel').value;
+    const item=ITEMS.find(i=>i.id===id);
+    if(!item)return'<div style="color:#aaa;padding:20px;">Select an item</div>';
+    const{from,to}=getDateRange('i');
+    const hist=filterHistory(item,from,to);
+    const totalQty=hist.reduce((s,h2)=>s+h2.qty,0);
+    const totalVal2=hist.reduce((s,h2)=>s+h2.value,0);
+    const customers=[...new Set(hist.map(h2=>h2.customer))];
+
+    let h=hdr;
+    h+=`<div style="margin-bottom:20px;">
+<div style="font-size:18px;font-weight:500;margin-bottom:4px;">${item.name}${item.variantLabel?' <span style="font-size:13px;color:#888;font-weight:400;">'+item.variantLabel+'</span>':''}</div>
+<div style="${bf}font-size:10px;color:#aaa;letter-spacing:2px;">${item.id} · ${item.brand||''} · ${item.isImported?'Imported':'Domestic'}</div>
+</div>`;
+
+    h+=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+${[['Current Stock',fmt(item.stock)+' '+item.unit],['Purchase Price',fmtC(item.purchasePrice)+'/'+item.unit],['Selling Price',fmtC(item.sellingPrice)+'/'+item.unit],['Stock Value',fmtC(item.stock*item.purchasePrice)]].map(([l,v])=>`<div style="background:#f8f7f4;padding:12px;border:1px solid #e8e6e0;"><div style="${bf}font-size:8px;letter-spacing:3px;text-transform:uppercase;color:#aaa;margin-bottom:5px;">${l}</div><div style="${sf}font-size:15px;font-weight:300;">${v}</div></div>`).join('')}
+</div>`;
+
+    h+=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
+${[['Total Sold (period)',fmt(totalQty)+' '+item.unit],['Total Revenue',fmtC(totalVal2)],['Unique Customers',String(customers.length)]].map(([l,v])=>`<div style="background:#f8f7f4;padding:12px;border:1px solid #e8e6e0;"><div style="${bf}font-size:8px;letter-spacing:3px;text-transform:uppercase;color:#aaa;margin-bottom:5px;">${l}</div><div style="${sf}font-size:15px;font-weight:300;">${v}</div></div>`).join('')}
+</div>`;
+
+    h+=`<div style="${bf}font-size:8px;letter-spacing:3px;text-transform:uppercase;color:#aaa;margin-bottom:8px;">Sales Movement (${from} to ${to})</div>`;
+    if(hist.length===0){
+      h+=`<div style="padding:20px;text-align:center;color:#bbb;font-size:11px;border:1px solid #f0efe9;">No sales transactions in selected period</div>`;
+    } else {
+      h+=`<table style="width:100%;border-collapse:collapse;${bf}font-size:11px;margin-bottom:20px;">
+<thead><tr style="border-bottom:2px solid #0a0a0a;">
+<th style="text-align:left;padding:7px 0;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#aaa;font-weight:400;">Date</th>
+<th style="text-align:left;padding:7px 0;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#aaa;font-weight:400;">Customer</th>
+<th style="text-align:right;padding:7px 0;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#aaa;font-weight:400;">Qty</th>
+<th style="text-align:right;padding:7px 0;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#aaa;font-weight:400;">Value</th>
+</tr></thead><tbody>
+${hist.sort((a,b)=>b.date.localeCompare(a.date)).map(h2=>`<tr style="border-bottom:1px solid #f0efe9;">
+<td style="padding:8px 0;color:#999;">${h2.date}</td>
+<td style="padding:8px 0;">${h2.customer}</td>
+<td style="padding:8px 0;text-align:right;">${fmt(h2.qty)} ${item.unit}</td>
+<td style="padding:8px 0;text-align:right;${sf}font-size:13px;">${fmtC(h2.value)}</td>
+</tr>`).join('')}
+<tr style="border-top:2px solid #0a0a0a;">
+<td colspan="3" style="padding:10px 0;font-weight:500;">Total</td>
+<td style="padding:10px 0;text-align:right;${sf}font-size:15px;font-weight:300;">${fmtC(totalVal2)}</td>
+</tr></tbody></table>`;
+    }
+
+    if(item.stockLog&&item.stockLog.length>0){
+      h+=`<div style="${bf}font-size:8px;letter-spacing:3px;text-transform:uppercase;color:#aaa;margin-bottom:8px;margin-top:8px;">Stock Adjustment Log</div>
+<table style="width:100%;border-collapse:collapse;${bf}font-size:11px;margin-bottom:20px;">
+<thead><tr style="border-bottom:1px solid #0a0a0a;">
+<th style="text-align:left;padding:6px 0;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#aaa;font-weight:400;">Date</th>
+<th style="text-align:left;padding:6px 0;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#aaa;font-weight:400;">Type</th>
+<th style="text-align:left;padding:6px 0;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#aaa;font-weight:400;">Qty</th>
+<th style="text-align:left;padding:6px 0;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#aaa;font-weight:400;">Reason</th>
+</tr></thead><tbody>
+${item.stockLog.map(l=>`<tr style="border-bottom:1px solid #f0efe9;">
+<td style="padding:7px 0;color:#999;">${l.date}</td>
+<td style="padding:7px 0;"><span style="font-size:9px;padding:2px 7px;letter-spacing:1px;${l.type==='add'?'background:#1a4a1a;color:#fff;':'background:#4a1a1a;color:#fff;'}">${l.type==='add'?'+ Added':'− Reduced'}</span></td>
+<td style="padding:7px 0;">${fmt(l.qty)} ${item.unit}</td>
+<td style="padding:7px 0;color:#666;">${l.reason}</td>
+</tr>`).join('')}
+</tbody></table>`;
+    }
+    h+=`<div style="margin-top:16px;border-top:1px solid #e8e6e0;padding-top:12px;${bf}font-size:9px;color:#bbb;letter-spacing:1px;">Watcon Management Software · Confidential · ${ts}</div>`;
+    return h;
+  }
+}
+
+function buildPlainText(){
+  const ts=new Date().toLocaleString('en-IN');
+  let txt='WATCON MANAGEMENT SOFTWARE\n'+(rtype==='complete'?'COMPLETE STOCK REPORT':'ITEM STOCK REPORT')+'\nGenerated: '+ts+'\n'+'='.repeat(60)+'\n\n';
+  if(rtype==='complete'){
+    const{from,to}=getDateRange('c');
+    const items=ITEMS.filter(i=>selectedIds.has(i.id));
+    txt+='Period: '+from+' to '+to+'\n\nCURRENT STOCK\n'+'-'.repeat(60)+'\n';
+    items.forEach(i=>{
+      txt+=i.id+' | '+i.name+(i.variantLabel?' ('+i.variantLabel+')':'')+'\n';
+      txt+='  Stock: '+fmt(i.stock)+' '+i.unit+' | Purchase: '+fmtC(i.purchasePrice)+' | Sell: '+fmtC(i.sellingPrice)+'\n';
+      txt+='  Stock Value: '+fmtC(i.stock*i.purchasePrice)+(i.stock<100?' [LOW STOCK]':'')+'\n\n';
+    });
+    txt+='Total Stock Value: '+fmtC(items.reduce((s,i)=>s+i.stock*i.purchasePrice,0))+'\n\nSALES MOVEMENT ('+from+' to '+to+')\n'+'-'.repeat(60)+'\n';
+    items.forEach(i=>{
+      const hist=filterHistory(i,from,to);
+      if(!hist.length)return;
+      txt+=i.name+(i.variantLabel?' ('+i.variantLabel+')\n':'\n');
+      hist.forEach(h=>txt+='  '+h.date+' | '+h.customer+' | '+fmt(h.qty)+' '+i.unit+' | '+fmtC(h.value)+'\n');
+      txt+='\n';
+    });
+  } else {
+    const id=document.getElementById('single-item-sel').value;
+    const item=ITEMS.find(i=>i.id===id);
+    if(!item)return'No item selected';
+    const{from,to}=getDateRange('i');
+    const hist=filterHistory(item,from,to);
+    txt+=item.name+(item.variantLabel?' ('+item.variantLabel+')':'')+' ('+item.id+')\nBrand: '+(item.brand||'—')+' | '+(item.isImported?'Imported':'Domestic')+'\n\n';
+    txt+='Current Stock: '+fmt(item.stock)+' '+item.unit+'\nPurchase: '+fmtC(item.purchasePrice)+'/'+item.unit+'\nSelling: '+fmtC(item.sellingPrice)+'/'+item.unit+'\nStock Value: '+fmtC(item.stock*item.purchasePrice)+'\n\nSALES ('+from+' to '+to+')\n'+'-'.repeat(40)+'\n';
+    hist.forEach(h=>txt+=h.date+' | '+h.customer+' | '+fmt(h.qty)+' '+item.unit+' | '+fmtC(h.value)+'\n');
+    txt+='\nTotal: '+fmtC(hist.reduce((s,h)=>s+h.value,0))+'\n';
+  }
+  return txt+'\nWatcon Management Software | Confidential';
+}
+
+function doAction(type){
+  const html=buildReportHTML(true);
+  const title=reportTitle();
+  const fb=document.getElementById('action-feedback');
+  fb.style.display='none';
+
+  if(type==='print'||type==='pdf'){
+    const w=window.open('','_blank');
+    w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>${title}</title>
+<style>
+@page{margin:20mm 18mm;}
+body{font-family:'Noto Serif JP',Georgia,serif;color:#0a0a0a;background:#fff;font-size:12px;line-height:1.6;}
+*{box-sizing:border-box;}
+.no-print{display:flex;gap:12px;padding:14px 20px;border-bottom:2px solid #0a0a0a;background:#fff;align-items:center;}
+.no-print button{padding:8px 18px;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border:none;}
+.pbtn{background:#0a0a0a;color:#fff;}
+.cbtn{background:transparent;border:1px solid #aaa!important;color:#555;}
+.hint{font-size:10px;color:#888;letter-spacing:1px;}
+@media print{.no-print{display:none!important;}}
+</style></head><body>
+<div class="no-print">
+<button class="pbtn" onclick="window.print()">${type==='pdf'?'Save as PDF':'Print'}</button>
+<button class="cbtn" onclick="window.close()">Close</button>
+${type==='pdf'?'<span class="hint">In the print dialog → choose "Save as PDF" as the destination</span>':''}
+</div>
+<div style="padding:28px 24px;">${html}</div>
+</body></html>`);
+    w.document.close();
+    if(type==='print')setTimeout(()=>w.print(),500);
+
+  } else if(type==='whatsapp'){
+    window.open('https://wa.me/?text='+encodeURIComponent(buildPlainText()),'_blank');
+  } else if(type==='email'){
+    window.open('mailto:?subject='+encodeURIComponent(title)+'&body='+encodeURIComponent(buildPlainText()),'_blank');
+  } else if(type==='copy'){
+    navigator.clipboard.writeText(buildPlainText()).then(()=>{
+      fb.style.display='block';fb.style.color='#3a6a3a';fb.textContent='Report copied to clipboard';
+      setTimeout(()=>fb.style.display='none',2500);
+    }).catch(()=>{
+      fb.style.display='block';fb.style.color='#8a3030';fb.textContent='Copy blocked by browser — please copy the preview text manually';
+      setTimeout(()=>fb.style.display='none',3000);
+    });
+  }
+}
+
+function renderPreview(){
+  document.getElementById('preview-body').innerHTML=buildReportHTML(false);
+}
+
+document.getElementById('c-from').onchange=renderPreview;
+document.getElementById('c-to').onchange=renderPreview;
+document.getElementById('i-from').onchange=renderPreview;
+document.getElementById('i-to').onchange=renderPreview;
+
+buildItemSelGrid();
+buildSingleSel();
+renderPreview();
+</script>
+</body>
+</html>

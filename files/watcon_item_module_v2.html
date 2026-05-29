@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200;300;400&family=Zen+Kaku+Gothic+New:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Zen Kaku Gothic New',sans-serif;background:#f8f7f4;color:#0a0a0a;font-size:13px;}
+input,select,button,textarea{font-family:'Zen Kaku Gothic New',sans-serif;}
+input[type=number]{-moz-appearance:textfield;}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:#f0efe9;}::-webkit-scrollbar-thumb{background:#ccc;}
+.serif{font-family:'Noto Serif JP',serif;font-weight:300;}
+/* topbar */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:11px 20px;border-bottom:1px solid rgba(10,10,10,0.1);background:#fff;position:sticky;top:0;z-index:100;}
+.brand{font-family:'Noto Serif JP',serif;font-weight:300;font-size:15px;letter-spacing:0.2em;}
+.breadcrumb{font-size:9px;letter-spacing:0.4em;color:#aaa;text-transform:uppercase;margin-left:14px;}
+.role-pill{font-size:9px;letter-spacing:0.3em;text-transform:uppercase;padding:3px 10px;border:1px solid rgba(10,10,10,0.2);color:#888;}
+.role-pill.admin{background:#0a0a0a;color:#f8f7f4;border-color:#0a0a0a;}
+/* buttons */
+.btn{border:none;padding:8px 18px;font-size:10px;letter-spacing:0.4em;text-transform:uppercase;cursor:pointer;font-family:inherit;transition:opacity 0.15s;}
+.btn-primary{background:#0a0a0a;color:#f8f7f4;}
+.btn-primary:hover{opacity:0.82;}
+.btn-ghost{background:transparent;color:#666;border:1px solid rgba(10,10,10,0.2);padding:7px 14px;font-size:10px;letter-spacing:0.3em;text-transform:uppercase;cursor:pointer;font-family:inherit;}
+.btn-ghost:hover{border-color:#0a0a0a;color:#0a0a0a;}
+.btn-danger{background:#7a2020;color:#fff;border:none;padding:7px 14px;font-size:10px;letter-spacing:0.3em;text-transform:uppercase;cursor:pointer;font-family:inherit;}
+.btn-sm{padding:5px 12px;font-size:9px;letter-spacing:0.3em;}
+/* layout */
+.main{padding:20px;}
+/* search */
+.search-bar{display:flex;gap:10px;margin-bottom:18px;align-items:center;}
+.search-wrap{flex:1;position:relative;}
+.search-input{width:100%;border:1px solid rgba(10,10,10,0.14);padding:8px 12px 8px 32px;background:#fff;font-size:12px;color:#0a0a0a;outline:none;}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:14px;color:#bbb;}
+.filter-tabs{display:flex;border:1px solid rgba(10,10,10,0.14);}
+.filter-tab{padding:8px 14px;font-size:10px;letter-spacing:0.2em;background:#fff;color:#888;border:none;cursor:pointer;}
+.filter-tab.active{background:#0a0a0a;color:#f8f7f4;}
+/* grid */
+.item-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:13px;}
+/* card */
+.item-card{background:#fff;border:1px solid rgba(10,10,10,0.1);padding:14px;cursor:pointer;transition:border-color 0.15s;}
+.item-card:hover{border-color:#0a0a0a;}
+.item-thumb{height:76px;background:#f3f2ef;display:flex;align-items:center;justify-content:center;margin-bottom:10px;overflow:hidden;}
+.item-thumb img{width:100%;height:100%;object-fit:cover;}
+.item-id{font-size:8px;letter-spacing:0.3em;color:#bbb;margin-bottom:3px;text-transform:uppercase;}
+.item-name{font-size:12px;font-weight:500;margin-bottom:7px;line-height:1.35;}
+.item-price{font-family:'Noto Serif JP',serif;font-weight:300;font-size:15px;}
+.item-unit-lbl{font-size:9px;color:#aaa;}
+.stock-bar-wrap{height:2px;background:#e8e6e0;margin:7px 0;}
+.stock-bar{height:100%;background:#0a0a0a;}
+.stock-bar.low{background:#8a3030;}
+/* tags */
+.tag{display:inline-block;font-size:8px;letter-spacing:0.2em;text-transform:uppercase;padding:2px 8px;background:#0a0a0a;color:#f8f7f4;}
+.tag-ghost{display:inline-block;font-size:8px;letter-spacing:0.2em;text-transform:uppercase;padding:2px 8px;border:1px solid rgba(10,10,10,0.2);color:#666;}
+.tag-parent{display:inline-block;font-size:8px;letter-spacing:0.2em;text-transform:uppercase;padding:2px 8px;border:1px solid rgba(10,10,10,0.15);color:#aaa;background:#f8f7f4;}
+/* panel */
+.panel{background:#fff;border:1px solid rgba(10,10,10,0.1);padding:16px;margin-bottom:14px;}
+.panel-title{font-size:8px;letter-spacing:0.45em;text-transform:uppercase;color:#aaa;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(10,10,10,0.07);display:flex;align-items:center;justify-content:space-between;}
+/* fields */
+.lbl{font-size:8px;letter-spacing:0.35em;text-transform:uppercase;color:#aaa;display:block;margin-bottom:5px;}
+.field-input{width:100%;background:transparent;border:none;border-bottom:1px solid rgba(10,10,10,0.22);padding:6px 0;font-size:12px;color:#0a0a0a;outline:none;}
+.field-input:disabled{color:#aaa;border-bottom-color:rgba(10,10,10,0.08);}
+.field-select{width:100%;background:#fff;border:1px solid rgba(10,10,10,0.16);padding:6px 8px;font-size:12px;color:#0a0a0a;outline:none;}
+.field-select:disabled{color:#aaa;background:#f8f7f4;border-color:rgba(10,10,10,0.08);}
+/* grids */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+/* metrics */
+.metric{background:#f8f7f4;padding:11px 13px;border:1px solid rgba(10,10,10,0.06);}
+.metric-lbl{font-size:8px;letter-spacing:0.4em;text-transform:uppercase;color:#aaa;margin-bottom:5px;}
+.metric-val{font-family:'Noto Serif JP',serif;font-size:17px;font-weight:300;}
+/* table */
+table{width:100%;border-collapse:collapse;font-size:11px;}
+th{text-align:left;padding:7px 0;font-size:8px;letter-spacing:0.3em;text-transform:uppercase;color:#aaa;font-weight:400;border-bottom:1px solid rgba(10,10,10,0.1);}
+th.r,td.r{text-align:right;}
+td{padding:8px 0;border-bottom:1px solid rgba(10,10,10,0.05);color:#444;}
+/* detail layout */
+.det-layout{display:grid;grid-template-columns:220px 1fr;gap:16px;}
+.img-box{height:180px;background:#f3f2ef;border:1px solid rgba(10,10,10,0.08);display:flex;align-items:center;justify-content:center;margin-bottom:12px;overflow:hidden;cursor:pointer;}
+.img-box img{width:100%;height:100%;object-fit:cover;}
+/* calc */
+.calc-panel{background:#fff;border:1px solid rgba(10,10,10,0.1);border-left:3px solid #0a0a0a;padding:16px;margin-bottom:14px;}
+.calc-trail{display:flex;flex-wrap:wrap;gap:16px;border-top:1px solid rgba(10,10,10,0.07);padding-top:10px;margin-top:8px;}
+.calc-trail-item{font-size:9px;color:#aaa;}
+.calc-trail-item span{font-family:'Noto Serif JP',serif;font-size:12px;font-weight:300;color:#0a0a0a;margin-left:5px;}
+/* variations */
+.var-add-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 34px;gap:8px;margin-bottom:10px;}
+.var-chips{display:flex;flex-wrap:wrap;gap:7px;}
+.var-chip{display:flex;align-items:center;gap:5px;border:1px solid rgba(10,10,10,0.14);padding:3px 10px;font-size:10px;color:#555;}
+.var-chip button{background:none;border:none;cursor:pointer;color:#bbb;font-size:14px;line-height:1;padding:0;}
+/* upload */
+.upload-box{height:160px;background:#f3f2ef;border:1px dashed rgba(10,10,10,0.2);display:flex;align-items:center;justify-content:center;cursor:pointer;margin-bottom:12px;overflow:hidden;}
+.upload-box img{width:100%;height:100%;object-fit:cover;}
+.upload-hint{text-align:center;font-size:9px;color:#ccc;letter-spacing:0.25em;text-transform:uppercase;}
+/* type toggle */
+.type-toggle{display:flex;border:1px solid rgba(10,10,10,0.2);}
+.type-btn{flex:1;padding:7px 0;font-size:10px;letter-spacing:0.2em;background:transparent;color:#aaa;border:none;cursor:pointer;}
+.type-btn.active{background:#0a0a0a;color:#f8f7f4;}
+/* actions */
+.actions-row{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;}
+.back-row{display:flex;align-items:center;gap:10px;margin-bottom:18px;}
+/* stock modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:999;}
+.modal{background:#fff;border:1px solid rgba(10,10,10,0.15);padding:24px;width:380px;max-width:90vw;}
+.modal-title{font-family:'Noto Serif JP',serif;font-size:18px;font-weight:300;margin-bottom:16px;}
+.adj-btns{display:flex;gap:0;border:1px solid rgba(10,10,10,0.2);margin-bottom:14px;}
+.adj-btn{flex:1;padding:8px 0;font-size:10px;letter-spacing:0.25em;border:none;background:transparent;color:#888;cursor:pointer;}
+.adj-btn.active{background:#0a0a0a;color:#f8f7f4;}
+.stock-log{margin-top:14px;border-top:1px solid rgba(10,10,10,0.07);padding-top:10px;max-height:120px;overflow-y:auto;}
+.log-row{display:flex;justify-content:space-between;padding:5px 0;font-size:10px;border-bottom:1px solid rgba(10,10,10,0.05);}
+.log-type{font-size:8px;letter-spacing:0.2em;text-transform:uppercase;padding:2px 6px;margin-right:6px;}
+.log-add{background:#1a4a1a;color:#fff;}
+.log-sub{background:#4a1a1a;color:#fff;}
+/* no items */
+.no-items{text-align:center;padding:50px 0;font-size:10px;color:#ccc;letter-spacing:0.3em;}
+/* edit badge */
+.edit-badge{font-size:8px;letter-spacing:0.3em;text-transform:uppercase;padding:2px 8px;background:#f3f0e0;color:#7a6010;border:1px solid #d4c060;}
+/* section */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(10,10,10,0.07);}
+.section-lbl{font-size:8px;letter-spacing:0.45em;text-transform:uppercase;color:#aaa;}
+/* parent ref */
+.parent-ref{background:#f8f7f4;border:1px solid rgba(10,10,10,0.07);padding:8px 12px;font-size:10px;color:#888;display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
+<script>
+const {useState,useRef,useEffect}=React;
+const e=React.createElement;
+const fmt=n=>new Intl.NumberFormat('en-IN',{maximumFractionDigits:2}).format(n);
+const fmtC=n=>'₹ '+fmt(n);
+const today=new Date().toISOString().split('T')[0];
+const d90=new Date(Date.now()-90*86400000).toISOString().split('T')[0];
+
+// ── Seed ──────────────────────────────────────────────────────────
+let _id=10;
+const genId=prefix=>`${prefix}-${String(++_id).padStart(3,'0')}`;
+
+const SEED=[
+  {id:'ITM-001',parentId:null,name:'Porcelain Floor Tile 600×600',variantLabel:'',unit:'SQM',purchasePrice:420,sellingPrice:680,stock:1240,deliveryDays:21,brand:'Kajaria',isImported:false,image:null,
+   history:[{date:'2026-05-10',qty:400,customer:'Rahul Constructions',value:272000},{date:'2026-04-22',qty:250,customer:'GreenBuild Pvt Ltd',value:170000},{date:'2026-04-01',qty:590,customer:'Metro Interiors',value:401200}],
+   stockLog:[{date:'2026-05-01',type:'add',qty:500,reason:'Purchase receipt'}],
+   lastPurchase:{date:'2026-05-01',price:420,supplier:'Kajaria Direct'}},
+  {id:'ITM-002',parentId:null,name:'Italian Marble Slab 2400×1200',variantLabel:'',unit:'SQM',purchasePrice:3800,sellingPrice:6200,stock:88,deliveryDays:45,brand:'Carrara',isImported:true,image:null,
+   importCurrency:'EUR',importPrice:42,exchangeRate:89.5,discount:5,transportType:'percent',transport:8,customDuty:18,profitMultiplier:1.35,
+   history:[{date:'2026-05-12',qty:18,customer:'Elite Residences',value:111600},{date:'2026-04-28',qty:22,customer:'The Arch Studio',value:136400}],
+   stockLog:[{date:'2026-04-20',type:'add',qty:100,reason:'Container arrival'}],
+   lastPurchase:{date:'2026-04-20',price:3800,supplier:'Carrara Imports Mumbai'}},
+  {id:'ITM-003',parentId:null,name:'Vitrified Tile 800×800',variantLabel:'',unit:'SQM',purchasePrice:580,sellingPrice:920,stock:620,deliveryDays:14,brand:'Somany',isImported:false,image:null,
+   history:[{date:'2026-05-08',qty:200,customer:'Skyline Developers',value:184000}],
+   stockLog:[],
+   lastPurchase:{date:'2026-04-10',price:580,supplier:'Somany Ceramics'}},
+];
+
+// ── Calc import price ──────────────────────────────────────────────
+function calcImport(f){
+  const base=parseFloat(f.importPrice||0)*parseFloat(f.exchangeRate||1);
+  const afterDisc=base*(1-parseFloat(f.discount||0)/100);
+  const tc=f.transportType==='lumpsum'?parseFloat(f.transport||0):afterDisc*parseFloat(f.transport||0)/100;
+  const wt=afterDisc+tc;
+  const wd=wt*(1+parseFloat(f.customDuty||0)/100);
+  const sell=wd*parseFloat(f.profitMultiplier||1);
+  return{base,afterDisc,tc,wt,wd,sell};
+}
+
+// ── Shared field helpers ───────────────────────────────────────────
+function FInput({label,value,onChange,disabled,type='text',placeholder='',step}){
+  return e('div',null,
+    e('label',{className:'lbl'},label),
+    e('input',{className:'field-input',type,value:value??'',disabled,placeholder,step,onChange:onChange?ev=>onChange(ev.target.value):undefined})
+  );
+}
+function FSelect({label,value,onChange,disabled,opts}){
+  return e('div',null,
+    e('label',{className:'lbl'},label),
+    e('select',{className:'field-select',value:value??'',disabled,onChange:onChange?ev=>onChange(ev.target.value):undefined},
+      ...opts.map(o=>{const[v,t]=Array.isArray(o)?o:[o,o];return e('option',{key:v,value:v},t);})
+    )
+  );
+}
+
+// ── Item Card ──────────────────────────────────────────────────────
+function ItemCard({item,onClick}){
+  const pct=Math.min(100,Math.round(item.stock/2000*100));
+  return e('div',{className:'item-card',onClick:()=>onClick(item)},
+    e('div',{className:'item-thumb'},
+      item.image?e('img',{src:item.image,alt:item.name})
+        :e('span',{style:{fontSize:8,letterSpacing:'0.3em',color:'#ccc',textTransform:'uppercase'}},'No Image')
+    ),
+    e('div',{className:'item-id'},item.id+(item.variantLabel?' · '+item.variantLabel:'')),
+    e('div',{className:'item-name'},item.name),
+    e('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:7}},
+      e('span',{className:'item-price serif'},fmtC(item.sellingPrice)),
+      e('span',{className:'item-unit-lbl'},'per '+item.unit)
+    ),
+    e('div',{style:{display:'flex',justifyContent:'space-between',fontSize:10,color:'#aaa',marginBottom:4}},
+      e('span',null,'Stock'),
+      e('span',{style:{color:item.stock<100?'#8a3030':'#0a0a0a',fontWeight:500}},fmt(item.stock)+' '+item.unit)
+    ),
+    e('div',{className:'stock-bar-wrap'},e('div',{className:'stock-bar'+(item.stock<100?' low':''),style:{width:pct+'%'}})),
+    e('div',{style:{marginTop:8,display:'flex',gap:5,flexWrap:'wrap'}},
+      item.isImported?e('span',{className:'tag'},'Imported'):e('span',{className:'tag-ghost'},'Domestic'),
+      item.parentId?e('span',{className:'tag-parent'},'Variant'):null,
+      item.brand?e('span',{className:'tag-ghost'},item.brand):null
+    )
+  );
+}
+
+// ── Price Calculator (editable) ────────────────────────────────────
+function PriceCalc({form,setForm,editable}){
+  const up=(k,v)=>setForm&&setForm(f=>({...f,[k]:v}));
+  const r=calcImport(form);
+  const dis=!editable;
+  return e('div',{className:'calc-panel'},
+    e('div',{className:'panel-title'},e('span',null,'Import Price Calculator')),
+    e('div',{className:'g3'},
+      e(FSelect,{label:'Currency',value:form.importCurrency,onChange:dis?null:v=>up('importCurrency',v),disabled:dis,opts:['USD','EUR','CNY']}),
+      e(FInput,{label:'Price in '+(form.importCurrency||'USD'),value:form.importPrice,onChange:dis?null:v=>up('importPrice',v),disabled:dis,type:'number',placeholder:'0.00'}),
+      e(FInput,{label:'₹ per '+(form.importCurrency||'USD'),value:form.exchangeRate,onChange:dis?null:v=>up('exchangeRate',v),disabled:dis,type:'number',placeholder:'83'}),
+      e(FInput,{label:'Discount %',value:form.discount,onChange:dis?null:v=>up('discount',v),disabled:dis,type:'number',placeholder:'0'}),
+      e(FSelect,{label:'Transport Mode',value:form.transportType,onChange:dis?null:v=>up('transportType',v),disabled:dis,opts:[['lumpsum','Lump Sum (₹)'],['percent','% of Cost After Discount']]}),
+      e(FInput,{label:'Transport '+(form.transportType==='lumpsum'?'(₹)':'(%)'),value:form.transport,onChange:dis?null:v=>up('transport',v),disabled:dis,type:'number',placeholder:'0'}),
+      e(FInput,{label:'Custom Duty %',value:form.customDuty,onChange:dis?null:v=>up('customDuty',v),disabled:dis,type:'number',placeholder:'0'}),
+      e(FInput,{label:'Profit Multiplier',value:form.profitMultiplier,onChange:dis?null:v=>up('profitMultiplier',v),disabled:dis,type:'number',placeholder:'1.30',step:'0.01'}),
+      e('div',{style:{background:'#f8f7f4',padding:'11px 13px',display:'flex',flexDirection:'column',justifyContent:'center',border:'1px solid rgba(10,10,10,0.07)'}},
+        e('div',{className:'metric-lbl'},'Calculated Selling Price'),
+        e('div',{className:'serif',style:{fontSize:20,color:'#0a0a0a'}},fmtC(Math.round(r.sell))),
+        e('div',{style:{fontSize:9,color:'#aaa',marginTop:4}},'per '+(form.unit||'unit'))
+      )
+    ),
+    e('div',{className:'calc-trail'},
+      ...([['Base INR',Math.round(r.base)],['After Discount',Math.round(r.afterDisc)],['+ Transport',Math.round(r.tc)],['+ Duty',Math.round(r.wd-r.wt)],['Cost Price',Math.round(r.wd)],['Sell Price',Math.round(r.sell)]]).map(([l,v])=>
+        e('div',{className:'calc-trail-item',key:l},l,e('span',null,fmtC(v)))
+      )
+    )
+  );
+}
+
+// ── Stock Adjust Modal ─────────────────────────────────────────────
+function StockModal({item,onClose,onSave}){
+  const [mode,setMode]=useState('add');
+  const [qty,setQty]=useState('');
+  const [reason,setReason]=useState('');
+  const submit=()=>{
+    const q=parseInt(qty);
+    if(!q||q<=0)return alert('Enter a valid quantity');
+    if(!reason.trim())return alert('Enter a reason');
+    onSave(item.id,mode,q,reason);
+    onClose();
+  };
+  return e('div',{className:'modal-overlay',onClick:e_=>e_.target===e_.currentTarget&&onClose()},
+    e('div',{className:'modal'},
+      e('div',{className:'modal-title'},'Adjust Stock'),
+      e('div',{style:{fontSize:11,color:'#888',marginBottom:14,letterSpacing:'0.05em'}},item.name+(item.variantLabel?' · '+item.variantLabel:'')),
+      e('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:14}},
+        e('div',{style:{fontSize:11,color:'#aaa'}},'Current stock:'),
+        e('div',{className:'serif',style:{fontSize:18}},fmt(item.stock)+' '+item.unit)
+      ),
+      e('div',{className:'adj-btns'},
+        e('button',{className:'adj-btn'+(mode==='add'?' active':''),onClick:()=>setMode('add')},'+ Add Stock'),
+        e('button',{className:'adj-btn'+(mode==='sub'?' active':''),onClick:()=>setMode('sub')},'− Reduce Stock')
+      ),
+      e('div',{style:{marginBottom:12}},
+        e('label',{className:'lbl'},'Quantity'),
+        e('input',{className:'field-input',type:'number',value:qty,onChange:ev=>setQty(ev.target.value),placeholder:'Enter quantity',style:{fontSize:14}})
+      ),
+      e('div',{style:{marginBottom:16}},
+        e('label',{className:'lbl'},'Reason'),
+        e('input',{className:'field-input',value:reason,onChange:ev=>setReason(ev.target.value),placeholder:'e.g. Purchase receipt, Damage write-off…'})
+      ),
+      // log
+      item.stockLog&&item.stockLog.length>0&&e('div',{className:'stock-log'},
+        e('div',{style:{fontSize:8,letterSpacing:'0.4em',textTransform:'uppercase',color:'#aaa',marginBottom:6}},'Adjustment History'),
+        ...item.stockLog.slice().reverse().map((l,i)=>
+          e('div',{className:'log-row',key:i},
+            e('div',null,
+              e('span',{className:'log-type '+(l.type==='add'?'log-add':'log-sub')},l.type==='add'?'+'+l.qty:'-'+l.qty),
+              l.reason
+            ),
+            e('div',{style:{color:'#bbb',fontSize:10}},l.date)
+          )
+        )
+      ),
+      e('div',{style:{display:'flex',gap:10,justifyContent:'flex-end',marginTop:16}},
+        e('button',{className:'btn-ghost btn-sm',onClick:onClose},'Cancel'),
+        e('button',{className:'btn btn-primary btn-sm',onClick:submit},'Confirm')
+      )
+    )
+  );
+}
+
+// ── Item Detail / Edit ─────────────────────────────────────────────
+function ItemDetail({item,allItems,role,onBack,onUpdate,onStockAdjust}){
+  const [editing,setEditing]=useState(false);
+  const [form,setForm]=useState({...item});
+  const [dateFrom,setDateFrom]=useState(d90);
+  const [dateTo,setDateTo]=useState(today);
+  const [stockModal,setStockModal]=useState(false);
+  const fileRef=useRef();
+  const up=(k,v)=>setForm(f=>({...f,[k]:v}));
+  const isAdmin=role==='admin';
+
+  // reset form when item changes
+  useEffect(()=>{setForm({...item});setEditing(false);},[item.id]);
+
+  const filtered=item.history.filter(h=>h.date>=dateFrom&&h.date<=dateTo);
+  const totalQty=filtered.reduce((s,h)=>s+h.qty,0);
+  const totalVal=filtered.reduce((s,h)=>s+h.value,0);
+  const customers=[...new Set(filtered.map(h=>h.customer))];
+
+  const handleSave=()=>{
+    let pp=parseFloat(form.purchasePrice)||0;
+    let sp=parseFloat(form.sellingPrice)||0;
+    if(form.isImported){
+      const r=calcImport(form);
+      pp=Math.round(r.wd);sp=Math.round(r.sell);
+    }
+    onUpdate({...form,purchasePrice:pp,sellingPrice:sp});
+    setEditing(false);
+  };
+
+  const handleImg=ev=>{
+    const f=ev.target.files[0];if(!f)return;
+    const rd=new FileReader();
+    rd.onload=e=>up('image',e.target.result);
+    rd.readAsDataURL(f);
+  };
+
+  const parent=allItems.find(i=>i.id===item.parentId);
+
+  return e('div',null,
+    // stock modal
+    stockModal&&e(StockModal,{item,onClose:()=>setStockModal(false),onSave:onStockAdjust}),
+
+    // back row
+    e('div',{className:'back-row'},
+      e('button',{className:'btn-ghost',onClick:onBack},'← Back'),
+      e('span',{style:{fontSize:9,letterSpacing:'0.4em',color:'#aaa',textTransform:'uppercase'}},'Item Detail / '+item.id),
+      e('div',{style:{marginLeft:'auto',display:'flex',gap:8}},
+        isAdmin&&e('button',{className:'btn-ghost btn-sm',onClick:()=>setStockModal(true)},
+          e('i',{className:'ti ti-adjustments-horizontal',style:{marginRight:5}}),'Adjust Stock'
+        ),
+        editing
+          ?e('span',{className:'edit-badge'},'Editing')
+          :e('button',{className:'btn-ghost btn-sm',onClick:()=>setEditing(true)},
+              e('i',{className:'ti ti-pencil',style:{marginRight:5}}),'Edit Item'
+            )
+      )
+    ),
+
+    e('div',{className:'det-layout'},
+      // LEFT col
+      e('div',null,
+        e('div',{className:'img-box',onClick:editing?()=>fileRef.current.click():null,style:{cursor:editing?'pointer':'default'}},
+          form.image?e('img',{src:form.image})
+            :e('div',{style:{textAlign:'center'}},
+              e('div',{style:{fontSize:9,letterSpacing:'0.25em',color:'#ccc',textTransform:'uppercase'}},editing?'Click to Change':'No Image')
+            )
+        ),
+        editing&&e('input',{ref:fileRef,type:'file',accept:'image/*',onChange:handleImg,style:{display:'none'}}),
+
+        e('div',{className:'panel'},
+          e('div',{className:'panel-title'},e('span',null,'Last Purchase')),
+          e('div',{style:{fontSize:11,color:'#777',marginBottom:5}},item.lastPurchase.supplier),
+          e('div',{className:'serif',style:{fontSize:20,marginBottom:3}},fmtC(item.lastPurchase.price)),
+          e('div',{style:{fontSize:10,color:'#aaa'}},'per '+item.unit+' · '+item.lastPurchase.date)
+        ),
+
+        isAdmin&&e('div',{className:'panel'},
+          e('div',{className:'panel-title'},e('span',null,'Stock')),
+          e('div',{className:'serif',style:{fontSize:24,marginBottom:4}},fmt(item.stock)),
+          e('div',{style:{fontSize:10,color:'#aaa',marginBottom:10}},'units in hand'),
+          e('button',{className:'btn btn-primary',style:{width:'100%',padding:'8px'},onClick:()=>setStockModal(true)},
+            'Adjust Stock'
+          )
+        ),
+
+        parent&&e('div',{className:'parent-ref'},
+          e('i',{className:'ti ti-link',style:{fontSize:13}}),
+          e('span',null,'Variant of '),
+          e('strong',null,parent.name)
+        )
+      ),
+
+      // RIGHT col
+      e('div',null,
+        // name + basic
+        e('div',{className:'panel'},
+          e('div',{className:'panel-title'},
+            e('span',null,'Item Information'),
+            editing&&e('div',{style:{display:'flex',gap:8}},
+              e('button',{className:'btn-ghost btn-sm',onClick:()=>{setForm({...item});setEditing(false);}},'Discard'),
+              e('button',{className:'btn btn-primary btn-sm',onClick:handleSave},'Save Changes')
+            )
+          ),
+          e('div',{style:{marginBottom:14}},
+            e('label',{className:'lbl'},'Item Name'),
+            e('input',{className:'field-input',value:form.name,disabled:!editing,onChange:ev=>up('name',ev.target.value),style:{fontSize:14}})
+          ),
+          e('div',{className:'g2',style:{marginBottom:12}},
+            e(FInput,{label:'Brand',value:form.brand,onChange:editing?v=>up('brand',v):null,disabled:!editing}),
+            e(FSelect,{label:'Unit',value:form.unit,onChange:editing?v=>up('unit',v):null,disabled:!editing,opts:['SQM','SQF','PCS','BOX','KG','MTR','LTR','SET','NOS']}),
+            e(FInput,{label:'Delivery (days)',value:form.deliveryDays,onChange:editing?v=>up('deliveryDays',v):null,disabled:!editing,type:'number'}),
+            e('div',null,
+              e('label',{className:'lbl'},'Item Type'),
+              editing
+                ?e('div',{className:'type-toggle'},
+                    e('button',{className:'type-btn'+(form.isImported?'':' active'),onClick:()=>up('isImported',false)},'Domestic'),
+                    e('button',{className:'type-btn'+(form.isImported?' active':''),onClick:()=>up('isImported',true)},'Imported')
+                  )
+                :e('span',{className:form.isImported?'tag':'tag-ghost'},form.isImported?'Imported':'Domestic')
+            )
+          ),
+          !form.isImported&&e('div',{className:'g2'},
+            e(FInput,{label:'Purchase Price (₹) per '+form.unit,value:form.purchasePrice,onChange:editing?v=>up('purchasePrice',v):null,disabled:!editing,type:'number'}),
+            e(FInput,{label:'Selling Price (₹) per '+form.unit,value:form.sellingPrice,onChange:editing?v=>up('sellingPrice',v):null,disabled:!editing,type:'number'})
+          )
+        ),
+
+        // import calc (view or edit)
+        form.isImported&&e(PriceCalc,{form,setForm:editing?setForm:null,editable:editing}),
+
+        // metrics row
+        e('div',{className:'g4',style:{marginBottom:14}},
+          ...([
+            {l:'Sell Price',v:fmtC(item.sellingPrice)+'/'+item.unit},
+            {l:'Purchase Price',v:fmtC(item.purchasePrice)+'/'+item.unit},
+            {l:'Delivery',v:item.deliveryDays+' days'},
+            {l:'Stock',v:fmt(item.stock)+' '+item.unit},
+          ]).map(({l,v})=>e('div',{className:'metric',key:l},e('div',{className:'metric-lbl'},l),e('div',{className:'metric-val serif'},v)))
+        )
+      )
+    ),
+
+    // report
+    e('div',{className:'panel'},
+      e('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12,paddingBottom:10,borderBottom:'1px solid rgba(10,10,10,0.07)'}},
+        e('span',{style:{fontSize:8,letterSpacing:'0.45em',textTransform:'uppercase',color:'#aaa'}},'Stock Movement Report'),
+        e('div',{style:{display:'flex',gap:10,alignItems:'center',fontSize:10,color:'#aaa'}},
+          'From',
+          e('input',{type:'date',value:dateFrom,onChange:ev=>setDateFrom(ev.target.value),style:{border:'1px solid rgba(10,10,10,0.15)',padding:'5px 8px',fontSize:11,fontFamily:'inherit',outline:'none'}}),
+          'To',
+          e('input',{type:'date',value:dateTo,onChange:ev=>setDateTo(ev.target.value),style:{border:'1px solid rgba(10,10,10,0.15)',padding:'5px 8px',fontSize:11,fontFamily:'inherit',outline:'none'}})
+        )
+      ),
+      e('div',{className:'g3',style:{marginBottom:14}},
+        ...([{l:'Total Qty Sold',v:fmt(totalQty)+' '+item.unit},{l:'Total Revenue',v:fmtC(totalVal)},{l:'Unique Customers',v:String(customers.length)}])
+          .map(({l,v})=>e('div',{className:'metric',key:l},e('div',{className:'metric-lbl'},l),e('div',{className:'metric-val serif'},v)))
+      ),
+      filtered.length===0
+        ?e('div',{style:{textAlign:'center',padding:'22px 0',fontSize:10,color:'#ccc',letterSpacing:'0.3em'}},'No transactions in selected period')
+        :e('table',null,
+            e('thead',null,e('tr',null,e('th',null,'Date'),e('th',null,'Customer'),e('th',{className:'r'},'Qty'),e('th',{className:'r'},'Value'))),
+            e('tbody',null,...filtered.map((h,i)=>e('tr',{key:i},
+              e('td',{style:{color:'#999'}},h.date),
+              e('td',null,h.customer),
+              e('td',{className:'r'},fmt(h.qty)+' '+item.unit),
+              e('td',{className:'r serif',style:{fontSize:13}},fmtC(h.value))
+            )))
+          )
+    )
+  );
+}
+
+// ── New Item Form ──────────────────────────────────────────────────
+function NewItemForm({onSave,onCancel}){
+  const [form,setForm]=useState({name:'',unit:'SQM',brand:'',deliveryDays:14,purchasePrice:0,sellingPrice:0,stock:0,isImported:false,image:null,variations:[],importCurrency:'USD',importPrice:0,exchangeRate:83,discount:0,transportType:'lumpsum',transport:0,customDuty:0,profitMultiplier:1.3});
+  const [nv,setNv]=useState({size:'',finish:'',make:'',brand:''});
+  const fileRef=useRef();
+  const up=(k,v)=>setForm(f=>({...f,[k]:v}));
+
+  const addVar=()=>{
+    if(!nv.size&&!nv.finish&&!nv.make)return;
+    setForm(f=>({...f,variations:[...f.variations,{...nv}]}));
+    setNv({size:'',finish:'',make:'',brand:''});
+  };
+  const remVar=i=>setForm(f=>({...f,variations:f.variations.filter((_,j)=>j!==i)}));
+
+  const handleImg=ev=>{
+    const f=ev.target.files[0];if(!f)return;
+    const rd=new FileReader();rd.onload=e=>up('image',e.target.result);rd.readAsDataURL(f);
+  };
+
+  const handleSave=()=>{
+    if(!form.name.trim()){alert('Please enter an item name');return;}
+    let pp=parseFloat(form.purchasePrice)||0;
+    let sp=parseFloat(form.sellingPrice)||0;
+    if(form.isImported){const r=calcImport(form);pp=Math.round(r.wd);sp=Math.round(r.sell);}
+
+    // build parent item + one child per variation
+    const parentId='ITM-'+String(Date.now()).slice(-4);
+    const items=[];
+    const base={...form,purchasePrice:pp,sellingPrice:sp,history:[],stockLog:[],lastPurchase:{date:today,price:pp,supplier:'—'},variations:[]};
+
+    if(form.variations.length===0){
+      items.push({...base,id:parentId,parentId:null,variantLabel:''});
+    } else {
+      // parent (template, no stock)
+      items.push({...base,id:parentId,parentId:null,variantLabel:'',stock:0,isTemplate:true});
+      // each variation becomes its own item
+      form.variations.forEach((v,i)=>{
+        const vLabel=[v.size,v.finish,v.make,v.brand].filter(Boolean).join(' · ');
+        items.push({...base,id:parentId+'-V'+(i+1),parentId:parentId,variantLabel:vLabel,stock:0});
+      });
+    }
+    onSave(items);
+  };
+
+  return e('div',null,
+    e('div',{className:'back-row'},
+      e('button',{className:'btn-ghost',onClick:onCancel},'← Cancel'),
+      e('span',{style:{fontSize:9,letterSpacing:'0.4em',color:'#aaa',textTransform:'uppercase'}},'New Item')
+    ),
+    e('div',{className:'det-layout'},
+      e('div',null,
+        e('div',{className:'upload-box',onClick:()=>fileRef.current.click()},
+          form.image?e('img',{src:form.image})
+            :e('div',{className:'upload-hint'},e('div',{style:{fontSize:24,color:'#ddd',marginBottom:6}},'⊕'),e('div',null,'Upload Photo'))
+        ),
+        e('input',{ref:fileRef,type:'file',accept:'image/*',onChange:handleImg,style:{display:'none'}}),
+        e('div',{style:{marginBottom:12}},
+          e('label',{className:'lbl'},'Item Type'),
+          e('div',{className:'type-toggle'},
+            e('button',{className:'type-btn'+(form.isImported?'':' active'),onClick:()=>up('isImported',false)},'Domestic'),
+            e('button',{className:'type-btn'+(form.isImported?' active':''),onClick:()=>up('isImported',true)},'Imported')
+          )
+        ),
+        form.variations.length>0&&e('div',{style:{background:'#f0f7e8',border:'1px solid #c0d898',padding:'10px 12px',fontSize:10,color:'#3a6010',lineHeight:1.6}},
+          e('strong',null,form.variations.length+' variation'+(form.variations.length>1?'s':''),' will become '+form.variations.length+' separate item'+(form.variations.length>1?'s':'')+' linked to this parent.')
+        )
+      ),
+      e('div',null,
+        e('div',{className:'panel'},
+          e('div',{className:'panel-title'},e('span',null,'Basic Information')),
+          e('div',{style:{marginBottom:14}},
+            e('label',{className:'lbl'},'Item Name'),
+            e('input',{className:'field-input',value:form.name,onChange:ev=>up('name',ev.target.value),placeholder:'Enter full item name',style:{fontSize:14}})
+          ),
+          e('div',{className:'g2'},
+            e(FInput,{label:'Brand',value:form.brand,onChange:v=>up('brand',v),placeholder:'Brand'}),
+            e(FSelect,{label:'Unit',value:form.unit,onChange:v=>up('unit',v),opts:['SQM','SQF','PCS','BOX','KG','MTR','LTR','SET','NOS']}),
+            e(FInput,{label:'Delivery (days)',value:form.deliveryDays,onChange:v=>up('deliveryDays',v),type:'number'}),
+            e(FInput,{label:'Opening Stock',value:form.stock,onChange:v=>up('stock',v),type:'number',placeholder:'0'})
+          ),
+          !form.isImported&&e('div',{className:'g2',style:{marginTop:14}},
+            e(FInput,{label:'Purchase Price (₹) per '+form.unit,value:form.purchasePrice,onChange:v=>up('purchasePrice',v),type:'number'}),
+            e(FInput,{label:'Selling Price (₹) per '+form.unit,value:form.sellingPrice,onChange:v=>up('sellingPrice',v),type:'number'})
+          )
+        ),
+        form.isImported&&e(PriceCalc,{form,setForm,editable:true}),
+        e('div',{className:'panel'},
+          e('div',{className:'panel-title'},e('span',null,'Variations — each becomes a separate item')),
+          e('div',{className:'var-add-row'},
+            ...['size','finish','make','brand'].map(k=>
+              e('input',{key:k,className:'field-input',placeholder:k.charAt(0).toUpperCase()+k.slice(1),value:nv[k],onChange:ev=>setNv(v=>({...v,[k]:ev.target.value})),
+                onKeyDown:ev=>{if(ev.key==='Enter')addVar();}})
+            ),
+            e('button',{className:'btn btn-primary',onClick:addVar,style:{padding:'0',fontSize:18,display:'flex',alignItems:'center',justifyContent:'center'}},'+')
+          ),
+          form.variations.length===0
+            ?e('div',{style:{fontSize:10,color:'#ccc',letterSpacing:'0.2em',padding:'6px 0'}},'No variations added — item will be created as-is')
+            :e('div',{className:'var-chips'},
+              ...form.variations.map((v,i)=>e('div',{className:'var-chip',key:i},
+                e('span',null,[v.size,v.finish,v.make,v.brand].filter(Boolean).join(' · ')),
+                e('button',{onClick:()=>remVar(i)},'×')
+              ))
+            )
+        )
+      )
+    ),
+    e('div',{className:'actions-row'},
+      e('button',{className:'btn-ghost',onClick:onCancel},'Cancel'),
+      form.isImported&&e('button',{className:'btn-ghost',onClick:()=>{
+        const r=calcImport(form);setForm(f=>({...f,purchasePrice:Math.round(r.wd),sellingPrice:Math.round(r.sell)}));
+      }},'↻ Recalculate'),
+      e('button',{className:'btn btn-primary',onClick:handleSave},'Save Item →')
+    )
+  );
+}
+
+// ── App ────────────────────────────────────────────────────────────
+function App(){
+  const [items,setItems]=useState(SEED);
+  const [view,setView]=useState('list');
+  const [selected,setSelected]=useState(null);
+  const [search,setSearch]=useState('');
+  const [filter,setFilter]=useState('all');
+  const [role,setRole]=useState('admin'); // toggle for demo
+
+  const filtered=items.filter(item=>{
+    const ms=item.name.toLowerCase().includes(search.toLowerCase())||item.id.toLowerCase().includes(search.toLowerCase())||(item.variantLabel||'').toLowerCase().includes(search.toLowerCase());
+    const mi=filter==='all'||(filter==='imported'?item.isImported:!item.isImported);
+    const mv=filter==='variants'?!!item.parentId:true;
+    return ms&&mi&&mv&&!item.isTemplate;
+  });
+
+  const openItem=item=>{setSelected(item);setView('detail');};
+
+  const handleUpdate=updated=>{
+    setItems(prev=>prev.map(i=>i.id===updated.id?updated:i));
+    setSelected(updated);
+  };
+
+  const handleStockAdjust=(itemId,type,qty,reason)=>{
+    setItems(prev=>prev.map(i=>{
+      if(i.id!==itemId)return i;
+      const newStock=type==='add'?i.stock+qty:Math.max(0,i.stock-qty);
+      const log={date:today,type,qty,reason};
+      return{...i,stock:newStock,stockLog:[...(i.stockLog||[]),log]};
+    }));
+    setSelected(prev=>({...prev,
+      stock:type==='add'?prev.stock+qty:Math.max(0,prev.stock-qty),
+      stockLog:[...(prev.stockLog||[]),{date:today,type,qty,reason}]
+    }));
+  };
+
+  const saveNew=newItems=>{
+    setItems(prev=>[...newItems,...prev]);
+    setView('list');
+  };
+
+  return e('div',null,
+    e('div',{className:'topbar'},
+      e('div',{style:{display:'flex',alignItems:'center'}},
+        e('span',{className:'brand'},'WATCON'),
+        e('span',{className:'breadcrumb'},'/ Item Management')
+      ),
+      e('div',{style:{display:'flex',gap:10,alignItems:'center'}},
+        // role toggle for demo
+        e('div',{style:{display:'flex',border:'1px solid rgba(10,10,10,0.15)',fontSize:9}},
+          e('button',{style:{padding:'4px 12px',background:role==='employee'?'#0a0a0a':'transparent',color:role==='employee'?'#f8f7f4':'#888',border:'none',cursor:'pointer',fontSize:9,letterSpacing:'0.2em'},onClick:()=>setRole('employee')},'Employee'),
+          e('button',{style:{padding:'4px 12px',background:role==='admin'?'#0a0a0a':'transparent',color:role==='admin'?'#f8f7f4':'#888',border:'none',cursor:'pointer',fontSize:9,letterSpacing:'0.2em'},onClick:()=>setRole('admin')},'Admin')
+        ),
+        e('span',{className:'role-pill'+(role==='admin'?' admin':'')},role),
+        view==='list'&&e('button',{className:'btn btn-primary',onClick:()=>setView('new')},'+ New Item')
+      )
+    ),
+    e('div',{className:'main'},
+      view==='list'&&e('div',null,
+        e('div',{className:'search-bar'},
+          e('div',{className:'search-wrap'},
+            e('i',{className:'ti ti-search search-icon'}),
+            e('input',{className:'search-input',placeholder:'Search by name, ID, or variant…',value:search,onChange:ev=>setSearch(ev.target.value)})
+          ),
+          e('div',{className:'filter-tabs'},
+            ...([['all','All'],['domestic','Domestic'],['imported','Imported'],['variants','Variants']]).map(([v,l])=>
+              e('button',{className:'filter-tab'+(filter===v?' active':''),key:v,onClick:()=>setFilter(v)},l)
+            )
+          ),
+          e('span',{style:{fontSize:10,color:'#aaa',letterSpacing:'0.1em',whiteSpace:'nowrap'}},filtered.length+' items')
+        ),
+        filtered.length===0
+          ?e('div',{className:'no-items'},'No items found')
+          :e('div',{className:'item-grid'},
+              ...filtered.map(item=>e(ItemCard,{key:item.id,item,onClick:openItem}))
+            )
+      ),
+      view==='detail'&&selected&&e(ItemDetail,{
+        item:selected,allItems:items,role,
+        onBack:()=>{setSelected(null);setView('list');},
+        onUpdate:handleUpdate,
+        onStockAdjust:handleStockAdjust
+      }),
+      view==='new'&&e(NewItemForm,{onSave:saveNew,onCancel:()=>setView('list')})
+    )
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(e(App));
+</script>
+</body>
+</html>

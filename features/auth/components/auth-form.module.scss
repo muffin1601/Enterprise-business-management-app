@@ -1,0 +1,50 @@
+// Shared layout for the auth forms (login/register/forgot/reset).
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-text-subtle);
+  font-size: var(--fs-200);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--color-border);
+  }
+}
+
+.inlineLink {
+  font-size: var(--fs-300);
+  color: var(--color-text-muted);
+
+  a {
+    color: var(--color-primary);
+    font-weight: var(--fw-medium);
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.sent {
+  font-size: var(--fs-400);
+  color: var(--color-text);
+  line-height: var(--lh-relaxed);
+}

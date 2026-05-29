@@ -1,0 +1,6 @@
+// Single entry for component modules: `@use 'index' as t;` exposes the SCSS
+// tools (breakpoints, functions, mixins). Reset/base emit global CSS and are
+// @use'd once in app/globals.scss instead — not here.
+@forward 'tokens';
+@forward 'functions';
+@forward 'mixins';

@@ -1,0 +1,17 @@
+.wrap {
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.label {
+  font-size: var(--fs-200);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  color: var(--color-text-subtle);
+}
+
+.single {
+  font-size: var(--fs-400);
+  font-weight: var(--fw-medium);
+}

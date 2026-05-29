@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>Watcon — Quotes v4</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200;300;400&family=Zen+Kaku+Gothic+New:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Zen Kaku Gothic New',sans-serif;background:#f8f7f4;color:#0a0a0a;font-size:13px;}
+input,select,button,textarea{font-family:'Zen Kaku Gothic New',sans-serif;}
+input[type=number]{-moz-appearance:textfield;}
+::-webkit-scrollbar{width:4px;height:4px;}::-webkit-scrollbar-thumb{background:#ccc;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:11px 20px;border-bottom:1px solid rgba(10,10,10,.1);background:#fff;position:sticky;top:0;z-index:200;}
+.brand{font-family:'Noto Serif JP',serif;font-weight:300;font-size:15px;letter-spacing:.2em;}
+.bc{font-size:9px;letter-spacing:.4em;color:#aaa;text-transform:uppercase;margin-left:14px;}
+.main{padding:18px;max-width:1200px;margin:0 auto;}
+.bp{background:#0a0a0a;color:#f8f7f4;border:none;padding:8px 18px;font-size:10px;letter-spacing:.4em;text-transform:uppercase;cursor:pointer;font-family:inherit;}
+.bp:hover{opacity:.8;}
+.bg{background:transparent;color:#555;border:1px solid rgba(10,10,10,.2);padding:7px 14px;font-size:10px;letter-spacing:.3em;text-transform:uppercase;cursor:pointer;font-family:inherit;}
+.bg:hover{border-color:#0a0a0a;color:#0a0a0a;}
+.bs{padding:5px 12px;font-size:9px;letter-spacing:.25em;}
+.bi{background:none;border:none;cursor:pointer;color:#aaa;font-size:16px;padding:3px;}
+.bi:hover{color:#0a0a0a;}
+.ba{display:flex;align-items:center;gap:6px;padding:7px 14px;border:1px dashed rgba(10,10,10,.25);background:transparent;font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:#777;cursor:pointer;width:100%;}
+.ba:hover{border-color:#0a0a0a;color:#0a0a0a;}
+.panel{background:#fff;border:1px solid rgba(10,10,10,.1);padding:16px;margin-bottom:14px;}
+.pt{font-size:8px;letter-spacing:.45em;text-transform:uppercase;color:#aaa;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(10,10,10,.07);display:flex;align-items:center;justify-content:space-between;}
+.lbl{font-size:8px;letter-spacing:.35em;text-transform:uppercase;color:#aaa;display:block;margin-bottom:5px;}
+.fi{width:100%;background:transparent;border:none;border-bottom:1px solid rgba(10,10,10,.2);padding:7px 0;font-size:12px;color:#0a0a0a;outline:none;}
+.fi:focus{border-bottom-color:#0a0a0a;}
+.fi:disabled{color:#aaa;border-bottom-color:rgba(10,10,10,.08);}
+.fsel{width:100%;background:#fff;border:1px solid rgba(10,10,10,.16);padding:7px 8px;font-size:12px;color:#0a0a0a;outline:none;}
+.fta{width:100%;background:transparent;border:1px solid rgba(10,10,10,.18);padding:8px;font-size:12px;color:#0a0a0a;outline:none;resize:vertical;min-height:56px;line-height:1.5;}
+.fi-inline{background:transparent;border:none;border-bottom:1px solid rgba(10,10,10,.12);padding:4px 0;font-size:12px;color:#0a0a0a;outline:none;width:100%;}
+.fi-inline:focus{border-bottom-color:#0a0a0a;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.fr{margin-bottom:12px;}
+.back-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.search-wrap{position:relative;flex:1;}
+.search-input{width:100%;border:1px solid rgba(10,10,10,.14);padding:9px 12px 9px 34px;font-size:12px;outline:none;color:#0a0a0a;background:#fff;}
+.search-input:focus{border-color:#0a0a0a;}
+.si{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:15px;color:#bbb;}
+.q-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:12px;}
+.qc{background:#fff;border:1px solid rgba(10,10,10,.1);padding:15px;cursor:pointer;transition:border-color .15s;}
+.qc:hover{border-color:#0a0a0a;}
+.qs{display:inline-block;font-size:8px;letter-spacing:.2em;text-transform:uppercase;padding:2px 8px;}
+.qs-draft{background:#888;color:#fff;}.qs-sent{background:#185fa5;color:#fff;}.qs-accepted{background:#1a5a1a;color:#fff;}.qs-revised{background:#ba7517;color:#fff;}.qs-cancelled{background:#7a2020;color:#fff;}
+.ftabs{display:flex;border:1px solid rgba(10,10,10,.14);flex-shrink:0;flex-wrap:wrap;}
+.ftab{padding:7px 10px;font-size:10px;letter-spacing:.15em;background:#fff;color:#888;border:none;cursor:pointer;font-family:inherit;}
+.ftab.active{background:#0a0a0a;color:#f8f7f4;}
+.qb-hdr{display:grid;grid-template-columns:1fr 265px;gap:14px;margin-bottom:12px;}
+.logo-box{height:62px;border:1px dashed rgba(10,10,10,.2);background:#f8f7f4;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;margin-bottom:10px;}
+.logo-box img{max-width:100%;max-height:100%;object-fit:contain;}
+/* location */
+.loc-block{border:1px solid rgba(10,10,10,.1);margin-bottom:14px;background:#fff;}
+.loc-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;border-bottom:1px solid rgba(10,10,10,.07);background:#f8f7f4;}
+.loc-num{font-size:8px;letter-spacing:.35em;text-transform:uppercase;color:#aaa;margin-right:8px;flex-shrink:0;}
+.loc-body{padding:13px;}
+/* items table */
+.li-table{width:100%;border-collapse:collapse;font-size:11px;}
+.li-table th{padding:6px 4px;font-size:8px;letter-spacing:.3em;text-transform:uppercase;color:#aaa;font-weight:400;border-bottom:1px solid rgba(10,10,10,.1);text-align:left;white-space:nowrap;}
+.li-table th.r,.li-table td.r{text-align:right;}
+.li-table td{padding:6px 4px;border-bottom:1px solid rgba(10,10,10,.05);vertical-align:middle;}
+.li-img{width:38px;height:38px;background:#f3f2ef;border:1px solid rgba(10,10,10,.08);display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;flex-shrink:0;}
+.li-img img{width:100%;height:100%;object-fit:cover;}
+.li-disc-lbl{color:#1a5a1a;font-size:10px;}
+.opt-row td{background:#fffdf5;border-bottom:1px solid rgba(185,175,120,.3);}
+.opt-row:last-of-type td{border-bottom:2px solid rgba(185,175,120,.5);}
+.opt-tag{display:inline-block;font-size:8px;letter-spacing:.2em;text-transform:uppercase;padding:2px 7px;background:#f8f4e0;border:1px solid #d4c060;color:#7a6010;margin-right:6px;vertical-align:middle;}
+.opt-make-primary{font-size:9px;letter-spacing:.2em;text-transform:uppercase;background:#0a0a0a;color:#f8f7f4;border:none;padding:3px 10px;cursor:pointer;font-family:inherit;white-space:nowrap;}
+.opt-make-primary:hover{opacity:.8;}
+.opt-indent{width:14px;flex-shrink:0;}
+/* installation block */
+.inst-block{margin-top:10px;border:1px solid rgba(185,175,120,.5);background:#fffdf5;}
+.inst-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#f8f4e0;border-bottom:1px solid rgba(185,175,120,.4);}
+.inst-body{padding:12px;}
+.inst-mode-wrap{display:flex;border:1px solid rgba(10,10,10,.18);margin-bottom:10px;}
+.imb{flex:1;padding:6px 4px;font-size:9px;letter-spacing:.1em;text-align:center;border:none;background:transparent;color:#888;cursor:pointer;font-family:inherit;line-height:1.4;}
+.imb.active{background:#0a0a0a;color:#f8f7f4;}
+.inst-total-row{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-top:1px solid rgba(185,175,120,.4);background:#f8f4e0;}
+/* loc total row */
+.loc-total-row{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;border-top:2px solid #0a0a0a;background:#0a0a0a;color:#f8f7f4;}
+.lt-label{font-size:9px;letter-spacing:.3em;text-transform:uppercase;}
+.lt-val{font-family:'Noto Serif JP',serif;font-size:16px;font-weight:300;}
+/* summary */
+.sum-grid{display:grid;grid-template-columns:1fr 300px;gap:14px;margin-top:12px;}
+.sum-row{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;border-bottom:1px solid rgba(10,10,10,.06);font-size:12px;}
+.sum-row:last-child{border-bottom:none;}
+.sum-label{color:#555;}
+.sum-val{font-family:'Noto Serif JP',serif;font-size:14px;font-weight:300;}
+.sum-row.gst .sum-val{color:#185fa5;}
+.sum-row.inst .sum-val{color:#7a6010;}
+.sum-row.grand{border-top:2px solid #0a0a0a;padding-top:10px;margin-top:4px;}
+.sum-row.grand .sum-label{font-weight:500;font-size:13px;}
+.sum-row.grand .sum-val{font-size:20px;}
+/* total display mode */
+.tm-wrap{display:flex;border:1px solid rgba(10,10,10,.15);margin-top:12px;}
+.tm-btn{flex:1;padding:11px 8px;border:none;background:transparent;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:5px;transition:background .15s;}
+.tm-btn:hover{background:#f0efe9;}
+.tm-btn.active{background:#0a0a0a;color:#f8f7f4;}
+.tm-btn i{font-size:18px;}
+.tm-btn .tm-lbl{font-size:9px;letter-spacing:.25em;text-transform:uppercase;text-align:center;line-height:1.4;}
+.tm-btn .tm-desc{font-size:9px;color:#aaa;text-align:center;line-height:1.4;}
+.tm-btn.active .tm-desc{color:rgba(248,247,244,.6);}
+/* gst mode */
+.gst-mode-wrap{display:flex;border:1px solid rgba(10,10,10,.2);margin-bottom:10px;}
+.gmb{flex:1;padding:7px 5px;font-size:9px;letter-spacing:.1em;text-align:center;border:none;background:transparent;color:#888;cursor:pointer;font-family:inherit;line-height:1.4;}
+.gmb.active{background:#0a0a0a;color:#f8f7f4;}
+/* terms */
+.term-row{display:flex;gap:7px;align-items:flex-start;margin-bottom:7px;}
+.tcb{font-size:9px;letter-spacing:.2em;text-transform:uppercase;background:#f8f7f4;border:1px solid rgba(10,10,10,.12);padding:4px 8px;color:#555;white-space:nowrap;cursor:default;flex-shrink:0;}
+.tab-b{font-size:9px;letter-spacing:.18em;text-transform:uppercase;background:#f8f7f4;border:1px solid rgba(10,10,10,.12);padding:4px 10px;color:#555;cursor:pointer;font-family:inherit;}
+.tab-b:hover{border-color:#0a0a0a;color:#0a0a0a;}
+/* modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:999;}
+.modal{background:#fff;border:1px solid rgba(10,10,10,.15);padding:22px;width:480px;max-width:96vw;max-height:88vh;overflow-y:auto;}
+.modal-title{font-family:'Noto Serif JP',serif;font-size:18px;font-weight:300;margin-bottom:14px;}
+.ip-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;max-height:260px;overflow-y:auto;margin-bottom:12px;}
+.ip-card{border:1px solid rgba(10,10,10,.1);padding:9px;cursor:pointer;display:flex;gap:7px;align-items:center;transition:border-color .15s;}
+.ip-card:hover{border-color:#0a0a0a;}.ip-card.sel{border-color:#0a0a0a;background:#f8f7f4;}
+.ip-thumb{width:34px;height:34px;background:#f3f2ef;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ip-nm{font-size:11px;font-weight:500;line-height:1.3;}.ip-sb{font-size:9px;color:#aaa;}
+/* preview */
+.pv-wrap{background:#fff;border:1px solid rgba(10,10,10,.1);padding:28px;font-size:12px;margin-bottom:14px;}
+.pv-brand{font-family:'Noto Serif JP',serif;font-size:22px;font-weight:300;letter-spacing:.15em;}
+.pv-loc-hd{background:#0a0a0a;color:#f8f7f4;padding:6px 10px;font-size:9px;letter-spacing:.4em;text-transform:uppercase;margin:14px 0 7px;}
+.pv-table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:4px;}
+.pv-table th{padding:6px 4px;font-size:8px;letter-spacing:.3em;text-transform:uppercase;color:#aaa;font-weight:400;border-bottom:1px solid rgba(10,10,10,.12);text-align:left;}
+.pv-table th.r,.pv-table td.r{text-align:right;}
+.pv-table td{padding:8px 4px;border-bottom:1px solid rgba(10,10,10,.05);}
+.pv-sub-row td{background:#f8f7f4;font-weight:500;border-top:1px solid rgba(10,10,10,.12);}
+.pv-inst-row td{background:#fffdf5;color:#7a6010;border-top:1px dashed rgba(185,175,120,.5);}
+.pv-loc-total td{background:#0a0a0a;color:#f8f7f4;font-weight:500;border-top:none;}
+.pv-terms{margin-top:18px;border-top:1px solid rgba(10,10,10,.1);padding-top:12px;}
+.pv-tc{font-size:8px;letter-spacing:.4em;text-transform:uppercase;color:#aaa;margin-bottom:3px;margin-top:10px;}
+.empty{text-align:center;padding:40px 0;font-size:10px;color:#ccc;letter-spacing:.3em;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div style="display:flex;align-items:center;"><span class="brand">WATCON</span><span class="bc">/ Quotes</span></div>
+  <div id="ta" style="display:flex;gap:8px;align-items:center;"></div>
+</div>
+<div class="main" id="app"></div>
+<div id="mr"></div>
+<script>
+const fmt=n=>new Intl.NumberFormat('en-IN',{maximumFractionDigits:2}).format(n||0);
+const fmtD=n=>'₹ '+fmt(n);
+const fmtC=n=>'Rs. '+fmt(n);
+const today=new Date().toISOString().split('T')[0];
+let _u=300; const uid=()=>++_u;
+function escH(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+const CAT=[
+  {id:'P1',name:'GI Pipe 20mm Medium Duty',brand:'Jindal',unit:'MTR',price:280},
+  {id:'P2',name:'GI Pipe 32mm Heavy Duty',brand:'Tata Steel',unit:'MTR',price:480},
+  {id:'T1',name:'Porcelain Floor Tile 600x600 Matte',brand:'Kajaria',unit:'SQM',price:680},
+  {id:'T2',name:'Porcelain Floor Tile 600x600 Gloss',brand:'Kajaria',unit:'SQM',price:720},
+  {id:'T3',name:'Vitrified Tile 800x800 Matte',brand:'Somany',unit:'SQM',price:920},
+  {id:'M1',name:'Italian Marble Slab 2400x1200 Polished',brand:'Carrara',unit:'SQM',price:6200},
+  {id:'W1',name:'Engineered Wood Plank Oak Matte',brand:'Pergo',unit:'SQF',price:380},
+  {id:'W2',name:'Engineered Wood Plank Walnut Gloss',brand:'Pergo',unit:'SQF',price:410},
+  {id:'F1',name:'Fireplace XL900 Electric',brand:'Dimplex',unit:'NOS',price:185000},
+  {id:'F2',name:'Fireplace S600 Gas',brand:'Valor',unit:'NOS',price:95000},
+];
+const DT=[
+  {cat:'Delivery',text:'Delivery within 4-6 weeks from order confirmation and advance payment.'},
+  {cat:'GST',text:'GST as applicable will be charged extra on the above prices.'},
+  {cat:'Payment',text:'50% advance with order, balance before dispatch.'},
+  {cat:'Warranty',text:'Manufacturer warranty applicable as per product specifications.'},
+  {cat:'Exclusion',text:'Civil work and site preparation are excluded unless installation is quoted separately.'},
+];
+let custs=[
+  {id:'C1',name:'Rahul Constructions',contact:'Rahul Mehta',phone:'9820012345',email:'rahul@rahulconstructions.in',billingAddress:'Plot 14, MIDC Industrial Area, Andheri East, Mumbai - 400093'},
+  {id:'C2',name:'Elite Residences',contact:'Priya Shah',phone:'9867543210',email:'priya.shah@eliteresidences.com',billingAddress:'1201, Lotus Business Park, Malad West, Mumbai - 400064'},
+  {id:'C3',name:'The Arch Studio',contact:'Neha Patel',phone:'9823456780',email:'neha@thearchstudio.in',billingAddress:'301, Maker Chambers V, Nariman Point, Mumbai - 400021'},
+];
+
+// ── Calculation helpers ───────────────────────────────────────────────────────
+const lt   = it  => it.rate * it.qty * (1 - (it.disc||0)/100);
+const itemsSub = loc => loc.items.reduce((s,it)=>s+lt(it),0);
+
+function instAmt(loc){
+  const inst=loc.installation;
+  if(!inst||!inst.enabled) return 0;
+  const base=itemsSub(loc);
+  if(inst.mode==='lumpsum')  return parseFloat(inst.lumpsum)||0;
+  if(inst.mode==='percent')  return base*(parseFloat(inst.percent)||0)/100;
+  if(inst.mode==='perunit'){
+    const totalQty=loc.items.reduce((s,it)=>s+(parseFloat(it.qty)||0),0);
+    return totalQty*(parseFloat(inst.perunit)||0);
+  }
+  return 0;
+}
+
+const locTotal  = loc  => itemsSub(loc) + instAmt(loc);
+const selLocs   = q    => q.locations.filter(l=>l.selected!==false);
+const qItemsSub = q    => selLocs(q).reduce((s,l)=>s+itemsSub(l),0);
+const qInstTotal= q    => selLocs(q).reduce((s,l)=>s+instAmt(l),0);
+const qSub      = q    => qItemsSub(q) + qInstTotal(q);
+const qGST      = q    => (q.gstMode==='no'||q.gstMode==='incl')?0:qSub(q)*(q.gstPct||0)/100;
+const qGrand    = q    => qSub(q)+qGST(q)+(parseFloat(q.transport)||0);
+
+// default installation object (disabled)
+const defInst=()=>({enabled:false,mode:'lumpsum',lumpsum:0,percent:0,perunit:0,note:''});
+
+let quotes=[
+  {id:'QT-2026-001',rev:0,status:'sent',date:'2026-05-10',subject:'Supply of Flooring Material',
+   custId:'C1',companyLogo:null,gstPct:18,gstMode:'yes',transport:5000,transportNote:'Ex-Mumbai',totalMode:'both',showBoq:true,
+   locations:[
+     {id:1,name:'Ground Floor',selected:true,
+      items:[{id:10,name:'Porcelain Floor Tile 600x600 Matte',brand:'Kajaria',unit:'SQM',rate:680,qty:400,disc:5,image:null},
+             {id:11,name:'Vitrified Tile 800x800 Matte',brand:'Somany',unit:'SQM',rate:920,qty:120,disc:0,image:null}],
+      installation:{enabled:true,mode:'lumpsum',lumpsum:25000,percent:0,perunit:0,note:'Floor prep and tile fixing'}},
+     {id:2,name:'First Floor',selected:true,
+      items:[{id:12,name:'Porcelain Floor Tile 600x600 Gloss',brand:'Kajaria',unit:'SQM',rate:720,qty:200,disc:5,image:null}],
+      installation:{enabled:true,mode:'percent',lumpsum:0,percent:8,perunit:0,note:'Tile installation @ 8%'}},
+   ],terms:JSON.parse(JSON.stringify(DT))},
+  {id:'QT-2026-002',rev:1,status:'accepted',date:'2026-04-22',subject:'Fireplace Supply — Bungalow Project',
+   custId:'C2',companyLogo:null,gstPct:18,gstMode:'no',transport:2500,transportNote:'',totalMode:'each',showBoq:true,
+   locations:[
+     {id:3,name:'Living Room',selected:true,
+      items:[{id:20,name:'Fireplace XL900 Electric',brand:'Dimplex',unit:'NOS',rate:185000,qty:1,disc:10,image:null}],
+      installation:{enabled:true,mode:'lumpsum',lumpsum:8500,percent:0,perunit:0,note:'Fireplace installation & commissioning'}},
+     {id:4,name:'Master Bedroom',selected:true,
+      items:[{id:21,name:'Fireplace S600 Gas',brand:'Valor',unit:'NOS',rate:95000,qty:1,disc:8,image:null}],
+      installation:{enabled:false,mode:'lumpsum',lumpsum:0,percent:0,perunit:0,note:''}},
+   ],terms:JSON.parse(JSON.stringify(DT))},
+];
+
+let view='list',eq=null,sq=null,search='',filt='all';
+
+// ── Main render ───────────────────────────────────────────────────────────────
+function render(){
+  const app=document.getElementById('app'),ta=document.getElementById('ta');
+  if(view==='list'){
+    ta.innerHTML=`<button class="bp" onclick="goNew()">+ New Quote</button>`;
+    app.innerHTML=rList();
+  } else if(view==='builder'){
+    ta.innerHTML=`<button class="bg bs" onclick="goPrev()"><i class="ti ti-eye" style="margin-right:4px;font-size:12px;vertical-align:-2px;"></i>Preview</button>
+      <button class="bg bs" onclick="saveL()">Save & Exit</button>`;
+    app.innerHTML=rBuilder();
+    setTimeout(updateBoqToggle,0);
+  } else {
+    ta.innerHTML=`<button class="bg bs" onclick="doPrint()"><i class="ti ti-printer" style="margin-right:4px;font-size:12px;vertical-align:-2px;"></i>Print/PDF</button>
+      <button class="bg bs" onclick="view='builder';render()"><i class="ti ti-pencil" style="margin-right:4px;font-size:12px;vertical-align:-2px;"></i>Edit</button>
+      <button class="bg bs" onclick="saveL()">← All Quotes</button>`;
+    app.innerHTML=rPreview();
+  }
+}
+
+// ── List ──────────────────────────────────────────────────────────────────────
+function rList(){
+  const ff=quotes.filter(q=>{const c=custs.find(x=>x.id===q.custId);
+    return(q.id+' '+(c?c.name:'')+' '+q.subject).toLowerCase().includes(search)&&(filt==='all'||q.status===filt);});
+  return `<div style="display:flex;gap:10px;margin-bottom:16px;align-items:center;flex-wrap:wrap;">
+    <div class="search-wrap"><i class="ti ti-search si"></i>
+      <input class="search-input" placeholder="Search…" value="${search}" oninput="search=this.value.toLowerCase();render()"/>
+    </div>
+    <div class="ftabs">${['all','draft','sent','accepted','revised','cancelled'].map(s=>
+      `<button class="ftab ${filt===s?'active':''}" onclick="filt='${s}';render()">${s==='all'?'All':s.charAt(0).toUpperCase()+s.slice(1)}</button>`).join('')}</div>
+    <span style="font-size:10px;color:#aaa;white-space:nowrap;">${ff.length} quotes</span>
+  </div>
+  ${ff.length===0?'<div class="empty">No quotes found</div>':'<div class="q-grid">'+ff.map(q=>{
+    const c=custs.find(x=>x.id===q.custId);
+    const hasInst=q.locations.some(l=>l.installation&&l.installation.enabled);
+    return `<div class="qc" onclick="openQ('${q.id}',${q.rev})">
+      <div style="font-size:9px;letter-spacing:.3em;color:#bbb;text-transform:uppercase;margin-bottom:3px;">${q.id}${q.rev>0?` <span style="font-size:8px;border:1px solid rgba(10,10,10,.15);padding:2px 6px;color:#888;">Rev ${q.rev}</span>`:''}</div>
+      <div style="font-size:13px;font-weight:500;margin-bottom:3px;">${escH(c?c.name:'Unknown')}</div>
+      <div style="font-size:11px;color:#888;margin-bottom:6px;">${escH(q.subject||'—')}</div>
+      <div style="font-size:10px;color:#aaa;margin-bottom:6px;">${q.locations.length} location${q.locations.length!==1?'s':''} · ${q.locations.reduce((s,l)=>s+l.items.length,0)} items${hasInst?' · Installation included':''}</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;">
+        <span class="qs qs-${q.status}">${q.status}</span>
+        ${q.gstMode==='no'?'<span style="font-size:8px;background:#f8f4e0;color:#7a6010;padding:2px 7px;border:1px solid #d4c060;">No GST</span>':q.gstMode==='incl'?'<span style="font-size:8px;background:#f0f4ff;color:#185fa5;padding:2px 7px;border:1px solid #b0c4de;">GST Incl.</span>':''}
+        ${q.locations.map(l=>`<span style="font-size:9px;border:1px solid rgba(10,10,10,.12);padding:2px 7px;color:#777;">${escH(l.name)}</span>`).join('')}
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;">
+        <span style="font-family:'Noto Serif JP',serif;font-size:16px;font-weight:300;">${fmtD(qGrand(q))}</span>
+        <span style="font-size:10px;color:#aaa;">${q.date}</span>
+      </div>
+    </div>`;}).join('')+'</div>'}`;
+}
+
+// ── Builder ───────────────────────────────────────────────────────────────────
+function rBuilder(){
+  const q=eq;
+  return `<div class="back-row">
+    <button class="bg" onclick="saveL()">← Save & Exit</button>
+    <span style="font-size:9px;letter-spacing:.4em;color:#aaa;text-transform:uppercase;">${q.id}${q.rev>0?' Rev '+q.rev:''}</span>
+    <div style="margin-left:auto;display:flex;gap:8px;">
+      <button class="bg bs" onclick="doRevise()"><i class="ti ti-git-branch" style="margin-right:4px;font-size:12px;vertical-align:-2px;"></i>Revise</button>
+      <button class="bg bs" onclick="goPrev()"><i class="ti ti-eye" style="margin-right:4px;font-size:12px;vertical-align:-2px;"></i>Preview</button>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="pt"><span>Quote Details</span>
+      <select class="fsel" style="width:120px;" onchange="eq.status=this.value">
+        ${['draft','sent','accepted','revised','cancelled'].map(s=>`<option value="${s}" ${q.status===s?'selected':''}>${s.charAt(0).toUpperCase()+s.slice(1)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="qb-hdr">
+      <div>
+        <div class="g3" style="margin-bottom:12px;">
+          <div class="fr"><label class="lbl">Quote Ref</label><input class="fi" value="${q.id}" disabled/></div>
+          <div class="fr"><label class="lbl">Revision</label><input class="fi" value="${q.rev}" disabled/></div>
+          <div class="fr"><label class="lbl">Date</label><input class="fi" type="date" value="${q.date}" onchange="eq.date=this.value"/></div>
+        </div>
+        <div class="fr"><label class="lbl">Subject / Project Name</label>
+          <input class="fi" value="${escH(q.subject)}" placeholder="e.g. Supply of Flooring — Bungalow Project" oninput="eq.subject=this.value"/>
+        </div>
+        <div class="pt" style="margin-bottom:10px;"><span>Customer</span>
+          <button class="bg bs" onclick="showNC()">+ New Customer</button>
+        </div>
+        <div class="g3">
+          <div class="fr"><label class="lbl">Select Customer</label>
+            <select class="fsel" onchange="eq.custId=this.value;render()">
+              <option value="">— Select —</option>
+              ${custs.map(c=>`<option value="${c.id}" ${q.custId===c.id?'selected':''}>${escH(c.name)}</option>`).join('')}
+            </select>
+          </div>
+          ${(()=>{const c=custs.find(x=>x.id===q.custId);if(!c)return'<div></div><div></div>';
+          return `<div class="fr"><label class="lbl">Contact</label><div style="font-size:12px;padding-top:6px;">${escH(c.contact)} · ${c.phone}</div></div>
+            <div class="fr"><label class="lbl">Address</label><div style="font-size:11px;color:#888;padding-top:5px;line-height:1.5;">${escH(c.billingAddress)}</div></div>`;})()}
+        </div>
+      </div>
+      <div>
+        <div class="logo-box" id="lbx" onclick="document.getElementById('lup').click()">
+          ${q.companyLogo?`<img src="${q.companyLogo}"/>`:'<div style="text-align:center;font-size:9px;color:#ccc;letter-spacing:.2em;text-transform:uppercase;"><i class="ti ti-building" style="font-size:20px;display:block;margin-bottom:4px;"></i>Company Logo</div>'}
+        </div>
+        <input type="file" id="lup" accept="image/*" style="display:none;" onchange="upLogo(this)"/>
+        <div class="fr"><label class="lbl">GST Mode</label>
+          <div class="gst-mode-wrap">
+            <button class="gmb ${q.gstMode==='yes'?'active':''}" onclick="eq.gstMode='yes';rerS()">Add GST</button>
+            <button class="gmb ${q.gstMode==='incl'?'active':''}" onclick="eq.gstMode='incl';rerS()">Incl. in Price</button>
+            <button class="gmb ${q.gstMode==='no'?'active':''}" onclick="eq.gstMode='no';rerS()">No GST</button>
+          </div>
+          ${q.gstMode!=='no'?`<div><label class="lbl">GST %</label>
+            <input class="fi" type="number" value="${q.gstPct}" min="0" max="28" oninput="eq.gstPct=parseFloat(this.value)||0;rerS()"/></div>`:
+            `<div style="background:#f8f4e0;border:1px solid #d4c060;padding:7px 9px;font-size:10px;color:#7a6010;">GST note in Terms &amp; Conditions</div>`}
+        </div>
+        <div class="fr"><label class="lbl">Transport (₹)</label>
+          <input class="fi" type="number" value="${q.transport||0}" oninput="eq.transport=parseFloat(this.value)||0;rerS()"/>
+        </div>
+        <div class="fr"><label class="lbl">Transport Note</label>
+          <input class="fi" value="${escH(q.transportNote)}" placeholder="Ex-Mumbai, included…" oninput="eq.transportNote=this.value"/>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  ${q.locations.map((loc,li)=>rLocBlock(loc,li)).join('')}
+  <button class="ba" style="margin-bottom:14px;" onclick="addLoc()">
+    <i class="ti ti-map-pin" style="font-size:15px;"></i> Add Location / Area
+  </button>
+
+  <div id="ss">${sumH(q)}</div>
+
+  <div class="panel">
+    <div class="pt"><span>Terms &amp; Conditions</span></div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
+      ${['Delivery','GST','Payment','Warranty','Installation','Exclusion','Other'].map(c=>`<button class="tab-b" onclick="addT('${c}')">${c}</button>`).join('')}
+    </div>
+    <div id="tc">${q.terms.map((t,i)=>`<div class="term-row" id="tr-${i}">
+      <span class="tcb">${t.cat}</span>
+      <input class="fi-inline" value="${escH(t.text)}" style="flex:1;" oninput="eq.terms[${i}].text=this.value" placeholder="Term text…"/>
+      <button class="bi" onclick="rmT(${i})"><i class="ti ti-x"></i></button>
+    </div>`).join('')}</div>
+  </div>`;
+}
+
+function rLocBlock(loc,li){
+  const iSub=itemsSub(loc);
+  const iAmt=instAmt(loc);
+  const lTot=iSub+iAmt;
+  const inst=loc.installation||defInst();
+
+  const rows=loc.items.map(it=>{
+    const ltv=lt(it),dA=it.rate*it.qty*(it.disc||0)/100;
+    const opts=it.options||[];
+    // Optional item rows (rendered after the main row)
+    const optRows=opts.map(opt=>{
+      const optTotal=opt.rate*(it.qty||0);
+      return `<tr class="opt-row" id="opt-row-${opt.id}">
+        <td>
+          <div id="opt-img-${opt.id}" class="li-img" onclick="pickOptImg(${it.id},${opt.id})" title="Add image" style="opacity:.8;">
+            ${opt.image?`<img src="${opt.image}" style="width:100%;height:100%;object-fit:cover;"/>`:
+              `<i class="ti ti-photo" style="font-size:13px;color:#d4c060;"></i>`}
+          </div>
+        </td>
+        <td>
+          <span class="opt-tag">Alt</span>
+          <input class="fi-inline" style="font-size:11px;" value="${escH(opt.name)}" oninput="upOpt(${it.id},${opt.id},'name',this.value)" placeholder="Alternative item name"/>
+        </td>
+        <td><input class="fi-inline" style="font-size:11px;" value="${escH(opt.brand||'')}" oninput="upOpt(${it.id},${opt.id},'brand',this.value)"/></td>
+        <td><input class="fi-inline" style="font-size:11px;width:46px;" value="${opt.unit||it.unit}" oninput="upOpt(${it.id},${opt.id},'unit',this.value)"/></td>
+        <td>
+          <input class="fi-inline" type="number" style="text-align:right;font-size:11px;" value="${opt.rate}" oninput="upOpt(${it.id},${opt.id},'rate',parseFloat(this.value)||0);document.getElementById('opt-total-${opt.id}').textContent=fmtD((parseFloat(this.value)||0)*(${it.qty}||0));"/>
+        </td>
+        <td style="text-align:right;font-size:11px;color:#aaa;">${fmt(it.qty)} <span style="font-size:9px;">(same)</span></td>
+        <td style="text-align:right;font-size:10px;color:#aaa;">—</td>
+        <td class="r">
+          <span id="opt-total-${opt.id}" style="font-family:'Noto Serif JP',serif;font-size:12px;color:#7a6010;">${fmtD(optTotal)}</span>
+          <div style="font-size:8px;color:#bbb;letter-spacing:.1em;">not in total</div>
+        </td>
+        <td style="vertical-align:middle;">
+          <div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end;">
+            <button class="opt-make-primary" onclick="makePrimary(${it.id},${opt.id})" title="Swap this with the main item">
+              <i class="ti ti-arrow-up" style="font-size:10px;vertical-align:-1px;margin-right:2px;"></i>Use
+            </button>
+            <button class="bi" onclick="removeOption(${it.id},${opt.id})"><i class="ti ti-x"></i></button>
+          </div>
+        </td>
+      </tr>`;}).join('');
+
+    return `<tr id="row-${it.id}">
+      <td><div class="li-img" onclick="pickImg(${it.id})" title="Add image">
+        ${it.image?`<img src="${it.image}"/>`:`<i class="ti ti-photo" style="font-size:14px;color:#ccc;"></i>`}
+      </div></td>
+      <td><input class="fi-inline" style="font-weight:500;" value="${escH(it.name)}" oninput="upIt(${it.id},'name',this.value)"/></td>
+      <td><input class="fi-inline" value="${escH(it.brand||'')}" oninput="upIt(${it.id},'brand',this.value)"/></td>
+      <td><input class="fi-inline" value="${it.unit}" style="width:46px;" oninput="upIt(${it.id},'unit',this.value)"/></td>
+      <td><input class="fi-inline" type="number" value="${it.rate}" style="text-align:right;" oninput="upIt(${it.id},'rate',parseFloat(this.value)||0)"/></td>
+      <td><input class="fi-inline" type="number" value="${it.qty}" style="text-align:right;" oninput="upIt(${it.id},'qty',parseFloat(this.value)||0)"/></td>
+      <td><input class="fi-inline" type="number" value="${it.disc||0}" min="0" max="100" style="text-align:right;" oninput="upIt(${it.id},'disc',parseFloat(this.value)||0)"/>
+        <div id="dl-${it.id}" class="${dA>0?'li-disc-lbl':''}" style="text-align:right;">${dA>0?'− '+fmtD(dA):''}</div></td>
+      <td class="r">
+        <span id="lt-${it.id}" style="font-family:'Noto Serif JP',serif;font-size:13px;font-weight:300;white-space:nowrap;">${fmtD(ltv)}</span>
+      </td>
+      <td>
+        <div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end;">
+          <button class="bi" onclick="rmIt(${it.id})" title="Remove item"><i class="ti ti-x"></i></button>
+          <button class="bi" onclick="addOption(${it.id})" title="Add alternative option" style="color:#ba7517;font-size:13px;">
+            <i class="ti ti-git-branch"></i>
+          </button>
+        </div>
+      </td>
+    </tr>${optRows}`;}).join('');
+
+  // Installation block content
+  const instContent=inst.enabled?`
+    <div class="inst-body">
+      <div class="fr"><label class="lbl">Mode</label>
+        <div class="inst-mode-wrap">
+          <button class="imb ${inst.mode==='lumpsum'?'active':''}" onclick="upInst(${loc.id},'mode','lumpsum')">Lump Sum (₹)</button>
+          <button class="imb ${inst.mode==='percent'?'active':''}" onclick="upInst(${loc.id},'mode','percent')">% of Subtotal</button>
+          <button class="imb ${inst.mode==='perunit'?'active':''}" onclick="upInst(${loc.id},'mode','perunit')">Per Unit (₹)</button>
+        </div>
+      </div>
+      <div class="g3">
+        ${inst.mode==='lumpsum'?`<div class="fr"><label class="lbl">Lump Sum Amount (₹)</label>
+          <input class="fi" type="number" value="${inst.lumpsum||0}" oninput="upInst(${loc.id},'lumpsum',parseFloat(this.value)||0)"/></div>`:''}
+        ${inst.mode==='percent'?`<div class="fr"><label class="lbl">% of Location Subtotal</label>
+          <input class="fi" type="number" value="${inst.percent||0}" min="0" max="100" oninput="upInst(${loc.id},'percent',parseFloat(this.value)||0)"/>
+          <div style="font-size:10px;color:#7a6010;margin-top:4px;">= ${fmtD(iSub*(inst.percent||0)/100)}</div></div>`:''}
+        ${inst.mode==='perunit'?`<div class="fr"><label class="lbl">Rate per Unit (₹)</label>
+          <input class="fi" type="number" value="${inst.perunit||0}" oninput="upInst(${loc.id},'perunit',parseFloat(this.value)||0)"/>
+          <div style="font-size:10px;color:#7a6010;margin-top:4px;">Total qty: ${loc.items.reduce((s,it)=>s+(parseFloat(it.qty)||0),0)} · = ${fmtD(loc.items.reduce((s,it)=>s+(parseFloat(it.qty)||0),0)*(inst.perunit||0))}</div></div>`:''}
+        <div class="fr" style="grid-column:${inst.mode==='lumpsum'?'2':'1'} / span 2"><label class="lbl">Installation Note / Description</label>
+          <input class="fi" value="${escH(inst.note)}" placeholder="e.g. Floor preparation and tile fixing" oninput="upInst(${loc.id},'note',this.value)"/>
+        </div>
+      </div>
+    </div>
+    <div class="inst-total-row">
+      <span style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#7a6010;">
+        <i class="ti ti-tool" style="font-size:12px;margin-right:5px;vertical-align:-2px;"></i>
+        Installation Charge ${inst.mode==='percent'?'('+fmt(inst.percent||0)+'%)':inst.mode==='perunit'?'(per unit)':'(lump sum)'}
+      </span>
+      <span id="inst-amt-${loc.id}" style="font-family:'Noto Serif JP',serif;font-size:15px;font-weight:300;color:#7a6010;">${fmtD(iAmt)}</span>
+    </div>`:'';
+
+  return `<div class="loc-block" id="loc-${loc.id}">
+    <div class="loc-hdr">
+      <div style="display:flex;align-items:center;gap:7px;flex:1;">
+        <span class="loc-num">Location ${li+1}</span>
+        <input class="fi-inline" style="flex:1;font-weight:500;" value="${escH(loc.name)}" placeholder="e.g. Ground Floor…" oninput="eq.locations[${li}].name=this.value"/>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-family:'Noto Serif JP',serif;font-size:13px;" id="lhd-${loc.id}">${fmtD(lTot)}</span>
+        ${li>0?`<button class="bi" onclick="rmLoc(${loc.id})"><i class="ti ti-trash"></i></button>`:''}
+      </div>
+    </div>
+    <div class="loc-body">
+      <table class="li-table">
+        <thead><tr>
+          <th style="width:46px;"></th><th>Item / Description</th>
+          <th style="width:78px;">Brand</th><th style="width:50px;">Unit</th>
+          <th style="width:108px;text-align:right;">Rate (₹)</th>
+          <th style="width:70px;text-align:right;">Qty</th>
+          <th style="width:76px;text-align:right;">Disc %</th>
+          <th class="r" style="width:120px;">Total (₹)</th>
+          <th style="width:30px;"></th>
+        </tr></thead>
+        <tbody id="tb-${loc.id}">${rows}</tbody>
+        <tfoot><tr style="background:#f8f7f4;border-top:1px solid rgba(10,10,10,.1);">
+          <td colspan="7" style="padding:7px 4px;font-size:11px;font-weight:500;">Material Subtotal — ${escH(loc.name)}</td>
+          <td class="r" style="padding:7px 4px;font-family:'Noto Serif JP',serif;font-size:13px;" id="ls-${loc.id}">${fmtD(iSub)}</td>
+          <td></td>
+        </tr></tfoot>
+      </table>
+      <button class="ba" style="margin-top:9px;margin-bottom:10px;" onclick="showP(${loc.id})">
+        <i class="ti ti-plus" style="font-size:14px;"></i> Add Item
+      </button>
+
+      <!-- Installation block -->
+      ${inst.enabled
+        ?`<div class="inst-block">${instContent}<div style="text-align:right;padding:4px 12px 8px;">
+            <button class="bi" style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#8a3030;" onclick="toggleInst(${loc.id},false)">
+              <i class="ti ti-x" style="font-size:11px;"></i> Remove Installation
+            </button>
+          </div></div>`
+        :`<button class="ba" style="border-color:rgba(185,175,120,.5);color:#7a6010;" onclick="toggleInst(${loc.id},true)">
+            <i class="ti ti-tool" style="font-size:14px;"></i> Add Installation Charge for this Location
+          </button>`}
+    </div>
+
+    <!-- Location total bar -->
+    <div class="loc-total-row" id="ltrow-${loc.id}">
+      <span class="lt-label">
+        <i class="ti ti-map-pin" style="font-size:12px;margin-right:5px;vertical-align:-2px;"></i>
+        Total — ${escH(loc.name)}${inst.enabled?' (incl. installation)':''}
+      </span>
+      <span class="lt-val" id="lt-tot-${loc.id}">${fmtD(lTot)}</span>
+    </div>
+  </div>`;
+}
+
+function toggleLocSel(locId){
+  const loc=eq.locations.find(l=>l.id===locId);
+  if(loc){ loc.selected=loc.selected===false?true:false; rerS(); }
+}
+
+function rCombinedToggle(q){
+  // per-area selection checkboxes
+  const areaRows=q.locations.map(function(loc){
+    const sel=loc.selected!==false;
+    const lT=locTotal(loc);
+    return '<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(10,10,10,.06);">'
+      +'<label style="display:flex;align-items:center;gap:8px;cursor:pointer;flex:1;min-width:0;">'
+      +'<input type="checkbox"'+(sel?' checked':'')
+        +' onchange="toggleLocSel('+loc.id+')"'
+        +' style="width:15px;height:15px;cursor:pointer;flex-shrink:0;accent-color:#0a0a0a;"/>'
+      +'<span style="font-size:12px;font-weight:500;color:'+(sel?'#0a0a0a':'#bbb')+';">'+escH(loc.name)+'</span>'
+      +(loc.installation&&loc.installation.enabled?'<span style="font-size:9px;color:#7a6010;margin-left:4px;"><i class="ti ti-tool" style="font-size:10px;vertical-align:-2px;"></i></span>':'')
+      +'</label>'
+      +'<span style="font-family:Georgia,serif;font-size:14px;font-weight:300;color:'+(sel?'#0a0a0a':'#ccc')+';">'+fmtD(lT)+'</span>'
+      +'</div>';
+  }).join('');
+
+  // 3-way total mode — only shown if 2+ locations
+  let modeSelector='';
+  if(q.locations.length>1){
+    const m=q.totalMode||'both';
+    const opts=[
+      ['grand','ti-sum','Grand Total Only','One combined total'],
+      ['each','ti-map-pin','Each Area Total','No grand total'],
+      ['both','ti-layout-list','Each + Grand Total','Both area & combined'],
+    ];
+    const btns=opts.map(function(o){
+      const active=m===o[0]?'active':'';
+      return '<button class="tm-btn '+active+'" onclick="eq.totalMode=\''+o[0]+'\';rerS()">'
+        +'<i class="ti '+o[1]+'"></i>'
+        +'<span class="tm-lbl">'+o[2]+'</span>'
+        +'<span class="tm-desc">'+o[3]+'</span>'
+        +'</button>';
+    }).join('');
+    modeSelector='<div style="margin-top:12px;">'
+      +'<div style="font-size:8px;letter-spacing:.4em;text-transform:uppercase;color:#aaa;margin-bottom:7px;">How to show totals</div>'
+      +'<div class="tm-wrap">'+btns+'</div>'
+      +'</div>';
+  }
+
+  return '<div style="margin-top:12px;">'
+    +'<div style="font-size:8px;letter-spacing:.4em;text-transform:uppercase;color:#aaa;margin-bottom:7px;">Areas included in this quote</div>'
+    +'<div style="background:#fff;border:1px solid rgba(10,10,10,.1);padding:10px 14px;">'
+    +'<div style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5;">Tick the areas the client wishes to proceed with. Only ticked areas are included in the total.</div>'
+    +areaRows
+    +'</div>'
+    +modeSelector
+    +'</div>';
+}
+function sumH(q){
+  const iSub=qItemsSub(q),instT=qInstTotal(q),sub=qSub(q),gA=qGST(q),tr=parseFloat(q.transport)||0,grand=sub+gA+tr;
+  const hasInst=q.locations.some(l=>l.installation&&l.installation.enabled);
+  const m=q.totalMode||'both';
+  const showEach=(m==='each'||m==='both')&&q.locations.length>1;
+  const showGrand=m==='grand'||m==='both';
+  const boqOn=q.showBoq!==false;
+
+  // GST row
+  let gstRow='';
+  if(q.gstMode==='no'){
+    gstRow=`<div class="sum-row" style="background:#f8f4e0;padding:6px 8px;"><span class="sum-label" style="color:#7a6010;font-size:11px;">No GST in this quote</span><span class="sum-val" style="color:#7a6010;font-size:11px;">—</span></div>`;
+  } else if(q.gstMode==='incl'){
+    gstRow=`<div class="sum-row gst"><span class="sum-label">GST @ ${q.gstPct}% (incl. in prices)</span><span class="sum-val" style="font-size:13px;">Included</span></div>`;
+  } else {
+    gstRow=`<div class="sum-row gst"><span class="sum-label">GST @ ${q.gstPct}%</span><span class="sum-val" style="font-size:13px;">${fmtD(gA)}</span></div>`;
+  }
+
+  // Area breakdown
+  let areaBreak='';
+  if(showEach){
+    const rows=q.locations.map(loc=>{
+      const lT=locTotal(loc);const inst=loc.installation;
+      return `<div style="display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid rgba(10,10,10,.05);font-size:12px;">
+        <span style="color:#555;">${escH(loc.name)}${inst&&inst.enabled?'<span style="font-size:9px;color:#7a6010;margin-left:5px;"><i class="ti ti-tool" style="font-size:10px;vertical-align:-2px;"></i></span>':''}</span>
+        <span style="font-family:'Noto Serif JP',serif;font-size:14px;">${fmtD(lT)}</span>
+      </div>`;}).join('');
+    areaBreak=`<div style="background:#fff;border:1px solid rgba(10,10,10,.06);padding:10px 12px;">
+      <div style="font-size:8px;letter-spacing:.35em;text-transform:uppercase;color:#aaa;margin-bottom:7px;">Area Totals</div>
+      ${rows}
+    </div>`;
+  } else {
+    areaBreak=`<div style="font-size:10px;color:#bbb;padding:8px 0;">Area breakdown shown in BOQ Summary</div>`;
+  }
+
+  // Grand total / no-grand note
+  let grandRow='';
+  if(showGrand){
+    grandRow=`<div class="sum-row grand"><span class="sum-label">Grand Total${q.gstMode==='no'?' (excl. GST)':''}</span><span class="sum-val">${fmtD(grand)}</span></div>`;
+  } else {
+    grandRow=`<div style="background:#f8f4e0;border:1px solid #d4c060;padding:7px 10px;margin-top:6px;font-size:10px;color:#7a6010;"><i class="ti ti-info-circle" style="vertical-align:-2px;margin-right:5px;font-size:12px;"></i>Grand total not shown — see area totals above</div>`;
+  }
+
+  return `${rCombinedToggle(q)}
+  <div style="margin-top:12px;">
+    <div style="font-size:8px;letter-spacing:.4em;text-transform:uppercase;color:#aaa;margin-bottom:6px;">BOQ Summary Page</div>
+    <div style="background:#fff;border:1px solid rgba(10,10,10,.1);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+      <div style="flex:1;">
+        <div style="font-size:12px;font-weight:500;margin-bottom:3px;">
+          <i class="ti ti-file-description" style="font-size:14px;vertical-align:-2px;margin-right:6px;"></i>BOQ Summary prints as a separate cover page
+        </div>
+        <div style="font-size:10px;color:#888;line-height:1.6;">
+          Client · Project · Address · Quote no. · Area-wise totals
+          ${showGrand?' · Grand Total':''}
+          ${q.gstMode==='yes'?' · GST @ '+q.gstPct+'%':q.gstMode==='incl'?' · GST included':' · No GST'}
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+        <div style="width:36px;height:20px;border-radius:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;padding:0 3px;" onclick="eq.showBoq=!eq.showBoq;rerS()" id="boq-toggle-track">
+          <div id="boq-toggle-thumb" style="width:14px;height:14px;background:#fff;border-radius:50%;"></div>
+        </div>
+        <span style="font-size:10px;color:#555;white-space:nowrap;">${boqOn?'Will print':'Disabled'}</span>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:16px;background:#f8f7f4;border:1px solid rgba(10,10,10,.08);padding:14px 16px;">
+    <div style="font-size:8px;letter-spacing:.4em;text-transform:uppercase;color:#aaa;margin-bottom:10px;">Quote Totals — Working Reference</div>
+    <div style="display:grid;grid-template-columns:1fr 300px;gap:14px;">
+      <div>${areaBreak}</div>
+      <div>
+        <div class="sum-row"><span class="sum-label">Material Subtotal</span><span class="sum-val" style="font-size:13px;">${fmtD(iSub)}</span></div>
+        ${hasInst?`<div class="sum-row inst"><span class="sum-label"><i class="ti ti-tool" style="font-size:12px;vertical-align:-2px;margin-right:4px;"></i>Installation</span><span class="sum-val" style="font-size:13px;">${fmtD(instT)}</span></div>`:''}
+        ${hasInst?`<div class="sum-row" style="border-bottom:2px solid rgba(10,10,10,.1);"><span class="sum-label" style="font-weight:500;">Subtotal</span><span class="sum-val" style="font-size:13px;">${fmtD(sub)}</span></div>`:''}
+        ${gstRow}
+        <div class="sum-row"><span class="sum-label">Transport ${q.transportNote?'('+escH(q.transportNote)+')':''}</span><span class="sum-val" style="font-size:13px;">${fmtD(tr)}</span></div>
+        ${grandRow}
+      </div>
+    </div>
+  </div>`;
+}
+
+function rerS(){
+  const s=document.getElementById('ss');
+  if(s){ s.innerHTML=sumH(eq); updateBoqToggle(); }
+}
+function updateBoqToggle(){
+  const track=document.getElementById('boq-toggle-track');
+  const thumb=document.getElementById('boq-toggle-thumb');
+  if(!track||!thumb) return;
+  const on=eq&&eq.showBoq!==false;
+  track.style.background=on?'#0a0a0a':'#ccc';
+  track.style.justifyContent=on?'flex-end':'flex-start';
+}
+
+// ── Mutation helpers ──────────────────────────────────────────────────────────
+function upIt(id,key,val){
+  for(const loc of eq.locations){
+    const it=loc.items.find(x=>x.id===id); if(!it) continue;
+    it[key]=val;
+    const ltv=lt(it), dA=it.rate*it.qty*(it.disc||0)/100;
+    const le=document.getElementById('lt-'+id); if(le) le.textContent=fmtD(ltv);
+    const de=document.getElementById('dl-'+id); if(de){de.textContent=dA>0?'− '+fmtD(dA):'';de.className=dA>0?'li-disc-lbl':'';}
+    // update material subtotal
+    const iS=itemsSub(loc);
+    const lse=document.getElementById('ls-'+loc.id); if(lse) lse.textContent=fmtD(iS);
+    // update installation if percent or perunit
+    const inst=loc.installation;
+    if(inst&&inst.enabled){
+      const iA=instAmt(loc);
+      const iae=document.getElementById('inst-amt-'+loc.id); if(iae) iae.textContent=fmtD(iA);
+      const lte=document.getElementById('lt-tot-'+loc.id); if(lte) lte.textContent=fmtD(iS+iA);
+      const lhe=document.getElementById('lhd-'+loc.id); if(lhe) lhe.textContent=fmtD(iS+iA);
+    } else {
+      const lte=document.getElementById('lt-tot-'+loc.id); if(lte) lte.textContent=fmtD(iS);
+      const lhe=document.getElementById('lhd-'+loc.id); if(lhe) lhe.textContent=fmtD(iS);
+    }
+    rerS(); break;
+  }
+}
+
+function upInst(locId,key,val){
+  const loc=eq.locations.find(l=>l.id===locId); if(!loc) return;
+  if(!loc.installation) loc.installation=defInst();
+  loc.installation[key]=val;
+  if(key==='mode'){ render(); return; } // full re-render when mode changes
+  // live update amounts
+  const iA=instAmt(loc), iS=itemsSub(loc), lT=iS+iA;
+  const iae=document.getElementById('inst-amt-'+locId); if(iae) iae.textContent=fmtD(iA);
+  const lte=document.getElementById('lt-tot-'+locId); if(lte) lte.textContent=fmtD(lT);
+  const lhe=document.getElementById('lhd-'+locId); if(lhe) lhe.textContent=fmtD(lT);
+  rerS();
+}
+
+function toggleInst(locId,enabled){
+  const loc=eq.locations.find(l=>l.id===locId); if(!loc) return;
+  if(!loc.installation) loc.installation=defInst();
+  loc.installation.enabled=enabled;
+  render();
+}
+
+function addLoc(){ eq.locations.push({id:uid(),name:'Location '+(eq.locations.length+1),selected:true,items:[],installation:defInst()}); render(); }
+function rmLoc(id){ if(eq.locations.length<=1){alert('Need at least one location');return;} eq.locations=eq.locations.filter(l=>l.id!==id); render(); }
+function rmIt(id){ for(const l of eq.locations){const i=l.items.findIndex(x=>x.id===id);if(i>-1){l.items.splice(i,1);break;}} render(); }
+function addOption(itemId){
+  for(const loc of eq.locations){
+    const it=loc.items.find(x=>x.id===itemId);
+    if(it){
+      if(!it.options) it.options=[];
+      it.options.push({id:uid(),name:it.name,brand:it.brand,unit:it.unit,rate:it.rate,image:null});
+      render();return;
+    }
+  }
+}
+
+function removeOption(itemId,optId){
+  for(const loc of eq.locations){
+    const it=loc.items.find(x=>x.id===itemId);
+    if(it&&it.options){
+      it.options=it.options.filter(o=>o.id!==optId);
+      render();return;
+    }
+  }
+}
+
+function upOpt(itemId,optId,key,val){
+  for(const loc of eq.locations){
+    const it=loc.items.find(x=>x.id===itemId);
+    if(it&&it.options){
+      const opt=it.options.find(o=>o.id===optId);
+      if(opt){ opt[key]=val; return; }
+    }
+  }
+}
+
+function makePrimary(itemId,optId){
+  for(const loc of eq.locations){
+    const it=loc.items.find(x=>x.id===itemId);
+    if(it&&it.options){
+      const optIdx=it.options.findIndex(o=>o.id===optId);
+      if(optIdx<0) return;
+      const opt=it.options[optIdx];
+      // swap: current main becomes an option, chosen option becomes main
+      const oldMain={id:uid(),name:it.name,brand:it.brand,unit:it.unit,rate:it.rate,image:it.image};
+      it.name=opt.name; it.brand=opt.brand; it.unit=opt.unit; it.rate=opt.rate; it.image=opt.image;
+      it.options.splice(optIdx,1,oldMain);
+      render();return;
+    }
+  }
+}
+
+function pickOptImg(itemId,optId){
+  const inp=document.createElement('input');inp.type='file';inp.accept='image/*';
+  inp.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
+    r.onload=ev=>{ upOpt(itemId,optId,'image',ev.target.result);
+      const b=document.getElementById('opt-img-'+optId);
+      if(b) b.innerHTML='<img src="'+ev.target.result+'" style="width:100%;height:100%;object-fit:cover;"/>';
+    }; r.readAsDataURL(f);};
+  inp.click();
+}
+
+function addT(cat){ eq.terms.push({cat,text:''}); const tc=document.getElementById('tc'); if(tc){const i=eq.terms.length-1;const d=document.createElement('div');d.className='term-row';d.id='tr-'+i;d.innerHTML=`<span class="tcb">${cat}</span><input class="fi-inline" style="flex:1;" placeholder="Term text…" oninput="eq.terms[${i}].text=this.value"/><button class="bi" onclick="rmT(${i})"><i class="ti ti-x"></i></button>`;tc.appendChild(d);}}
+function rmT(i){ eq.terms.splice(i,1); render(); }
+function upLogo(inp){ const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{eq.companyLogo=e.target.result;const b=document.getElementById('lbx');if(b)b.innerHTML=`<img src="${e.target.result}" style="max-width:100%;max-height:100%;object-fit:contain;"/>`;};r.readAsDataURL(f); }
+function pickImg(id){ const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{for(const l of eq.locations){const it=l.items.find(x=>x.id===id);if(it){it.image=ev.target.result;const b=document.querySelector('#row-'+id+' .li-img');if(b)b.innerHTML=`<img src="${ev.target.result}"/>`;break;}}};r.readAsDataURL(f);};inp.click(); }
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+function goNew(){
+  eq={id:'QT-2026-'+String(quotes.length+1).padStart(3,'0'),rev:0,status:'draft',date:today,subject:'',custId:'',companyLogo:null,gstPct:18,gstMode:'yes',transport:0,transportNote:'',totalMode:'both',showBoq:true,
+      locations:[{id:uid(),name:'Location 1',selected:true,items:[],installation:defInst()}],
+      terms:JSON.parse(JSON.stringify(DT))};
+  view='builder'; render();
+}
+function openQ(id,rev){ eq=JSON.parse(JSON.stringify(quotes.find(q=>q.id===id&&q.rev===rev))); sq=eq; view='preview'; render(); }
+function saveL(){ const i=quotes.findIndex(q=>q.id===eq.id&&q.rev===eq.rev); if(i>-1) quotes[i]=eq; else quotes.unshift(eq); view='list'; render(); }
+function goPrev(){ const i=quotes.findIndex(q=>q.id===eq.id&&q.rev===eq.rev); if(i>-1) quotes[i]=eq; else quotes.unshift(eq); sq=eq; view='preview'; render(); }
+function doRevise(){ const nq=JSON.parse(JSON.stringify(eq)); nq.rev=(eq.rev||0)+1; nq.status='revised'; quotes=quotes.filter(q=>!(q.id===eq.id&&q.rev===eq.rev)); quotes.unshift(nq); eq=nq; render(); }
+
+// ── Item picker ───────────────────────────────────────────────────────────────
+let _pL=null,_pS=new Set();
+function showP(locId){
+  _pL=locId; _pS=new Set();
+  document.getElementById('mr').innerHTML=`<div class="modal-overlay" onclick="if(event.target===this)cM()">
+    <div class="modal"><div class="modal-title">Add Items</div>
+      <div style="position:relative;margin-bottom:10px;"><i class="ti ti-search si" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:14px;color:#bbb;"></i>
+        <input class="search-input" placeholder="Search catalogue…" style="padding-left:32px;" oninput="fpI(this.value)"/></div>
+      <div class="ip-grid" id="pg">${pI('')}</div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button class="bg bs" onclick="cM()">Cancel</button>
+        <button class="bp bs" onclick="cPick()">Add Selected →</button>
+      </div>
+    </div>
+  </div>`;
+}
+function pI(s){ return CAT.filter(it=>(it.name+it.brand).toLowerCase().includes(s.toLowerCase())).map(it=>`
+  <div class="ip-card ${_pS.has(it.id)?'sel':''}" onclick="tP('${it.id}',this)">
+    <div class="ip-thumb"><i class="ti ti-package" style="font-size:15px;color:#ccc;"></i></div>
+    <div><div class="ip-nm">${it.name}</div><div class="ip-sb">${it.brand} · ${it.unit} · ${fmtD(it.price)}</div></div>
+  </div>`).join('');}
+function fpI(s){ const g=document.getElementById('pg'); if(g) g.innerHTML=pI(s); }
+function tP(id,el){ _pS.has(id)?(_pS.delete(id),el.classList.remove('sel')):(_pS.add(id),el.classList.add('sel')); }
+function cPick(){ const loc=eq.locations.find(l=>l.id===_pL); if(!loc) return; _pS.forEach(cid=>{const c=CAT.find(x=>x.id===cid);if(c)loc.items.push({id:uid(),name:c.name,brand:c.brand,unit:c.unit,rate:c.price,qty:1,disc:0,image:null});}); cM(); render(); }
+function cM(){ document.getElementById('mr').innerHTML=''; }
+
+// ── New customer ──────────────────────────────────────────────────────────────
+function showNC(){
+  document.getElementById('mr').innerHTML=`<div class="modal-overlay" onclick="if(event.target===this)cM()">
+    <div class="modal"><div class="modal-title">New Customer</div>
+      <div class="fr"><label class="lbl">Name *</label><input class="fi" id="nc-n" placeholder="Company/Person name"/></div>
+      <div class="fr"><label class="lbl">Contact Person</label><input class="fi" id="nc-c"/></div>
+      <div class="g2"><div class="fr"><label class="lbl">Phone *</label><input class="fi" id="nc-p"/></div>
+        <div class="fr"><label class="lbl">Email</label><input class="fi" id="nc-e"/></div></div>
+      <div class="fr"><label class="lbl">Billing Address</label><textarea class="fta" id="nc-a" style="min-height:50px;"></textarea></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
+        <button class="bg bs" onclick="cM()">Cancel</button>
+        <button class="bp bs" onclick="sNC()">Create & Select →</button>
+      </div>
+    </div>
+  </div>`;
+}
+function sNC(){ const n=document.getElementById('nc-n').value.trim(),p=document.getElementById('nc-p').value.trim(); if(!n)return alert('Name required'); if(!p)return alert('Phone required'); const id='C'+Date.now(); custs.push({id,name:n,contact:document.getElementById('nc-c').value.trim(),phone:p,email:document.getElementById('nc-e').value.trim(),billingAddress:document.getElementById('nc-a').value.trim()}); eq.custId=id; cM(); render(); }
+
+// ── Preview ───────────────────────────────────────────────────────────────────
+function rPreview(){
+  const q=sq||eq, c=custs.find(x=>x.id===q.custId)||{name:'—',contact:'—',billingAddress:'—'};
+  const iSub=qItemsSub(q),instT=qInstTotal(q),sub=qSub(q),gA=qGST(q),tr=parseFloat(q.transport)||0,grand=sub+gA+tr;
+  const hasInst=q.locations.some(l=>l.installation&&l.installation.enabled);
+  const m=q.totalMode||'both';
+  const showEach=(m==='each'||m==='both')&&q.locations.length>1;
+  const showGrand=m==='grand'||m==='both';
+  const tBC={};q.terms.forEach(t=>{if(!tBC[t.cat])tBC[t.cat]=[];tBC[t.cat].push(t.text);});
+
+  const locSec=q.locations.map(loc=>{
+    const iS=itemsSub(loc),iA=instAmt(loc),lT=iS+iA;const inst=loc.installation;
+    const sel=loc.selected!==false;
+    const locHdBg=sel?'#0a0a0a':'#888';
+    const wrapStyle=sel?'':'opacity:.5;';
+    const notInclBanner=sel?'':'<div style="background:#f3f2ef;border:1px dashed rgba(10,10,10,.2);padding:8px 12px;font-size:10px;color:#aaa;letter-spacing:.15em;margin-bottom:6px;"><i class="ti ti-circle-off" style="font-size:12px;vertical-align:-2px;margin-right:6px;"></i>This area is NOT included in the selected total</div>';
+    const notInclTag=sel?'':'<span style="font-size:9px;letter-spacing:.2em;margin-left:10px;opacity:.7;text-transform:uppercase;"> — Not included</span>';
+    return '<div style="'+wrapStyle+'">'
+      +notInclBanner
+      +'<div class="pv-loc-hd" style="background:'+locHdBg+';">'
+      +'<i class="ti '+(sel?'ti-map-pin':'ti-circle-off')+'" style="margin-right:5px;font-size:12px;"></i>'
+      +escH(loc.name)+notInclTag
+      +'</div>'
+      +'<table class="pv-tbl"><thead><tr><th style="width:42px;"></th><th>Item</th><th>Brand</th><th>Unit</th><th class="r">Rate</th><th class="r">Qty</th><th class="r">Disc</th><th class="r">Total</th></tr></thead><tbody>'
+      +loc.items.map(it=>{const ltv=lt(it),dA=it.rate*it.qty*(it.disc||0)/100;return '<tr>'
+        +'<td>'+(it.image?'<img src="'+it.image+'" style="width:34px;height:34px;object-fit:cover;border:1px solid rgba(10,10,10,.08);"/>':'<div style="width:34px;height:34px;background:#f3f2ef;display:flex;align-items:center;justify-content:center;"><i class="ti ti-package" style="font-size:14px;color:#ccc;"></i></div>')+'</td>'
+        +'<td style="font-weight:500;">'+escH(it.name)+'</td><td>'+escH(it.brand||'—')+'</td><td>'+it.unit+'</td>'
+        +'<td class="r">'+fmtD(it.rate)+'</td><td class="r">'+fmt(it.qty)+'</td>'
+        +'<td class="r">'+(it.disc?it.disc+'%':'—')+(dA>0?'<br/><span style="color:#1a5a1a;font-size:10px;">− '+fmtD(dA)+'</span>':'')+'</td>'
+        +'<td class="r" style="font-family:Georgia,serif;font-size:13px;">'+fmtD(ltv)+'</td>'
+        +'</tr>';}).join('')
+      +'</tbody><tfoot>'
+      +'<tr style="background:#f8f7f4;border-top:1px solid rgba(10,10,10,.12);">'
+      +'<td colspan="7" style="padding:7px 4px;font-weight:500;font-size:11px;">Material Subtotal — '+escH(loc.name)+'</td>'
+      +'<td class="r" style="padding:7px 4px;font-family:Georgia,serif;font-size:13px;">'+fmtD(iS)+'</td></tr>'
+      +(inst&&inst.enabled?'<tr style="background:#fffdf5;"><td colspan="7" style="padding:7px 4px;color:#7a6010;font-size:11px;"><i class="ti ti-tool" style="font-size:11px;margin-right:5px;vertical-align:-2px;"></i>Installation'+(inst.note?' — '+escH(inst.note):'')+'</td><td class="r" style="padding:7px 4px;font-family:Georgia,serif;font-size:13px;color:#7a6010;">'+fmtD(iA)+'</td></tr>':'')
+      +'<tr style="background:'+locHdBg+';">'
+      +'<td colspan="7" style="padding:9px 4px;color:#f8f7f4;font-size:9px;letter-spacing:.3em;text-transform:uppercase;">Total — '+escH(loc.name)+(inst&&inst.enabled?' (incl. installation)':'')+'</td>'
+      +'<td class="r" style="padding:9px 4px;color:#f8f7f4;font-family:Georgia,serif;font-size:15px;">'+fmtD(lT)+'</td>'
+      +'</tr></tfoot></table>'
+      +'</div>';
+  }).join('');
+
+  return `<div class="back-row">
+    <button class="bg" onclick="view='builder';render()"><i class="ti ti-pencil" style="margin-right:4px;font-size:12px;vertical-align:-2px;"></i>Edit</button>
+    <span style="font-size:9px;letter-spacing:.4em;color:#aaa;text-transform:uppercase;">${q.id} — Preview</span>
+    <div style="margin-left:auto;display:flex;gap:8px;">
+      <button class="bg bs" onclick="doPrint('quote')"><i class="ti ti-printer" style="margin-right:4px;font-size:12px;vertical-align:-2px;"></i>Print Quote</button>
+      ${q.showBoq!==false?`<button class="bg bs" onclick="doPrint('boq')"><i class="ti ti-file-description" style="margin-right:4px;font-size:12px;vertical-align:-2px;"></i>Print BOQ Summary</button>`:''}
+      <button class="bg bs" onclick="doPrint('both')"><i class="ti ti-files" style="margin-right:4px;font-size:12px;vertical-align:-2px;"></i>Print Both</button>
+    </div>
+  </div>
+  <div class="pv-wrap">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid #0a0a0a;">
+      <div>${q.companyLogo?`<img src="${q.companyLogo}" style="max-height:55px;max-width:150px;object-fit:contain;margin-bottom:6px;display:block;"/>`:
+        '<div class="pv-brand">WATCON</div>'}
+        <div style="font-size:10px;color:#aaa;letter-spacing:.2em;margin-top:3px;">Management Software</div></div>
+      <div style="text-align:right;">
+        <div style="font-size:9px;letter-spacing:.4em;text-transform:uppercase;color:#aaa;margin-bottom:3px;">Quotation</div>
+        <div style="font-family:'Noto Serif JP',serif;font-size:20px;font-weight:300;">${q.id}</div>
+        ${q.rev>0?`<div style="font-size:10px;color:#ba7517;letter-spacing:.2em;margin-top:2px;">Revision ${q.rev}</div>`:''}
+        <div style="font-size:11px;color:#888;margin-top:3px;">Date: ${q.date}</div>
+        <span class="qs qs-${q.status}" style="margin-top:5px;display:inline-block;">${q.status}</span>
+      </div>
+    </div>
+    <div class="g2" style="margin-bottom:18px;">
+      <div><div style="font-size:8px;letter-spacing:.4em;text-transform:uppercase;color:#aaa;margin-bottom:5px;">Customer</div>
+        <div style="font-weight:500;font-size:14px;margin-bottom:2px;">${escH(c.name)}</div>
+        <div style="font-size:11px;color:#777;line-height:1.6;">${escH(c.contact)}<br/>${escH(c.billingAddress)}</div>
+      </div>
+      <div><div style="font-size:8px;letter-spacing:.4em;text-transform:uppercase;color:#aaa;margin-bottom:5px;">Subject</div>
+        <div style="font-size:13px;font-weight:500;margin-bottom:7px;">${escH(q.subject||'—')}</div>
+        <div style="font-size:11px;color:#777;">${q.locations.length} location${q.locations.length!==1?'s':''}: ${q.locations.map(l=>escH(l.name)).join(' · ')}</div>
+      </div>
+    </div>
+    ${locSec}
+    ${(function(){
+      const sel2=selLocs(q);
+      const iSub2=qItemsSub(q),instT2=qInstTotal(q),sub2=qSub(q),gA2=qGST(q),tr2=parseFloat(q.transport)||0,grand2=sub2+gA2+tr2;
+      const hasInst2=q.locations.some(l=>l.installation&&l.installation.enabled);
+      const m2=q.totalMode||'both';
+      const showGrand2=m2==='grand'||m2==='both';
+      const showEach2=(m2==='each'||m2==='both')&&q.locations.length>1;
+      let html='<div style="margin-top:20px;border-top:2px solid #0a0a0a;padding-top:14px;display:grid;grid-template-columns:1fr 260px;gap:16px;">';
+      // Left: area selection summary
+      html+='<div><div style="font-size:8px;letter-spacing:.4em;text-transform:uppercase;color:#aaa;margin-bottom:8px;">Area Selection</div>';
+      html+=q.locations.map(function(loc){
+        const sel3=loc.selected!==false;const lT2=locTotal(loc);const inst2=loc.installation;
+        return '<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(10,10,10,.05);">'
+          +'<span style="font-size:15px;color:'+(sel3?'#1a5a1a':'#ccc')+';">'+(sel3?'&#10003;':'&#10005;')+'</span>'
+          +'<span style="font-size:12px;flex:1;color:'+(sel3?'#0a0a0a':'#bbb')+';">'+escH(loc.name)+(inst2&&inst2.enabled?'<span style="font-size:9px;color:#7a6010;margin-left:5px;"><i class="ti ti-tool" style="font-size:10px;vertical-align:-2px;"></i></span>':'')+'</span>'
+          +'<span style="font-family:Georgia,serif;font-size:14px;color:'+(sel3?'#0a0a0a':'#bbb')+';">'+fmtD(lT2)+'</span>'
+          +'</div>';
+      }).join('');
+      html+='<div style="font-size:10px;color:#aaa;padding-top:7px;">'+sel2.length+' of '+q.locations.length+' area'+(q.locations.length!==1?'s':'')+' selected</div>';
+      html+='</div>';
+      // Right: totals column
+      html+='<div>';
+      html+='<div class="sum-row"><span class="sum-label">Material Subtotal</span><span class="sum-val">'+fmtD(iSub2)+'</span></div>';
+      if(hasInst2) html+='<div class="sum-row inst"><span class="sum-label"><i class="ti ti-tool" style="font-size:13px;vertical-align:-2px;margin-right:4px;"></i>Installation</span><span class="sum-val">'+fmtD(instT2)+'</span></div>';
+      if(hasInst2) html+='<div class="sum-row" style="border-bottom:2px solid rgba(10,10,10,.1);"><span class="sum-label" style="font-weight:500;">Subtotal</span><span class="sum-val">'+fmtD(sub2)+'</span></div>';
+      if(q.gstMode==='no') html+='<div class="sum-row"><span class="sum-label" style="color:#7a6010;">No GST</span><span class="sum-val" style="color:#7a6010;font-size:12px;">—</span></div>';
+      else if(q.gstMode==='incl') html+='<div class="sum-row gst"><span class="sum-label">GST @ '+q.gstPct+'% (incl.)</span><span class="sum-val">Included</span></div>';
+      else html+='<div class="sum-row gst"><span class="sum-label">GST @ '+q.gstPct+'%</span><span class="sum-val">'+fmtD(gA2)+'</span></div>';
+      html+='<div class="sum-row"><span class="sum-label">Transport'+(q.transportNote?' ('+escH(q.transportNote)+')':'')+'</span><span class="sum-val">'+fmtD(tr2)+'</span></div>';
+      if(showGrand2) html+='<div class="sum-row grand"><span class="sum-label">Grand Total'+(q.gstMode==='no'?' (excl. GST)':'')+'</span><span class="sum-val">'+fmtD(grand2)+'</span></div>';
+      else html+='<div style="background:#f8f4e0;border:1px solid #d4c060;padding:7px 10px;margin-top:6px;font-size:10px;color:#7a6010;"><i class="ti ti-info-circle" style="vertical-align:-2px;margin-right:5px;font-size:12px;"></i>Grand total not shown</div>';
+      html+='</div></div>';
+      return html;
+    })()}
+    <div class="pv-terms" style="margin-top:18px;">
+      <div style="font-size:9px;letter-spacing:.4em;text-transform:uppercase;color:#aaa;margin-bottom:8px;">Terms &amp; Conditions</div>
+      ${Object.entries(tBC).map(([cat,txts])=>`<div class="pv-tc">${cat}</div>${txts.map(t=>`<div style="font-size:11px;color:#555;margin-bottom:4px;padding-left:8px;border-left:2px solid rgba(10,10,10,.1);line-height:1.6;">${escH(t)}</div>`).join('')}`).join('')}
+    </div>
+    <div style="margin-top:18px;border-top:1px solid rgba(10,10,10,.08);padding-top:10px;font-size:9px;color:#bbb;">Watcon Management Software · ${q.id} · ${q.date}</div>
+  </div>
+  ${q.showBoq!==false?`<div style="margin-top:10px;padding:10px 14px;background:#f8f7f4;border:1px solid rgba(10,10,10,.08);font-size:10px;color:#888;display:flex;align-items:center;gap:8px;">
+    <i class="ti ti-file-description" style="font-size:16px;"></i>
+    BOQ Summary page will print separately — click <strong>Print BOQ Summary</strong> or <strong>Print Both</strong> above
+  </div>`:''}`;
+}
+
+function buildQuoteHTML(q,c){
+  const iSub=qItemsSub(q),instT=qInstTotal(q),sub=qSub(q),gA=qGST(q),tr=parseFloat(q.transport)||0,grand=sub+gA+tr;
+  const CW={img:12,item:52,brand:20,unit:10,rate:22,qty:14,disc:18,total:24};
+  const col=mm=>`<col style="width:${mm}mm"/>`;
+  const th=(mm,al,txt)=>`<th style="width:${mm}mm;text-align:${al};padding:5px 4px;font-size:7pt;letter-spacing:2px;text-transform:uppercase;color:#777;font-weight:400;border-bottom:1.5px solid #0a0a0a;white-space:nowrap;">${txt}</th>`;
+  const td=(mm,al,cnt,extra)=>`<td style="width:${mm}mm;text-align:${al};padding:7px 4px;border-bottom:0.5px solid #eee;vertical-align:top;word-break:break-word;${extra||''}">${cnt}</td>`;
+  const tBC={};q.terms.forEach(t=>{if(!tBC[t.cat])tBC[t.cat]=[];tBC[t.cat].push(t.text);});
+  const hasInst=q.locations.some(l=>l.installation&&l.installation.enabled);
+  const mm=q.totalMode||'both';
+  const showGrandPDF=(mm==='grand'||mm==='both');
+
+  const locs=q.locations.map(loc=>{
+    const iS=itemsSub(loc),iA=instAmt(loc),lT=iS+iA;const inst=loc.installation;
+    const rows=loc.items.map(it=>{const ltv=lt(it),dA=it.rate*it.qty*(it.disc||0)/100;
+      const imgC=it.image?`<img src="${it.image}" style="width:28px;height:28px;object-fit:cover;border:0.5px solid #ccc;display:block;"/>`:
+        `<div style="width:28px;height:28px;background:#f3f2ef;border:0.5px solid #ddd;"></div>`;
+      const opts3=it.options||[];
+      const optPdfRows=opts3.map(opt=>{const ot=opt.rate*(it.qty||0);
+        const oImg=opt.image?`<img src="${opt.image}" style="width:28px;height:28px;object-fit:cover;border:0.5px solid #d4c060;display:block;"/>`:
+          `<div style="width:28px;height:28px;background:#f8f4e0;border:0.5px solid #d4c060;"></div>`;
+        return `<tr style="background:#fffdf5;">`
+          +td(CW.img,'center',oImg,'background:#fffdf5;')
+          +td(CW.item,'left','<span style="font-size:7pt;background:#f8f4e0;border:0.5px solid #d4c060;color:#7a6010;padding:1px 5px;letter-spacing:1px;margin-right:5px;">ALT</span><span style="font-size:9pt;color:#666;">'+escH(opt.name)+'</span>','background:#fffdf5;')
+          +td(CW.brand,'left','<span style="color:#888;font-size:9pt;">'+escH(opt.brand||'—')+'</span>','background:#fffdf5;')
+          +td(CW.unit,'center','<span style="color:#888;">'+((opt.unit||it.unit))+'</span>','background:#fffdf5;')
+          +td(CW.rate,'right','<span style="color:#7a6010;font-size:9pt;">'+fmtC(opt.rate)+'</span>','background:#fffdf5;')
+          +td(CW.qty,'right','<span style="color:#aaa;font-size:9pt;">'+fmt(it.qty)+'</span>','background:#fffdf5;')
+          +td(CW.disc,'right','<span style="color:#aaa;font-size:8pt;">—</span>','background:#fffdf5;')
+          +td(CW.total,'right','<span style="font-size:10pt;color:#7a6010;">'+fmtC(ot)+'</span><div style="font-size:7pt;color:#bbb;letter-spacing:1px;">not in total</div>','background:#fffdf5;')
+          +'</tr>';}).join('');
+      return `<tr>${td(CW.img,'center',imgC)}${td(CW.item,'left','<span style="font-weight:600;font-size:9pt;">'+escH(it.name)+'</span>')}${td(CW.brand,'left',escH(it.brand||'—'))}${td(CW.unit,'center',it.unit)}${td(CW.rate,'right',fmtC(it.rate))}${td(CW.qty,'right',fmt(it.qty))}${td(CW.disc,'right',(it.disc?it.disc+'%<br/><span style="color:#1a5a1a;font-size:8pt;">−'+fmtC(dA)+'</span>':'—'))}${td(CW.total,'right','<span style="font-size:11pt;font-weight:700;">'+fmtC(ltv)+'</span>')}</tr>${optPdfRows}`;}).join('');
+    return `<div style="background:#0a0a0a;color:#fff;padding:5px 8px;font-size:7pt;letter-spacing:3px;text-transform:uppercase;margin:14px 0 0;">Location: ${escH(loc.name)}</div>
+    <table style="width:100%;border-collapse:collapse;table-layout:fixed;font-size:9pt;">
+      <colgroup>${col(CW.img)}${col(CW.item)}${col(CW.brand)}${col(CW.unit)}${col(CW.rate)}${col(CW.qty)}${col(CW.disc)}${col(CW.total)}</colgroup>
+      <thead><tr style="border-bottom:1.5px solid #0a0a0a;background:#fff;">${th(CW.img,'center','')}${th(CW.item,'left','Item / Description')}${th(CW.brand,'left','Brand')}${th(CW.unit,'center','Unit')}${th(CW.rate,'right','Rate (Rs.)')}${th(CW.qty,'right','Qty')}${th(CW.disc,'right','Disc')}${th(CW.total,'right','Total (Rs.)')}</tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot>
+        <tr style="background:#f8f7f4;border-top:1px solid #ddd;"><td colspan="7" style="padding:7px 4px;font-size:9pt;font-weight:600;">Material Subtotal — ${escH(loc.name)}</td><td style="padding:7px 4px;text-align:right;font-size:10pt;font-weight:600;">${fmtC(iS)}</td></tr>
+        ${inst&&inst.enabled?`<tr style="background:#fffdf5;border-top:1px dashed #d4c060;"><td colspan="7" style="padding:7px 4px;font-size:9pt;color:#7a6010;">Installation${inst.note?' — '+escH(inst.note):''} (${inst.mode==='lumpsum'?'Lump sum':inst.mode==='percent'?fmt(inst.percent)+'% of subtotal':'Per unit @ '+fmtC(inst.perunit)})</td><td style="padding:7px 4px;text-align:right;font-size:10pt;color:#7a6010;font-weight:600;">${fmtC(iA)}</td></tr>`:''}
+        <tr style="background:#0a0a0a;"><td colspan="7" style="padding:8px 4px;color:#fff;font-size:8pt;letter-spacing:2px;text-transform:uppercase;font-weight:600;">Total — ${escH(loc.name)}${inst&&inst.enabled?' (incl. installation)':''}</td><td style="padding:8px 4px;text-align:right;color:#fff;font-size:12pt;font-weight:700;">${fmtC(lT)}</td></tr>
+      </tfoot>
+    </table>`;}).join('');
+
+  const termsH=Object.entries(tBC).map(([cat,txts])=>
+    `<div style="font-size:7pt;letter-spacing:2px;text-transform:uppercase;color:#999;margin-top:10px;margin-bottom:3px;">${cat}</div>
+    ${txts.map(t=>`<div style="font-size:9pt;color:#444;padding-left:8px;border-left:2px solid #ddd;margin-bottom:4px;line-height:1.6;">${escH(t)}</div>`).join('')}`).join('');
+
+  const locBreak=((mm==='each'||mm==='both')&&q.locations.length>1)?`<div style="margin-bottom:14px;border:1px solid #eee;padding:10px 12px;">
+    <div style="font-size:7pt;letter-spacing:2px;text-transform:uppercase;color:#999;margin-bottom:8px;">Summary by Location</div>
+    ${q.locations.map(loc=>{const lT=locTotal(loc);const inst=loc.installation;return `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:0.5px solid #eee;font-size:9pt;"><span>${escH(loc.name)}${inst&&inst.enabled?' (+ installation)':''}</span><span style="font-weight:600;">${fmtC(lT)}</span></div>`;}).join('')}</div>`:'' ;
+
+  const sumSection=`${locBreak}<table style="width:100%;border-collapse:collapse;font-size:9pt;margin-top:4px;border-top:2px solid #0a0a0a;">
+    <tr><td style="padding:7px 4px;color:#555;width:75%;">Material Subtotal</td><td style="padding:7px 4px;text-align:right;font-size:10pt;">${fmtC(iSub)}</td></tr>
+    ${hasInst?`<tr style="background:#fffdf5;"><td style="padding:7px 4px;color:#7a6010;">Total Installation</td><td style="padding:7px 4px;text-align:right;font-size:10pt;color:#7a6010;font-weight:600;">${fmtC(instT)}</td></tr>`:''}
+    ${hasInst?`<tr style="background:#f8f7f4;"><td style="padding:7px 4px;font-weight:700;">Combined Subtotal</td><td style="padding:7px 4px;text-align:right;font-size:11pt;font-weight:700;">${fmtC(sub)}</td></tr>`:''}
+    ${q.gstMode==='no'?`<tr style="background:#f8f4e0;"><td style="padding:7px 4px;color:#7a6010;">GST</td><td style="padding:7px 4px;text-align:right;color:#7a6010;font-size:9pt;">Not applicable for this quote</td></tr>`:
+      q.gstMode==='incl'?`<tr style="background:#f0f4ff;"><td style="padding:7px 4px;color:#185fa5;">GST @ ${q.gstPct}% (included in item prices)</td><td style="padding:7px 4px;text-align:right;color:#185fa5;font-size:10pt;font-weight:600;">Included</td></tr>`:
+      `<tr style="background:#f0f4ff;"><td style="padding:7px 4px;color:#185fa5;">GST @ ${q.gstPct}%</td><td style="padding:7px 4px;text-align:right;color:#185fa5;font-size:10pt;font-weight:600;">${fmtC(gA)}</td></tr>`}
+    <tr><td style="padding:7px 4px;color:#555;">Transport ${q.transportNote?'('+escH(q.transportNote)+')':''}</td><td style="padding:7px 4px;text-align:right;font-size:10pt;">${fmtC(tr)}</td></tr>
+    ${showGrandPDF?`<tr style="border-top:2px solid #0a0a0a;background:#f8f7f4;"><td style="padding:10px 4px;font-weight:700;font-size:11pt;">Grand Total${q.gstMode==='no'?' (excl. GST)':''}</td><td style="padding:10px 4px;text-align:right;font-size:16pt;font-weight:700;">${fmtC(grand)}</td></tr>`:''}
+  </table>`;
+
+  const logoH=q.companyLogo?`<img src="${q.companyLogo}" style="max-height:55px;max-width:150px;object-fit:contain;display:block;margin-bottom:6px;"/>`:
+    `<div style="font-size:20pt;font-weight:300;letter-spacing:3px;font-family:Georgia,serif;">WATCON</div>`;
+
+  return `<div style="padding:18px 16px;">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #0a0a0a;padding-bottom:14px;margin-bottom:14px;">
+    <div>${logoH}<div style="font-size:7pt;color:#aaa;letter-spacing:2px;margin-top:3px;">Management Software</div></div>
+    <div style="text-align:right;">
+      <div style="font-size:7pt;letter-spacing:3px;text-transform:uppercase;color:#aaa;margin-bottom:2px;">Quotation</div>
+      <div style="font-size:18pt;font-weight:300;letter-spacing:1px;font-family:Georgia,serif;">${q.id}</div>
+      ${q.rev>0?`<div style="font-size:8pt;color:#ba7517;letter-spacing:2px;">Revision ${q.rev}</div>`:''}
+      <div style="font-size:8pt;color:#888;margin-top:2px;">Date: ${q.date}</div>
+    </div>
+  </div>
+  <table style="width:100%;border-collapse:collapse;margin-bottom:14px;font-size:9pt;">
+    <tr>
+      <td style="width:50%;vertical-align:top;padding-right:16px;"><div style="font-size:7pt;letter-spacing:3px;text-transform:uppercase;color:#aaa;margin-bottom:4px;">Customer</div>
+        <div style="font-weight:700;font-size:11pt;margin-bottom:3px;">${escH(c.name)}</div>
+        <div style="color:#666;line-height:1.6;">${escH(c.contact)}<br/>${escH(c.billingAddress)}</div></td>
+      <td style="width:50%;vertical-align:top;padding-left:16px;border-left:1px solid #eee;"><div style="font-size:7pt;letter-spacing:3px;text-transform:uppercase;color:#aaa;margin-bottom:4px;">Subject</div>
+        <div style="font-weight:700;font-size:11pt;margin-bottom:5px;">${escH(q.subject||'—')}</div>
+        <div style="color:#666;">${q.locations.length} location${q.locations.length!==1?'s':''}: ${q.locations.map(l=>escH(l.name)).join(', ')}</div></td>
+    </tr>
+  </table>
+  ${locs}
+  <div style="margin-top:18px;">${sumSection}</div>
+  <div style="margin-top:18px;border-top:1px solid #ddd;padding-top:12px;">
+    <div style="font-size:7pt;letter-spacing:3px;text-transform:uppercase;color:#aaa;margin-bottom:8px;">Terms &amp; Conditions</div>
+    ${termsH}
+  </div>
+  <div style="margin-top:16px;border-top:1px solid #eee;padding-top:8px;font-size:8pt;color:#bbb;display:flex;justify-content:space-between;">
+    <span>Watcon Management Software · ${q.id} · ${q.date}</span><span>Confidential</span>
+  </div>
+  </div>`;
+}
+
+function buildBOQHTML(q,c){
+  const iSub=qItemsSub(q),instT=qInstTotal(q),sub=qSub(q),gA=qGST(q),tr=parseFloat(q.transport)||0,grand=sub+gA+tr;
+  const hasInst=q.locations.some(l=>l.installation&&l.installation.enabled);
+  const m=q.totalMode||'both';
+  const showGrand=(m==='grand'||m==='both');
+  const logoH=q.companyLogo?`<img src="${q.companyLogo}" style="max-height:65px;max-width:180px;object-fit:contain;display:block;"/>`:
+    `<div style="font-size:22pt;font-weight:300;letter-spacing:3px;font-family:Georgia,serif;">WATCON</div><div style="font-size:7pt;color:#aaa;letter-spacing:3px;margin-top:3px;">Management Software</div>`;
+
+  const areaRows=q.locations.map(loc=>{
+    const sel=loc.selected!==false;
+    const iS=itemsSub(loc),iA=instAmt(loc),lT=iS+iA;const inst=loc.installation;
+    const materialItemRows=loc.items.map(it=>{const ltv=lt(it);return `
+      <tr>
+        <td style="padding:6px 8px 6px 24px;font-size:9pt;color:#666;border-bottom:0.5px solid #f0efe9;">${escH(it.name)} — ${escH(it.brand||'')} (${fmt(it.qty)} ${it.unit} × ${fmtC(it.rate)}${it.disc?', '+it.disc+'% disc':''})</td>
+        <td style="padding:6px 8px;text-align:right;font-size:9pt;color:#555;border-bottom:0.5px solid #f0efe9;">${fmtC(ltv)}</td>
+      </tr>`;}).join('');
+    return `<tr style="background:${sel?'#f8f7f4':'#fafaf8'};">
+      <td colspan="2" style="padding:10px 8px;font-size:10pt;font-weight:700;letter-spacing:1px;border-top:1.5px solid ${sel?'#0a0a0a':'#ccc'};border-bottom:0.5px solid #ddd;color:${sel?'#0a0a0a':'#bbb'};">
+        ${sel?'&#9655;':'&#9633;'} ${escH(loc.name)}${sel?'':'<span style="font-size:8pt;font-weight:400;margin-left:10px;color:#bbb;letter-spacing:1px;">— NOT INCLUDED</span>'}
+      </td>
+    </tr>
+    ${materialItemRows}
+    ${inst&&inst.enabled?`<tr style="background:#fffdf5;">
+      <td style="padding:6px 8px 6px 24px;font-size:9pt;color:#7a6010;border-bottom:0.5px solid #f0efe9;">Installation${inst.note?' — '+escH(inst.note):''}</td>
+      <td style="padding:6px 8px;text-align:right;font-size:9pt;color:#7a6010;border-bottom:0.5px solid #f0efe9;">${fmtC(iA)}</td>
+    </tr>`:''}
+    <tr style="background:${sel?'#0a0a0a':'#ccc'};">
+      <td style="padding:9px 8px;color:#fff;font-size:10pt;font-weight:700;letter-spacing:1px;">Area Total — ${escH(loc.name)}${inst&&inst.enabled?' (incl. installation)':''}</td>
+      <td style="padding:9px 8px;text-align:right;color:#fff;font-size:13pt;font-weight:700;">${fmtC(lT)}</td>
+    </tr>
+    <tr><td colspan="2" style="padding:8px 0;"></td></tr>`;}).join('');
+
+  const summaryRows=`
+    <tr style="border-top:2px solid #0a0a0a;">
+      <td style="padding:8px 8px;color:#555;font-size:9pt;">Material Subtotal</td>
+      <td style="padding:8px 8px;text-align:right;font-size:10pt;">${fmtC(iSub)}</td>
+    </tr>
+    ${hasInst?`<tr style="background:#fffdf5;"><td style="padding:8px 8px;color:#7a6010;font-size:9pt;">Total Installation</td><td style="padding:8px 8px;text-align:right;font-size:10pt;color:#7a6010;font-weight:700;">${fmtC(instT)}</td></tr>`:''}
+    ${hasInst?`<tr style="background:#f8f7f4;"><td style="padding:8px 8px;font-weight:700;font-size:10pt;">Combined Subtotal</td><td style="padding:8px 8px;text-align:right;font-size:11pt;font-weight:700;">${fmtC(sub)}</td></tr>`:''}
+    ${q.gstMode==='no'?`<tr style="background:#f8f4e0;"><td style="padding:8px 8px;color:#7a6010;font-size:9pt;">GST</td><td style="padding:8px 8px;text-align:right;color:#7a6010;font-size:9pt;">Not applicable</td></tr>`:
+      q.gstMode==='incl'?`<tr style="background:#f0f4ff;"><td style="padding:8px 8px;color:#185fa5;font-size:9pt;">GST @ ${q.gstPct}% (included in prices)</td><td style="padding:8px 8px;text-align:right;color:#185fa5;font-size:10pt;font-weight:700;">Included</td></tr>`:
+      `<tr style="background:#f0f4ff;"><td style="padding:8px 8px;color:#185fa5;font-size:9pt;">GST @ ${q.gstPct}%</td><td style="padding:8px 8px;text-align:right;color:#185fa5;font-size:10pt;font-weight:700;">${fmtC(gA)}</td></tr>`}
+    <tr><td style="padding:8px 8px;color:#555;font-size:9pt;">Transport ${q.transportNote?'('+escH(q.transportNote)+')':''}</td><td style="padding:8px 8px;text-align:right;font-size:10pt;">${fmtC(tr)}</td></tr>
+    ${showGrand?`<tr style="background:#0a0a0a;border-top:2px solid #0a0a0a;">
+      <td style="padding:12px 8px;color:#fff;font-size:12pt;font-weight:700;letter-spacing:1px;">Grand Total${q.gstMode==='no'?' (excl. GST)':''}</td>
+      <td style="padding:12px 8px;text-align:right;color:#fff;font-size:18pt;font-weight:700;">${fmtC(grand)}</td>
+    </tr>`:''}`;
+
+  return `<div style="padding:20px 18px;">
+  <!-- BOQ Header -->
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #0a0a0a;padding-bottom:16px;margin-bottom:20px;">
+    <div>${logoH}</div>
+    <div style="text-align:right;">
+      <div style="font-size:7pt;letter-spacing:4px;text-transform:uppercase;color:#aaa;margin-bottom:4px;">Bill of Quantities — Summary</div>
+      <div style="font-size:16pt;font-family:Georgia,serif;font-weight:300;letter-spacing:1px;">${q.id}</div>
+      ${q.rev>0?`<div style="font-size:8pt;color:#ba7517;letter-spacing:2px;margin-top:2px;">Revision ${q.rev}</div>`:''}
+      <div style="font-size:8pt;color:#888;margin-top:3px;">Date: ${q.date}</div>
+    </div>
+  </div>
+
+  <!-- Client details box -->
+  <table style="width:100%;border-collapse:collapse;margin-bottom:20px;border:1px solid #e8e6e0;">
+    <tr style="background:#f8f7f4;">
+      <td style="padding:10px 14px;width:50%;vertical-align:top;border-right:1px solid #e8e6e0;">
+        <div style="font-size:7pt;letter-spacing:3px;text-transform:uppercase;color:#aaa;margin-bottom:6px;">Client</div>
+        <div style="font-weight:700;font-size:12pt;margin-bottom:3px;">${escH(c.name)}</div>
+        <div style="font-size:9pt;color:#666;line-height:1.7;">${escH(c.contact)}<br/>${escH(c.billingAddress)}</div>
+      </td>
+      <td style="padding:10px 14px;width:50%;vertical-align:top;">
+        <div style="font-size:7pt;letter-spacing:3px;text-transform:uppercase;color:#aaa;margin-bottom:6px;">Project</div>
+        <div style="font-weight:700;font-size:11pt;margin-bottom:6px;">${escH(q.subject||'—')}</div>
+        <table style="font-size:9pt;color:#666;border-collapse:collapse;">
+          <tr><td style="padding:2px 12px 2px 0;color:#aaa;white-space:nowrap;">Quote No.</td><td style="font-weight:600;">${q.id}</td></tr>
+          ${q.rev>0?`<tr><td style="padding:2px 12px 2px 0;color:#aaa;">Revision</td><td style="font-weight:600;color:#ba7517;">${q.rev}</td></tr>`:''}
+          <tr><td style="padding:2px 12px 2px 0;color:#aaa;">Date</td><td>${q.date}</td></tr>
+          <tr><td style="padding:2px 12px 2px 0;color:#aaa;">Areas</td><td>${q.locations.map(l=>escH(l.name)).join(', ')}</td></tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Area-wise BOQ table -->
+  <div style="font-size:7pt;letter-spacing:3px;text-transform:uppercase;color:#aaa;margin-bottom:8px;">Area-wise Bill of Quantities</div>
+  <table style="width:100%;border-collapse:collapse;font-size:9pt;">
+    <thead><tr style="background:#0a0a0a;">
+      <th style="padding:8px;text-align:left;color:#fff;font-size:8pt;letter-spacing:2px;text-transform:uppercase;font-weight:600;">Description</th>
+      <th style="padding:8px;text-align:right;color:#fff;font-size:8pt;letter-spacing:2px;text-transform:uppercase;font-weight:600;width:140px;">Amount (Rs.)</th>
+    </tr></thead>
+    <tbody>${areaRows}</tbody>
+    ${showGrand||q.gstMode!=='no'?`<tbody style="border-top:2px solid #0a0a0a;">${summaryRows}</tbody>`:''}
+  </table>
+
+  <div style="margin-top:20px;border-top:1px solid #eee;padding-top:10px;font-size:8pt;color:#bbb;display:flex;justify-content:space-between;">
+    <span>Watcon Management Software · BOQ Summary · ${q.id} · ${q.date}</span><span>Confidential</span>
+  </div>
+  </div>`;
+}
+
+function doPrint(mode){
+  mode=mode||'both';
+  const q=sq||eq;
+  const c=custs.find(x=>x.id===q.custId)||{name:'—',contact:'—',billingAddress:'—'};
+  const quoteHTML=buildQuoteHTML(q,c);
+  const boqHTML=buildBOQHTML(q,c);
+
+  const w=window.open('','_blank');
+  let body='';
+  if(mode==='quote') body=quoteHTML;
+  else if(mode==='boq') body=boqHTML;
+  else body=quoteHTML+'<div style="page-break-before:always;"></div>'+boqHTML;
+
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>${q.id}</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+@page{margin:14mm 13mm;size:A4 portrait;}
+*{box-sizing:border-box;}
+body{font-family:'Zen Kaku Gothic New','Arial',sans-serif;font-size:9pt;color:#0a0a0a;background:#fff;line-height:1.5;}
+.np{display:flex;gap:10px;padding:10px 16px;border-bottom:2px solid #0a0a0a;background:#fff;align-items:center;flex-wrap:wrap;}
+.np button{padding:7px 14px;font-size:9pt;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border:none;font-family:inherit;}
+.pb{background:#0a0a0a;color:#fff;}.pc{border:1px solid #aaa;background:transparent;color:#555;}
+.ht{font-size:8pt;color:#888;letter-spacing:1px;}
+@media print{.np{display:none!important;}}
+</style></head><body>
+<div class="np">
+  <button class="pb" onclick="window.print()">Print / Save as PDF</button>
+  <button class="pc" onclick="window.close()">Close</button>
+  <span class="ht">Print → Destination → Save as PDF &nbsp;|&nbsp; Printing: ${mode==='quote'?'Quote only':mode==='boq'?'BOQ Summary only':'Quote + BOQ Summary'}</span>
+</div>
+${body}
+</body></html>`);
+  w.document.close();
+  setTimeout(()=>w.print(),700);
+}
+
+
+render();
+</script>
+</body>
+</html>

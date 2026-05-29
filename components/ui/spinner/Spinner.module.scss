@@ -1,0 +1,32 @@
+.spinner {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: var(--radius-full);
+  animation: spin var(--dur-slow) linear infinite;
+
+  &[data-size='sm'] {
+    font-size: var(--fs-400);
+  }
+  &[data-size='md'] {
+    font-size: var(--fs-700);
+  }
+  &[data-size='lg'] {
+    font-size: var(--fs-900);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// prefers-reduced-motion zeroes the duration token; also stop the rotation.
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
+}

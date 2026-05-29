@@ -1,0 +1,23 @@
+.main {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: var(--space-6) var(--space-4);
+  background: var(--color-bg);
+}
+
+.inner {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-size: var(--fs-700);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--tracking-tight);
+  text-align: center;
+}

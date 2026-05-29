@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>Watcon — Quotes Module</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200;300;400&family=Zen+Kaku+Gothic+New:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Zen Kaku Gothic New',sans-serif;background:#f8f7f4;color:#0a0a0a;font-size:13px;}
+input,select,button,textarea{font-family:'Zen Kaku Gothic New',sans-serif;}
+input[type=number]{-moz-appearance:textfield;}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;}
+::-webkit-scrollbar{width:4px;height:4px;}::-webkit-scrollbar-thumb{background:#ccc;}
+
+/* ── topbar ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:11px 20px;border-bottom:1px solid rgba(10,10,10,0.1);background:#fff;position:sticky;top:0;z-index:200;}
+.brand{font-family:'Noto Serif JP',serif;font-weight:300;font-size:15px;letter-spacing:0.2em;}
+.bc{font-size:9px;letter-spacing:0.4em;color:#aaa;text-transform:uppercase;margin-left:14px;}
+
+/* ── buttons ── */
+.btn{border:none;cursor:pointer;font-family:inherit;transition:opacity .15s;}
+.btn-primary{background:#0a0a0a;color:#f8f7f4;padding:8px 18px;font-size:10px;letter-spacing:.4em;text-transform:uppercase;}
+.btn-primary:hover{opacity:.8;}
+.btn-ghost{background:transparent;color:#555;border:1px solid rgba(10,10,10,.2);padding:7px 14px;font-size:10px;letter-spacing:.3em;text-transform:uppercase;}
+.btn-ghost:hover{border-color:#0a0a0a;color:#0a0a0a;}
+.btn-sm{padding:5px 12px;font-size:9px;letter-spacing:.25em;}
+.btn-danger{background:#7a2020;color:#fff;padding:5px 10px;font-size:9px;letter-spacing:.2em;text-transform:uppercase;}
+.btn-icon{background:none;border:none;cursor:pointer;color:#aaa;font-size:16px;padding:3px;}
+.btn-icon:hover{color:#0a0a0a;}
+.btn-add{display:flex;align-items:center;gap:6px;padding:7px 14px;border:1px dashed rgba(10,10,10,.25);background:transparent;font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:#777;cursor:pointer;width:100%;}
+.btn-add:hover{border-color:#0a0a0a;color:#0a0a0a;}
+
+/* ── layout ── */
+.main{padding:20px;max-width:1200px;margin:0 auto;}
+.back-row{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
+
+/* ── panel ── */
+.panel{background:#fff;border:1px solid rgba(10,10,10,.1);padding:18px;margin-bottom:14px;}
+.pt{font-size:8px;letter-spacing:.45em;text-transform:uppercase;color:#aaa;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(10,10,10,.07);display:flex;align-items:center;justify-content:space-between;}
+
+/* ── form fields ── */
+.lbl{font-size:8px;letter-spacing:.35em;text-transform:uppercase;color:#aaa;display:block;margin-bottom:5px;}
+.fi{width:100%;background:transparent;border:none;border-bottom:1px solid rgba(10,10,10,.2);padding:7px 0;font-size:12px;color:#0a0a0a;outline:none;}
+.fi:focus{border-bottom-color:#0a0a0a;}
+.fi:disabled{color:#aaa;border-bottom-color:rgba(10,10,10,.08);}
+.fsel{width:100%;background:#fff;border:1px solid rgba(10,10,10,.16);padding:7px 8px;font-size:12px;color:#0a0a0a;outline:none;}
+.fta{width:100%;background:transparent;border:1px solid rgba(10,10,10,.18);padding:8px;font-size:12px;color:#0a0a0a;outline:none;resize:vertical;min-height:60px;line-height:1.5;}
+.fta:focus{border-color:#0a0a0a;}
+.fi-inline{background:transparent;border:none;border-bottom:1px solid rgba(10,10,10,.15);padding:4px 0;font-size:12px;color:#0a0a0a;outline:none;width:100%;}
+.fi-inline:focus{border-bottom-color:#0a0a0a;}
+
+/* ── grid ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.fr{margin-bottom:13px;}
+
+/* ── quote list ── */
+.search-wrap{position:relative;flex:1;}
+.search-input{width:100%;border:1px solid rgba(10,10,10,.14);padding:9px 12px 9px 34px;font-size:12px;outline:none;color:#0a0a0a;background:#fff;}
+.search-input:focus{border-color:#0a0a0a;}
+.si{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:15px;color:#bbb;}
+.q-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:13px;}
+.q-card{background:#fff;border:1px solid rgba(10,10,10,.1);padding:16px;cursor:pointer;transition:border-color .15s;}
+.q-card:hover{border-color:#0a0a0a;}
+.q-ref{font-size:9px;letter-spacing:.3em;color:#bbb;text-transform:uppercase;margin-bottom:3px;}
+.q-name{font-size:13px;font-weight:500;margin-bottom:4px;}
+.q-sub{font-size:11px;color:#888;margin-bottom:8px;}
+.q-meta{display:flex;justify-content:space-between;align-items:baseline;margin-top:8px;}
+.q-total{font-family:'Noto Serif JP',serif;font-size:16px;font-weight:300;}
+.q-date{font-size:10px;color:#aaa;}
+.q-status{display:inline-block;font-size:8px;letter-spacing:.2em;text-transform:uppercase;padding:2px 8px;}
+.qs-draft{background:#888;color:#fff;}
+.qs-sent{background:#185fa5;color:#fff;}
+.qs-accepted{background:#1a5a1a;color:#fff;}
+.qs-revised{background:#ba7517;color:#fff;}
+.qs-cancelled{background:#7a2020;color:#fff;}
+.rev-badge{font-size:8px;letter-spacing:.2em;padding:2px 7px;border:1px solid rgba(10,10,10,.15);color:#888;margin-left:6px;}
+
+/* ── quote builder ── */
+.qb-header{display:grid;grid-template-columns:1fr 280px;gap:16px;margin-bottom:14px;}
+.logo-box{height:70px;border:1px dashed rgba(10,10,10,.2);background:#f8f7f4;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;margin-bottom:10px;}
+.logo-box img{max-width:100%;max-height:100%;object-fit:contain;}
+.logo-hint{font-size:9px;color:#ccc;letter-spacing:.25em;text-transform:uppercase;text-align:center;}
+
+/* ── location block ── */
+.loc-block{border:1px solid rgba(10,10,10,.1);margin-bottom:14px;background:#fff;}
+.loc-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid rgba(10,10,10,.07);background:#f8f7f4;}
+.loc-title{font-size:10px;font-weight:500;letter-spacing:.1em;}
+.loc-num{font-size:8px;letter-spacing:.35em;text-transform:uppercase;color:#aaa;margin-right:10px;}
+.loc-body{padding:14px;}
+
+/* ── line item table ── */
+.li-table{width:100%;border-collapse:collapse;font-size:11px;}
+.li-table th{padding:7px 5px;font-size:8px;letter-spacing:.3em;text-transform:uppercase;color:#aaa;font-weight:400;border-bottom:1px solid rgba(10,10,10,.1);text-align:left;white-space:nowrap;}
+.li-table th.r{text-align:right;}
+.li-table td{padding:6px 5px;border-bottom:1px solid rgba(10,10,10,.05);vertical-align:middle;}
+.li-table td.r{text-align:right;}
+.li-img{width:40px;height:40px;background:#f3f2ef;border:1px solid rgba(10,10,10,.08);display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;flex-shrink:0;}
+.li-img img{width:100%;height:100%;object-fit:cover;}
+.li-subtotal{font-family:'Noto Serif JP',serif;font-size:13px;font-weight:300;white-space:nowrap;}
+.li-disc{color:#1a5a1a;font-size:11px;}
+.loc-subtotal-row{background:#f8f7f4;border-top:2px solid rgba(10,10,10,.12);}
+.loc-subtotal-row td{padding:9px 5px;font-weight:500;font-size:12px;}
+
+/* ── summary section ── */
+.summary-grid{display:grid;grid-template-columns:1fr 320px;gap:16px;margin-top:14px;}
+.sum-row{display:flex;justify-content:space-between;align-items:baseline;padding:9px 0;border-bottom:1px solid rgba(10,10,10,.06);font-size:12px;}
+.sum-row:last-child{border-bottom:none;}
+.sum-label{color:#555;letter-spacing:.03em;}
+.sum-val{font-family:'Noto Serif JP',serif;font-size:15px;font-weight:300;}
+.sum-row.gst .sum-val{color:#185fa5;}
+.sum-row.transport .sum-val{color:#555;}
+.sum-row.grand{border-top:2px solid #0a0a0a;padding-top:12px;margin-top:4px;}
+.sum-row.grand .sum-label{font-weight:500;font-size:13px;}
+.sum-row.grand .sum-val{font-size:22px;color:#0a0a0a;}
+
+/* ── terms ── */
+.term-row{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;}
+.term-row input{flex:1;}
+.term-cat{font-size:9px;letter-spacing:.3em;text-transform:uppercase;background:#f8f7f4;border:1px solid rgba(10,10,10,.12);padding:4px 8px;color:#555;white-space:nowrap;cursor:pointer;}
+
+/* ── status filter ── */
+.ftabs{display:flex;border:1px solid rgba(10,10,10,.14);flex-shrink:0;}
+.ftab{padding:8px 12px;font-size:10px;letter-spacing:.2em;background:#fff;color:#888;border:none;cursor:pointer;font-family:inherit;white-space:nowrap;}
+.ftab.active{background:#0a0a0a;color:#f8f7f4;}
+
+/* ── modal ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:999;}
+.modal{background:#fff;border:1px solid rgba(10,10,10,.15);padding:24px;width:460px;max-width:95vw;max-height:90vh;overflow-y:auto;}
+.modal-title{font-family:'Noto Serif JP',serif;font-size:18px;font-weight:300;margin-bottom:16px;}
+
+/* ── item picker ── */
+.item-pick-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:280px;overflow-y:auto;margin-bottom:14px;}
+.item-pick-card{border:1px solid rgba(10,10,10,.1);padding:10px;cursor:pointer;display:flex;gap:8px;align-items:center;transition:border-color .15s;}
+.item-pick-card:hover{border-color:#0a0a0a;}
+.item-pick-card.sel{border-color:#0a0a0a;background:#f8f7f4;}
+.ip-thumb{width:36px;height:36px;background:#f3f2ef;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:8px;color:#ccc;}
+.ip-thumb img{width:100%;height:100%;object-fit:cover;}
+.ip-name{font-size:11px;font-weight:500;line-height:1.3;}
+.ip-sub{font-size:9px;color:#aaa;}
+
+/* ── preview ── */
+.preview-wrap{background:#fff;border:1px solid rgba(10,10,10,.1);padding:32px;font-family:'Zen Kaku Gothic New',sans-serif;font-size:12px;color:#0a0a0a;}
+.pv-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #0a0a0a;}
+.pv-brand{font-family:'Noto Serif JP',serif;font-size:22px;font-weight:300;letter-spacing:.15em;}
+.pv-ref{font-size:9px;letter-spacing:.4em;text-transform:uppercase;color:#aaa;margin-bottom:4px;}
+.pv-loc-head{background:#0a0a0a;color:#f8f7f4;padding:7px 10px;font-size:9px;letter-spacing:.4em;text-transform:uppercase;margin:16px 0 8px;}
+.pv-table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:6px;}
+.pv-table th{padding:6px 5px;font-size:8px;letter-spacing:.3em;text-transform:uppercase;color:#aaa;font-weight:400;border-bottom:1px solid rgba(10,10,10,.12);text-align:left;}
+.pv-table th.r,.pv-table td.r{text-align:right;}
+.pv-table td{padding:8px 5px;border-bottom:1px solid rgba(10,10,10,.05);}
+.pv-sub-row td{background:#f8f7f4;font-weight:500;border-top:1px solid rgba(10,10,10,.12);}
+.pv-terms{margin-top:20px;border-top:1px solid rgba(10,10,10,.1);padding-top:14px;}
+.pv-term-cat{font-size:8px;letter-spacing:.4em;text-transform:uppercase;color:#aaa;margin-bottom:4px;margin-top:10px;}
+.empty{text-align:center;padding:50px 0;font-size:10px;color:#ccc;letter-spacing:.3em;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div style="display:flex;align-items:center;"><span class="brand">WATCON</span><span class="bc">/ Quotes</span></div>
+  <div id="ta" style="display:flex;gap:8px;align-items:center;"></div>
+</div>
+
+<div class="main" id="app"></div>
+
+<div id="modal-root"></div>
+
+<script>
+// ── helpers ───────────────────────────────────────────────────────────────────
+const fmt  = n => new Intl.NumberFormat('en-IN',{maximumFractionDigits:2}).format(n||0);
+const fmtC = n => '₹ ' + fmt(n);
+const today= new Date().toISOString().split('T')[0];
+let   _uid = 100;
+const uid  = () => ++_uid;
+
+// ── master item catalogue ─────────────────────────────────────────────────────
+const CATALOGUE = [
+  {id:'PIPE-001',name:'GI Pipe 20mm · Medium Duty',brand:'Jindal',unit:'MTR',price:280,image:null},
+  {id:'PIPE-002',name:'GI Pipe 25mm · Medium Duty',brand:'Jindal',unit:'MTR',price:340,image:null},
+  {id:'PIPE-003',name:'GI Pipe 32mm · Heavy Duty',brand:'Tata Steel',unit:'MTR',price:480,image:null},
+  {id:'TILE-001',name:'Porcelain Floor Tile 600×600 · Matte',brand:'Kajaria',unit:'SQM',price:680,image:null},
+  {id:'TILE-002',name:'Porcelain Floor Tile 600×600 · Gloss',brand:'Kajaria',unit:'SQM',price:720,image:null},
+  {id:'TILE-003',name:'Vitrified Tile 800×800 · Matte',brand:'Somany',unit:'SQM',price:920,image:null},
+  {id:'MARB-001',name:'Italian Marble Slab 2400×1200 · Polished',brand:'Carrara',unit:'SQM',price:6200,image:null},
+  {id:'WOOD-001',name:'Engineered Wood Plank · Oak · Matte',brand:'Pergo',unit:'SQF',price:380,image:null},
+  {id:'WOOD-002',name:'Engineered Wood Plank · Walnut · Gloss',brand:'Pergo',unit:'SQF',price:410,image:null},
+  {id:'FP-001',name:'Fireplace XL900 · Electric',brand:'Dimplex',unit:'NOS',price:185000,image:null},
+  {id:'FP-002',name:'Fireplace S600 · Gas',brand:'Valor',unit:'NOS',price:95000,image:null},
+];
+
+const CUSTOMERS = [
+  {id:'CUST-001',name:'Rahul Constructions',contact:'Rahul Mehta',phone:'9820012345',email:'rahul@rahulconstructions.in',billingAddress:'Plot 14, MIDC Industrial Area, Andheri East, Mumbai - 400093'},
+  {id:'CUST-002',name:'Elite Residences',contact:'Priya Shah',phone:'9867543210',email:'priya.shah@eliteresidences.com',billingAddress:'1201, Lotus Business Park, Malad West, Mumbai - 400064'},
+  {id:'CUST-003',name:'Metro Interiors',contact:'Anil Kumar',phone:'9821987654',email:'anil@metrointeriors.in',billingAddress:'Shop 4-5, Maratha Mandir Building, Dadar West, Mumbai - 400028'},
+  {id:'CUST-004',name:'Skyline Developers',contact:'Deepak Joshi',phone:'9988776655',email:'deepak@skylinedev.com',billingAddress:'702, Trade Centre, BKC, Mumbai - 400051'},
+  {id:'CUST-005',name:'The Arch Studio',contact:'Neha Patel',phone:'9823456780',email:'neha@thearchstudio.in',billingAddress:'301, Maker Chambers V, Nariman Point, Mumbai - 400021'},
+];
+
+const DEFAULT_TERMS = [
+  {cat:'Delivery',text:'Delivery within 4–6 weeks from order confirmation and advance payment.'},
+  {cat:'GST',text:'GST as applicable will be charged extra on the above prices.'},
+  {cat:'Payment',text:'50% advance with order, balance before dispatch.'},
+  {cat:'Warranty',text:'Manufacturer warranty applicable as per product specifications.'},
+  {cat:'Exclusion',text:'Civil work, installation, and site preparation are excluded from this quote.'},
+];
+
+// ── seed quotes ───────────────────────────────────────────────────────────────
+const SEED_QUOTES = [
+  {
+    id:'QT-2026-001', rev:0, status:'sent', date:'2026-05-10', subject:'Supply of Flooring Material',
+    custId:'CUST-001', companyLogo:null,
+    gstPct:18, transport:5000, transportNote:'Ex-Mumbai',
+    locations:[
+      {id:1, name:'Ground Floor', items:[
+        {id:10,catId:'TILE-001',name:'Porcelain Floor Tile 600×600 · Matte',brand:'Kajaria',unit:'SQM',image:null,rate:680,qty:400,disc:5},
+        {id:11,catId:'TILE-003',name:'Vitrified Tile 800×800 · Matte',brand:'Somany',unit:'SQM',image:null,rate:920,qty:120,disc:0},
+      ]},
+      {id:2, name:'First Floor', items:[
+        {id:12,catId:'TILE-002',name:'Porcelain Floor Tile 600×600 · Gloss',brand:'Kajaria',unit:'SQM',image:null,rate:720,qty:200,disc:5},
+      ]},
+    ],
+    terms:[...DEFAULT_TERMS],
+  },
+  {
+    id:'QT-2026-002', rev:1, status:'accepted', date:'2026-04-22', subject:'Fireplace Supply — Bungalow Project',
+    custId:'CUST-002', companyLogo:null,
+    gstPct:18, transport:2500, transportNote:'',
+    locations:[
+      {id:1, name:'Living Room', items:[
+        {id:20,catId:'FP-001',name:'Fireplace XL900 · Electric',brand:'Dimplex',unit:'NOS',image:null,rate:185000,qty:1,disc:10},
+      ]},
+      {id:2, name:'Master Bedroom', items:[
+        {id:21,catId:'FP-002',name:'Fireplace S600 · Gas',brand:'Valor',unit:'NOS',image:null,rate:95000,qty:1,disc:8},
+      ]},
+    ],
+    terms:[...DEFAULT_TERMS],
+  },
+];
+
+// ── state ─────────────────────────────────────────────────────────────────────
+let customers   = JSON.parse(JSON.stringify(CUSTOMERS));
+let quotes      = JSON.parse(JSON.stringify(SEED_QUOTES));
+let view        = 'list';  // list | builder | preview
+let editingQ    = null;    // quote being built/edited
+let selQ        = null;    // quote being previewed
+let search      = '';
+let filt        = 'all';
+
+// ── quote totals ──────────────────────────────────────────────────────────────
+function lineTotal(it){ return it.rate * it.qty * (1 - (it.disc||0)/100); }
+function locSubtotal(loc){ return loc.items.reduce((s,it)=>s+lineTotal(it),0); }
+function quoteSubtotal(q){ return q.locations.reduce((s,l)=>s+locSubtotal(l),0); }
+function quoteGST(q){ return quoteSubtotal(q) * (q.gstPct||0)/100; }
+function quoteGrand(q){ return quoteSubtotal(q) + quoteGST(q) + (parseFloat(q.transport)||0); }
+
+// ── render ────────────────────────────────────────────────────────────────────
+function render(){
+  const app=document.getElementById('app');
+  const ta =document.getElementById('ta');
+  if(view==='list'){
+    ta.innerHTML=`<button class="btn btn-primary" onclick="goNew()">+ New Quote</button>`;
+    app.innerHTML=renderList();
+  } else if(view==='builder'){
+    ta.innerHTML=`
+      <button class="btn btn-ghost btn-sm" onclick="goPreview()"><i class="ti ti-eye" style="margin-right:4px;font-size:13px;"></i>Preview</button>
+      <button class="btn btn-ghost btn-sm" onclick="goList()">← All Quotes</button>`;
+    app.innerHTML=renderBuilder();
+    bindBuilderLive();
+  } else if(view==='preview'){
+    ta.innerHTML=`
+      <button class="btn btn-ghost btn-sm" onclick="goPrint()"><i class="ti ti-printer" style="margin-right:4px;font-size:13px;"></i>Print</button>
+      <button class="btn btn-ghost btn-sm" onclick="view='builder';render()"><i class="ti ti-pencil" style="margin-right:4px;font-size:13px;"></i>Edit</button>
+      <button class="btn btn-ghost btn-sm" onclick="goList()">← All Quotes</button>`;
+    app.innerHTML=renderPreview();
+  }
+}
+
+// ── LIST ─────────────────────────────────────────────────────────────────────
+function renderList(){
+  const filtered=quotes.filter(q=>{
+    const c=customers.find(x=>x.id===q.custId);
+    const ms=(q.id+' '+(c?c.name:'')+' '+q.subject).toLowerCase().includes(search);
+    const mf=filt==='all'||q.status===filt;
+    return ms&&mf;
+  });
+  const STATUSES=['all','draft','sent','accepted','revised','cancelled'];
+  return `
+  <div style="display:flex;gap:10px;margin-bottom:18px;align-items:center;flex-wrap:wrap;">
+    <div class="search-wrap"><i class="ti ti-search si"></i>
+      <input class="search-input" placeholder="Search by quote #, customer, subject…" value="${search}" oninput="search=this.value.toLowerCase();render()"/>
+    </div>
+    <div class="ftabs">${STATUSES.map(s=>`<button class="ftab ${filt===s?'active':''}" onclick="filt='${s}';render()">${s.charAt(0).toUpperCase()+s.slice(1)}</button>`).join('')}</div>
+    <span style="font-size:10px;color:#aaa;white-space:nowrap;">${filtered.length} quotes</span>
+  </div>
+  ${filtered.length===0?'<div class="empty">No quotes found</div>':
+  `<div class="q-grid">${filtered.map(q=>{
+    const c=customers.find(x=>x.id===q.custId);
+    return `<div class="q-card" onclick="goPreviewQ('${q.id}')">
+      <div class="q-ref">${q.id} ${q.rev>0?`<span class="rev-badge">Rev ${q.rev}</span>`:''}</div>
+      <div class="q-name">${c?c.name:'Unknown Customer'}</div>
+      <div class="q-sub">${q.subject}</div>
+      <div style="font-size:10px;color:#aaa;margin-bottom:6px;">${q.locations.length} location${q.locations.length!==1?'s':''} · ${q.locations.reduce((s,l)=>s+l.items.length,0)} items</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+        <span class="q-status qs-${q.status}">${q.status}</span>
+        ${q.locations.map(l=>`<span style="font-size:9px;letter-spacing:.1em;border:1px solid rgba(10,10,10,.12);padding:2px 7px;color:#777;">${l.name}</span>`).join('')}
+      </div>
+      <div class="q-meta">
+        <div class="q-total">${fmtC(quoteGrand(q))}</div>
+        <div class="q-date">${q.date}</div>
+      </div>
+    </div>`;}).join('')}</div>`}`;
+}
+
+// ── BUILDER ───────────────────────────────────────────────────────────────────
+function renderBuilder(){
+  const q=editingQ;
+  const locBlocks=q.locations.map((loc,li)=>renderLocBlock(loc,li)).join('');
+  const termRows=q.terms.map((t,i)=>renderTermRow(t,i)).join('');
+  const sub=quoteSubtotal(q);
+  const gstAmt=quoteGST(q);
+  const grand=quoteGrand(q);
+
+  return `
+  <div class="back-row">
+    <button class="btn btn-ghost" onclick="saveAndList()">Save & Exit</button>
+    <span style="font-size:9px;letter-spacing:.4em;color:#aaa;text-transform:uppercase;">${q.id} ${q.rev>0?'Rev '+q.rev:''}</span>
+    <div style="margin-left:auto;display:flex;gap:8px;">
+      <button class="btn btn-ghost btn-sm" onclick="goRevise()"><i class="ti ti-git-branch" style="margin-right:4px;font-size:12px;"></i>Create Revision</button>
+      <button class="btn btn-ghost btn-sm" onclick="goPreview()"><i class="ti ti-eye" style="margin-right:4px;font-size:12px;"></i>Preview</button>
+    </div>
+  </div>
+
+  <!-- Header strip -->
+  <div class="panel">
+    <div class="pt"><span>Quote Details</span>
+      <select class="fsel" style="width:130px;" onchange="editingQ.status=this.value;rerender()">
+        ${['draft','sent','accepted','revised','cancelled'].map(s=>`<option value="${s}" ${q.status===s?'selected':''}>${s.charAt(0).toUpperCase()+s.slice(1)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="qb-header">
+      <div class="g3">
+        <div class="fr"><label class="lbl">Quote Reference</label><input class="fi" value="${q.id}" disabled/></div>
+        <div class="fr"><label class="lbl">Revision No.</label><input class="fi" value="${q.rev}" disabled/></div>
+        <div class="fr"><label class="lbl">Date</label><input class="fi" type="date" value="${q.date}" onchange="editingQ.date=this.value"/></div>
+        <div class="fr" style="grid-column:1/-1;"><label class="lbl">Subject / Project Name</label>
+          <input class="fi" value="${q.subject}" placeholder="e.g. Supply of Flooring Material — Bungalow Project" oninput="editingQ.subject=this.value"/>
+        </div>
+      </div>
+      <div>
+        <div class="logo-box" id="logo-box" onclick="document.getElementById('logo-upload').click()">
+          ${q.companyLogo?`<img src="${q.companyLogo}"/>`:'<div class="logo-hint"><i class="ti ti-building" style="font-size:22px;display:block;margin-bottom:4px;"></i>Upload Logo</div>'}
+        </div>
+        <input type="file" id="logo-upload" accept="image/*" style="display:none;" onchange="uploadLogo(this)"/>
+        <div class="fr"><label class="lbl">GST %</label>
+          <input class="fi" type="number" id="q-gst" value="${q.gstPct}" min="0" max="28" oninput="editingQ.gstPct=parseFloat(this.value)||0;rerenderSummary()"/>
+        </div>
+        <div class="fr"><label class="lbl">Transport (₹)</label>
+          <input class="fi" type="number" id="q-transport" value="${q.transport}" min="0" oninput="editingQ.transport=parseFloat(this.value)||0;rerenderSummary()"/>
+        </div>
+        <div class="fr"><label class="lbl">Transport Note</label>
+          <input class="fi" value="${q.transportNote}" placeholder="Ex-Mumbai, included etc." oninput="editingQ.transportNote=this.value"/>
+        </div>
+      </div>
+    </div>
+    <!-- Customer -->
+    <div style="border-top:1px solid rgba(10,10,10,.07);padding-top:14px;">
+      <div class="pt" style="margin-bottom:10px;"><span>Customer</span>
+        <button class="btn btn-ghost btn-sm" onclick="showNewCustModal()">+ New Customer</button>
+      </div>
+      <div class="g3">
+        <div class="fr"><label class="lbl">Select Customer</label>
+          <select class="fsel" id="q-cust" onchange="editingQ.custId=this.value;rerender()">
+            <option value="">— Select —</option>
+            ${customers.map(c=>`<option value="${c.id}" ${q.custId===c.id?'selected':''}>${c.name}</option>`).join('')}
+          </select>
+        </div>
+        ${(()=>{const c=customers.find(x=>x.id===q.custId);if(!c)return'<div></div><div></div>';
+        return `<div class="fr"><label class="lbl">Contact</label><div style="font-size:12px;padding-top:7px;">${c.contact} · ${c.phone}</div></div>
+          <div class="fr"><label class="lbl">Billing Address</label><div style="font-size:11px;color:#888;padding-top:5px;line-height:1.5;">${c.billingAddress}</div></div>`;})()}
+      </div>
+    </div>
+  </div>
+
+  <!-- Locations -->
+  <div id="locations-container">${locBlocks}</div>
+  <button class="btn-add" onclick="addLocation()" style="margin-bottom:14px;">
+    <i class="ti ti-map-pin" style="font-size:15px;"></i> Add Location / Area
+  </button>
+
+  <!-- Summary -->
+  <div id="summary-section">${renderSummaryHTML(q)}</div>
+
+  <!-- Terms -->
+  <div class="panel">
+    <div class="pt"><span>Terms &amp; Conditions</span>
+      <button class="btn btn-ghost btn-sm" onclick="addTerm()">+ Add Term</button>
+    </div>
+    <div style="margin-bottom:10px;display:flex;flex-wrap:wrap;gap:6px;">
+      ${['Delivery','GST','Payment','Warranty','Exclusion','Other'].map(cat=>`<button class="term-cat" onclick="addTermWithCat('${cat}')">${cat}</button>`).join('')}
+    </div>
+    <div id="terms-container">${termRows}</div>
+  </div>
+  `;
+}
+
+function renderLocBlock(loc,li){
+  const sub=locSubtotal(loc);
+  const rows=loc.items.map((it,ii)=>renderLineItem(it,li,ii)).join('');
+  return `<div class="loc-block" id="loc-${loc.id}">
+    <div class="loc-header">
+      <div style="display:flex;align-items:center;gap:8px;flex:1;">
+        <span class="loc-num">Location ${li+1}</span>
+        <input class="fi-inline" style="flex:1;font-weight:500;" value="${loc.name}" placeholder="e.g. Ground Floor, Living Room…"
+          oninput="editingQ.locations[${li}].name=this.value"/>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <span style="font-family:'Noto Serif JP',serif;font-size:14px;font-weight:300;color:#0a0a0a;">${fmtC(sub)}</span>
+        ${li>0?`<button class="btn-icon" onclick="removeLocation(${loc.id})" title="Remove location"><i class="ti ti-trash"></i></button>`:''}
+      </div>
+    </div>
+    <div class="loc-body">
+      <table class="li-table">
+        <thead><tr>
+          <th style="width:50px;"></th>
+          <th>Item / Description</th>
+          <th style="width:90px;">Brand</th>
+          <th style="width:55px;">Unit</th>
+          <th style="width:110px;text-align:right;">Rate (₹)</th>
+          <th style="width:80px;text-align:right;">Qty</th>
+          <th style="width:80px;text-align:right;">Disc %</th>
+          <th style="width:130px;" class="r">Line Total</th>
+          <th style="width:36px;"></th>
+        </tr></thead>
+        <tbody id="tbody-${loc.id}">${rows}</tbody>
+        <tfoot><tr class="loc-subtotal-row">
+          <td colspan="7">Location Subtotal — ${loc.name}</td>
+          <td class="r" style="font-family:'Noto Serif JP',serif;font-size:14px;" id="loc-sub-${loc.id}">${fmtC(sub)}</td>
+          <td></td>
+        </tr></tfoot>
+      </table>
+      <button class="btn-add" style="margin-top:10px;" onclick="showItemPicker(${loc.id})">
+        <i class="ti ti-plus" style="font-size:14px;"></i> Add Item
+      </button>
+    </div>
+  </div>`;
+}
+
+function renderLineItem(it,li,ii){
+  const lt=lineTotal(it);
+  const discAmt=it.rate*it.qty*(it.disc||0)/100;
+  return `<tr id="row-${it.id}">
+    <td>
+      <div class="li-img" onclick="uploadItemImg(${it.id},${li})" title="Click to add image">
+        ${it.image?`<img src="${it.image}"/>`:`<i class="ti ti-photo" style="font-size:14px;color:#ccc;"></i>`}
+      </div>
+    </td>
+    <td>
+      <input class="fi-inline" style="font-weight:500;" value="${it.name}" oninput="updateItem(${it.id},'name',this.value)"/>
+    </td>
+    <td><input class="fi-inline" value="${it.brand||''}" oninput="updateItem(${it.id},'brand',this.value)"/></td>
+    <td><input class="fi-inline" value="${it.unit}" style="width:50px;" oninput="updateItem(${it.id},'unit',this.value)"/></td>
+    <td><input class="fi-inline" type="number" value="${it.rate}" style="text-align:right;" oninput="updateItem(${it.id},'rate',parseFloat(this.value)||0)"/></td>
+    <td><input class="fi-inline" type="number" value="${it.qty}" style="text-align:right;" oninput="updateItem(${it.id},'qty',parseFloat(this.value)||0)"/></td>
+    <td>
+      <input class="fi-inline" type="number" value="${it.disc||0}" min="0" max="100" style="text-align:right;" oninput="updateItem(${it.id},'disc',parseFloat(this.value)||0)"/>
+      ${discAmt>0?`<div class="li-disc" style="text-align:right;font-size:10px;">− ${fmtC(discAmt)}</div>`:''}
+    </td>
+    <td class="r"><span class="li-subtotal" id="lt-${it.id}">${fmtC(lt)}</span></td>
+    <td><button class="btn-icon" onclick="removeItem(${it.id})" title="Remove"><i class="ti ti-x"></i></button></td>
+  </tr>`;
+}
+
+function renderTermRow(t,i){
+  return `<div class="term-row" id="term-row-${i}">
+    <span class="term-cat" style="cursor:default;">${t.cat}</span>
+    <input class="fi-inline" value="${t.text}" style="flex:1;" oninput="editingQ.terms[${i}].text=this.value" placeholder="Term text…"/>
+    <button class="btn-icon" onclick="removeTerm(${i})"><i class="ti ti-x"></i></button>
+  </div>`;
+}
+
+function renderSummaryHTML(q){
+  const sub=quoteSubtotal(q);
+  const gstAmt=quoteGST(q);
+  const trans=parseFloat(q.transport)||0;
+  const grand=sub+gstAmt+trans;
+  return `<div class="summary-grid">
+    <div></div>
+    <div>
+      <div class="sum-row"><span class="sum-label">Subtotal (before GST)</span><span class="sum-val">${fmtC(sub)}</span></div>
+      <div class="sum-row gst">
+        <span class="sum-label">GST @ <input class="fi-inline" type="number" id="q-gst-sum" value="${q.gstPct}" min="0" max="28" style="width:40px;text-align:center;" oninput="editingQ.gstPct=parseFloat(this.value)||0;rerenderSummary()"/>%</span>
+        <span class="sum-val" id="sum-gst">${fmtC(gstAmt)}</span>
+      </div>
+      <div class="sum-row transport">
+        <span class="sum-label">Transport ${q.transportNote?`(${q.transportNote})`:''}</span>
+        <span class="sum-val" id="sum-transport">${fmtC(trans)}</span>
+      </div>
+      <div class="sum-row grand">
+        <span class="sum-label">Grand Total</span>
+        <span class="sum-val" id="sum-grand">${fmtC(grand)}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── LIVE UPDATE (no full re-render) ──────────────────────────────────────────
+function updateItem(itemId,key,val){
+  // find item across all locations
+  for(const loc of editingQ.locations){
+    const it=loc.items.find(x=>x.id===itemId);
+    if(it){
+      it[key]=val;
+      const lt=lineTotal(it);
+      const discAmt=it.rate*it.qty*(it.disc||0)/100;
+      const el=document.getElementById('lt-'+itemId);
+      if(el) el.textContent=fmtC(lt);
+      // update disc label
+      const row=document.getElementById('row-'+itemId);
+      if(row){
+        const discEl=row.querySelector('.li-disc');
+        if(discAmt>0){
+          if(discEl) discEl.textContent='− '+fmtC(discAmt);
+          else{
+            const discCell=row.querySelectorAll('td')[6];
+            if(discCell) discCell.innerHTML+=`<div class="li-disc" style="text-align:right;font-size:10px;">− ${fmtC(discAmt)}</div>`;
+          }
+        } else { if(discEl) discEl.remove(); }
+      }
+      // update loc header subtotal
+      const locSub=locSubtotal(loc);
+      const locEl=document.getElementById('loc-sub-'+loc.id);
+      if(locEl) locEl.textContent=fmtC(locSub);
+      // update loc header display
+      const locHeader=document.querySelector(`#loc-${loc.id} .loc-header span[style*="Noto"]`);
+      if(locHeader) locHeader.textContent=fmtC(locSub);
+      rerenderSummary();
+      break;
+    }
+  }
+}
+
+function rerenderSummary(){
+  const sec=document.getElementById('summary-section');
+  if(sec) sec.innerHTML=renderSummaryHTML(editingQ);
+}
+
+function rerender(){ render(); }
+
+function bindBuilderLive(){}
+
+// ── ACTIONS ───────────────────────────────────────────────────────────────────
+function addLocation(){
+  editingQ.locations.push({id:uid(),name:'Location '+( editingQ.locations.length+1),items:[]});
+  rerender();
+}
+function removeLocation(locId){
+  if(editingQ.locations.length<=1){alert('At least one location required');return;}
+  editingQ.locations=editingQ.locations.filter(l=>l.id!==locId);
+  rerender();
+}
+function removeItem(itemId){
+  for(const loc of editingQ.locations){
+    const idx=loc.items.findIndex(x=>x.id===itemId);
+    if(idx>-1){loc.items.splice(idx,1);break;}
+  }
+  rerender();
+}
+function addTerm(){ editingQ.terms.push({cat:'Other',text:''});rerender(); }
+function addTermWithCat(cat){ editingQ.terms.push({cat,text:''});rerender(); }
+function removeTerm(i){ editingQ.terms.splice(i,1);rerender(); }
+
+function uploadLogo(inp){
+  const f=inp.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=e=>{editingQ.companyLogo=e.target.result;
+    const box=document.getElementById('logo-box');
+    if(box) box.innerHTML=`<img src="${e.target.result}" style="max-width:100%;max-height:100%;object-fit:contain;"/>`;
+  };
+  rd.readAsDataURL(f);
+}
+
+function uploadItemImg(itemId,li){
+  const inp=document.createElement('input');
+  inp.type='file';inp.accept='image/*';
+  inp.onchange=e=>{
+    const f=e.target.files[0];if(!f)return;
+    const rd=new FileReader();
+    rd.onload=ev=>{
+      for(const loc of editingQ.locations){const it=loc.items.find(x=>x.id===itemId);if(it){it.image=ev.target.result;break;}}
+      const box=document.querySelector(`#row-${itemId} .li-img`);
+      if(box) box.innerHTML=`<img src="${ev.target.result}"/>`;
+    };
+    rd.readAsDataURL(f);
+  };
+  inp.click();
+}
+
+function goNew(){
+  const nextNum='QT-2026-'+String(quotes.length+1).padStart(3,'0');
+  editingQ={
+    id:nextNum,rev:0,status:'draft',date:today,subject:'',
+    custId:'',companyLogo:null,
+    gstPct:18,transport:0,transportNote:'',
+    locations:[{id:uid(),name:'Location 1',items:[]}],
+    terms:JSON.parse(JSON.stringify(DEFAULT_TERMS)),
+  };
+  view='builder';render();
+}
+
+function goEdit(id){
+  editingQ=JSON.parse(JSON.stringify(quotes.find(q=>q.id===id)));
+  view='builder';render();
+}
+
+function goRevise(){
+  const newQ=JSON.parse(JSON.stringify(editingQ));
+  newQ.rev=(editingQ.rev||0)+1;
+  newQ.status='revised';
+  newQ.id=editingQ.id; // same base ID
+  quotes=quotes.filter(q=>!(q.id===editingQ.id&&q.rev===editingQ.rev));
+  quotes.unshift(newQ);
+  editingQ=newQ;
+  rerender();
+}
+
+function saveAndList(){
+  const idx=quotes.findIndex(q=>q.id===editingQ.id&&q.rev===editingQ.rev);
+  if(idx>-1) quotes[idx]=editingQ;
+  else quotes.unshift(editingQ);
+  view='list';render();
+}
+
+function goPreview(){
+  if(editingQ){
+    const idx=quotes.findIndex(q=>q.id===editingQ.id&&q.rev===editingQ.rev);
+    if(idx>-1) quotes[idx]=editingQ; else quotes.unshift(editingQ);
+    selQ=editingQ;
+  }
+  view='preview';render();
+}
+
+function goPreviewQ(id){
+  selQ=quotes.find(q=>q.id===id);
+  editingQ=JSON.parse(JSON.stringify(selQ));
+  view='preview';render();
+}
+
+// ── ITEM PICKER MODAL ─────────────────────────────────────────────────────────
+let _pickerLocId=null;
+let _pickerSel=new Set();
+
+function showItemPicker(locId){
+  _pickerLocId=locId;_pickerSel=new Set();
+  const mr=document.getElementById('modal-root');
+  mr.innerHTML=`<div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <div class="modal-title">Add Items</div>
+      <div style="position:relative;margin-bottom:12px;">
+        <i class="ti ti-search si" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:14px;color:#bbb;"></i>
+        <input class="search-input" placeholder="Search items…" style="padding-left:32px;" oninput="filterPickerItems(this.value)"/>
+      </div>
+      <div class="item-pick-grid" id="picker-grid">${renderPickerItems('')}</div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button class="btn btn-ghost btn-sm" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="confirmItemPick()">Add Selected</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderPickerItems(s){
+  const filtered=CATALOGUE.filter(it=>
+    it.name.toLowerCase().includes(s.toLowerCase())||it.brand.toLowerCase().includes(s.toLowerCase())
+  );
+  return filtered.map(it=>`
+    <div class="item-pick-card ${_pickerSel.has(it.id)?'sel':''}" onclick="togglePick('${it.id}',this)">
+      <div class="ip-thumb">${it.image?`<img src="${it.image}"/>`:`<i class="ti ti-package" style="font-size:16px;color:#ccc;"></i>`}</div>
+      <div><div class="ip-name">${it.name}</div><div class="ip-sub">${it.brand} · ${it.unit} · ${fmtC(it.price)}</div></div>
+    </div>`).join('');
+}
+
+function filterPickerItems(s){
+  const g=document.getElementById('picker-grid');
+  if(g) g.innerHTML=renderPickerItems(s);
+}
+
+function togglePick(id,el){
+  if(_pickerSel.has(id)){_pickerSel.delete(id);el.classList.remove('sel');}
+  else{_pickerSel.add(id);el.classList.add('sel');}
+}
+
+function confirmItemPick(){
+  const loc=editingQ.locations.find(l=>l.id===_pickerLocId);
+  if(!loc)return;
+  _pickerSel.forEach(catId=>{
+    const cat=CATALOGUE.find(x=>x.id===catId);
+    if(!cat)return;
+    loc.items.push({id:uid(),catId:cat.id,name:cat.name,brand:cat.brand,unit:cat.unit,rate:cat.price,qty:1,disc:0,image:cat.image});
+  });
+  closeModal();rerender();
+}
+
+function closeModal(){ document.getElementById('modal-root').innerHTML=''; }
+
+// ── NEW CUSTOMER MODAL ────────────────────────────────────────────────────────
+function showNewCustModal(){
+  const mr=document.getElementById('modal-root');
+  mr.innerHTML=`<div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <div class="modal-title">New Customer</div>
+      <div class="fr"><label class="lbl">Customer Name *</label><input class="fi" id="nc-name" placeholder="Company / Person name"/></div>
+      <div class="fr"><label class="lbl">Contact Person</label><input class="fi" id="nc-contact" placeholder="Contact person"/></div>
+      <div class="fr"><label class="lbl">Phone *</label><input class="fi" id="nc-phone" placeholder="10-digit mobile"/></div>
+      <div class="fr"><label class="lbl">Email</label><input class="fi" id="nc-email" placeholder="email@example.com"/></div>
+      <div class="fr"><label class="lbl">GSTIN</label><input class="fi" id="nc-gstin" placeholder="27AAAAA0000A1Z5"/></div>
+      <div class="fr"><label class="lbl">Billing Address</label><textarea class="fta" id="nc-addr" placeholder="Full billing address" style="min-height:50px;"></textarea></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
+        <button class="btn btn-ghost btn-sm" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="saveNewCust()">Create & Select</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function saveNewCust(){
+  const name=document.getElementById('nc-name').value.trim();
+  const phone=document.getElementById('nc-phone').value.trim();
+  if(!name)return alert('Name required');
+  if(!phone)return alert('Phone required');
+  const id='CUST-'+String(customers.length+1).padStart(3,'0');
+  customers.push({id,name,contact:document.getElementById('nc-contact').value.trim(),
+    phone,email:document.getElementById('nc-email').value.trim(),
+    gstin:document.getElementById('nc-gstin').value.trim(),
+    billingAddress:document.getElementById('nc-addr').value.trim()});
+  editingQ.custId=id;
+  closeModal();rerender();
+}
+
+// ── PREVIEW ───────────────────────────────────────────────────────────────────
+function renderPreview(){
+  const q=selQ||editingQ;
+  const c=customers.find(x=>x.id===q.custId)||{name:'—',contact:'—',billingAddress:'—'};
+  const sub=quoteSubtotal(q);
+  const gstAmt=quoteGST(q);
+  const trans=parseFloat(q.transport)||0;
+  const grand=sub+gstAmt+trans;
+
+  const locSections=q.locations.map(loc=>{
+    const lsub=locSubtotal(loc);
+    const rows=loc.items.map(it=>{
+      const lt=lineTotal(it);
+      const discAmt=it.rate*it.qty*(it.disc||0)/100;
+      return `<tr>
+        <td>${it.image?`<img src="${it.image}" style="width:36px;height:36px;object-fit:cover;border:1px solid rgba(10,10,10,.08);"/>`:
+          `<div style="width:36px;height:36px;background:#f3f2ef;display:flex;align-items:center;justify-content:center;"><i class="ti ti-package" style="font-size:14px;color:#ccc;"></i></div>`}</td>
+        <td style="font-weight:500;">${it.name}</td>
+        <td>${it.brand||'—'}</td>
+        <td>${it.unit}</td>
+        <td class="r">${fmtC(it.rate)}</td>
+        <td class="r">${fmt(it.qty)}</td>
+        <td class="r">${it.disc?it.disc+'%':'—'}${discAmt>0?`<br/><span style="color:#1a5a1a;font-size:10px;">− ${fmtC(discAmt)}</span>`:''}</td>
+        <td class="r" style="font-family:'Noto Serif JP',serif;font-size:13px;">${fmtC(lt)}</td>
+      </tr>`;}).join('');
+    return `<div class="pv-loc-head"><i class="ti ti-map-pin" style="margin-right:6px;font-size:12px;"></i>${loc.name}</div>
+    <table class="pv-table">
+      <thead><tr>
+        <th style="width:44px;"></th>
+        <th>Item / Description</th>
+        <th>Brand</th>
+        <th>Unit</th>
+        <th class="r">Rate</th>
+        <th class="r">Qty</th>
+        <th class="r">Disc</th>
+        <th class="r">Total</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot><tr class="pv-sub-row">
+        <td colspan="7">Location Subtotal — ${loc.name}</td>
+        <td class="r" style="font-family:'Noto Serif JP',serif;font-size:13px;">${fmtC(lsub)}</td>
+      </tr></tfoot>
+    </table>`;}).join('');
+
+  // group terms by category
+  const termsByCat={};
+  q.terms.forEach(t=>{if(!termsByCat[t.cat])termsByCat[t.cat]=[];termsByCat[t.cat].push(t.text);});
+  const termsHtml=Object.entries(termsByCat).map(([cat,txts])=>
+    `<div class="pv-term-cat">${cat}</div>${txts.map((t,i)=>`<div style="font-size:11px;color:#555;margin-bottom:4px;padding-left:8px;border-left:2px solid rgba(10,10,10,.1);line-height:1.6;">${t}</div>`).join('')}`
+  ).join('');
+
+  return `
+  <div class="back-row">
+    <button class="btn btn-ghost" onclick="view='builder';render()"><i class="ti ti-pencil" style="margin-right:4px;font-size:12px;"></i>Edit</button>
+    <span style="font-size:9px;letter-spacing:.4em;color:#aaa;text-transform:uppercase;">${q.id} — Preview</span>
+    <div style="margin-left:auto;display:flex;gap:8px;">
+      <button class="btn btn-ghost btn-sm" onclick="goPrint()"><i class="ti ti-printer" style="margin-right:4px;font-size:12px;"></i>Print / PDF</button>
+    </div>
+  </div>
+  <div class="preview-wrap" id="preview-content">
+    <div class="pv-header">
+      <div>
+        ${q.companyLogo?`<img src="${q.companyLogo}" style="max-height:60px;max-width:160px;object-fit:contain;margin-bottom:8px;display:block;"/>`:'<div class="pv-brand">WATCON</div>'}
+        <div style="font-size:10px;color:#aaa;letter-spacing:.2em;margin-top:4px;">Management Software</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="pv-ref">Quotation</div>
+        <div style="font-family:'Noto Serif JP',serif;font-size:20px;font-weight:300;">${q.id}</div>
+        ${q.rev>0?`<div style="font-size:10px;color:#ba7517;letter-spacing:.2em;margin-top:2px;">Revision ${q.rev}</div>`:''}
+        <div style="font-size:11px;color:#888;margin-top:4px;">Date: ${q.date}</div>
+        <span class="q-status qs-${q.status}" style="margin-top:6px;display:inline-block;">${q.status}</span>
+      </div>
+    </div>
+
+    <div class="g2" style="margin-bottom:20px;">
+      <div>
+        <div style="font-size:8px;letter-spacing:.4em;text-transform:uppercase;color:#aaa;margin-bottom:5px;">Customer</div>
+        <div style="font-weight:500;font-size:14px;margin-bottom:2px;">${c.name}</div>
+        <div style="font-size:11px;color:#777;line-height:1.6;">${c.contact}<br/>${c.billingAddress}</div>
+      </div>
+      <div>
+        <div style="font-size:8px;letter-spacing:.4em;text-transform:uppercase;color:#aaa;margin-bottom:5px;">Subject</div>
+        <div style="font-size:13px;font-weight:500;margin-bottom:8px;">${q.subject||'—'}</div>
+        <div style="font-size:11px;color:#777;">${q.locations.length} location${q.locations.length!==1?'s':''}: ${q.locations.map(l=>l.name).join(', ')}</div>
+      </div>
+    </div>
+
+    ${locSections}
+
+    <div style="display:grid;grid-template-columns:1fr 280px;gap:16px;margin-top:20px;border-top:2px solid #0a0a0a;padding-top:14px;">
+      <div></div>
+      <div>
+        <div class="sum-row"><span class="sum-label">Subtotal</span><span class="sum-val">${fmtC(sub)}</span></div>
+        <div class="sum-row gst"><span class="sum-label">GST @ ${q.gstPct}%</span><span class="sum-val">${fmtC(gstAmt)}</span></div>
+        <div class="sum-row transport"><span class="sum-label">Transport ${q.transportNote?`(${q.transportNote})`:''}</span><span class="sum-val">${fmtC(trans)}</span></div>
+        <div class="sum-row grand"><span class="sum-label">Grand Total</span><span class="sum-val">${fmtC(grand)}</span></div>
+      </div>
+    </div>
+
+    <div class="pv-terms">
+      <div style="font-size:9px;letter-spacing:.4em;text-transform:uppercase;color:#aaa;margin-bottom:10px;">Terms &amp; Conditions</div>
+      ${termsHtml}
+    </div>
+    <div style="margin-top:20px;border-top:1px solid rgba(10,10,10,.08);padding-top:10px;font-size:9px;color:#bbb;letter-spacing:.2em;">Watcon Management Software · Quotation · ${q.id} · ${q.date}</div>
+  </div>`;
+}
+
+function goPrint(){
+  const q=selQ||editingQ;
+  const content=document.getElementById('preview-content');
+  if(!content)return;
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>${q.id}</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200;300;400&family=Zen+Kaku+Gothic+New:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css" rel="stylesheet"/>
+<style>
+@page{margin:18mm 16mm;}
+*{box-sizing:border-box;}
+body{font-family:'Zen Kaku Gothic New',Arial,sans-serif;font-size:12px;color:#0a0a0a;background:#fff;line-height:1.5;}
+.no-print{display:flex;gap:10px;padding:12px 16px;border-bottom:2px solid #0a0a0a;background:#fff;align-items:center;}
+.no-print button{padding:7px 16px;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border:none;font-family:inherit;}
+.pb{background:#0a0a0a;color:#fff;} .pg{background:transparent;border:1px solid #aaa;color:#555;}
+@media print{.no-print{display:none!important;}}
+</style></head><body>
+<div class="no-print"><button class="pb" onclick="window.print()">Print / Save PDF</button><button class="pg" onclick="window.close()">Close</button>
+<span style="font-size:10px;color:#888;letter-spacing:1px;">To save as PDF: choose "Save as PDF" in print destination</span></div>
+<div style="padding:24px;">${content.innerHTML}</div>
+</body></html>`);
+  w.document.close();
+  setTimeout(()=>w.print(),600);
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>

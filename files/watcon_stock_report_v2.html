@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>Watcon — Stock Reports</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200;300;400&family=Zen+Kaku+Gothic+New:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Zen Kaku Gothic New',sans-serif;background:#f8f7f4;color:#0a0a0a;font-size:13px;}
+input,select,button{font-family:'Zen Kaku Gothic New',sans-serif;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-thumb{background:#ccc;}
+
+/* topbar */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:11px 20px;border-bottom:1px solid rgba(10,10,10,0.1);background:#fff;position:sticky;top:0;z-index:100;}
+.brand{font-family:'Noto Serif JP',serif;font-weight:300;font-size:15px;letter-spacing:0.2em;}
+.bc{font-size:9px;letter-spacing:0.4em;color:#aaa;text-transform:uppercase;margin-left:14px;}
+
+/* layout */
+.layout{display:grid;grid-template-columns:320px 1fr;gap:0;min-height:calc(100vh - 49px);}
+.sidebar{border-right:1px solid rgba(10,10,10,0.1);background:#fff;padding:20px;overflow-y:auto;}
+.content{padding:20px;background:#f8f7f4;overflow-y:auto;}
+
+/* panel */
+.panel{background:#fff;border:1px solid rgba(10,10,10,0.1);padding:16px;margin-bottom:14px;}
+.pt{font-size:8px;letter-spacing:0.45em;text-transform:uppercase;color:#aaa;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(10,10,10,0.07);}
+
+/* search */
+.search-wrap{position:relative;margin-bottom:14px;}
+.search-input{width:100%;border:1px solid rgba(10,10,10,0.15);padding:9px 12px 9px 32px;font-size:12px;outline:none;color:#0a0a0a;background:#f8f7f4;}
+.search-input:focus{background:#fff;border-color:#0a0a0a;}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:15px;color:#bbb;}
+
+/* filter chips */
+.filter-section{margin-bottom:16px;}
+.filter-label{font-size:8px;letter-spacing:0.4em;text-transform:uppercase;color:#aaa;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+.filter-label button{font-size:9px;letter-spacing:0.2em;background:none;border:none;cursor:pointer;color:#0a0a0a;text-decoration:underline;text-transform:uppercase;font-family:inherit;}
+.chip-grid{display:flex;flex-wrap:wrap;gap:6px;}
+.chip{padding:5px 11px;font-size:10px;letter-spacing:0.1em;border:1px solid rgba(10,10,10,0.15);background:#fff;cursor:pointer;color:#555;transition:all 0.12s;}
+.chip:hover{border-color:#0a0a0a;color:#0a0a0a;}
+.chip.active{background:#0a0a0a;color:#f8f7f4;border-color:#0a0a0a;}
+.chip.partial{background:#f0efe9;border-color:#888;color:#333;}
+
+/* results summary */
+.result-summary{background:#f8f7f4;border:1px solid rgba(10,10,10,0.08);padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
+.rs-count{font-family:'Noto Serif JP',serif;font-size:20px;font-weight:300;}
+.rs-label{font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:#aaa;margin-top:2px;}
+
+/* date range */
+.date-row{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap;}
+.date-row label{font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:#aaa;}
+.date-row input{border:1px solid rgba(10,10,10,0.15);padding:6px 10px;font-size:11px;outline:none;color:#0a0a0a;background:#fff;width:130px;}
+.date-row input:focus{border-color:#0a0a0a;}
+
+/* share buttons */
+.share-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.share-btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:10px 12px;border:1px solid rgba(10,10,10,0.18);background:#fff;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;color:#333;transition:all 0.15s;width:100%;}
+.share-btn:hover{border-color:#0a0a0a;color:#0a0a0a;}
+.share-btn.black{background:#0a0a0a;color:#f8f7f4;border-color:#0a0a0a;}
+.share-btn.black:hover{opacity:0.8;}
+.share-btn.green{border-color:#1a7a3a;color:#1a7a3a;}
+.share-btn.green:hover{background:#1a7a3a;color:#fff;}
+.share-btn.blue{border-color:#185fa5;color:#185fa5;}
+.share-btn.blue:hover{background:#185fa5;color:#fff;}
+.share-btn i{font-size:15px;}
+
+/* feedback */
+.feedback{font-size:10px;letter-spacing:0.15em;padding:7px 0;display:none;border-top:1px solid rgba(10,10,10,0.07);margin-top:6px;}
+
+/* preview */
+.preview-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.preview-title{font-family:'Noto Serif JP',serif;font-size:18px;font-weight:300;}
+.preview-meta{font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:#aaa;}
+
+/* item list in preview */
+.item-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:0;border-bottom:1px solid rgba(10,10,10,0.06);padding:10px 0;align-items:center;}
+.item-row:first-child{border-top:1px solid rgba(10,10,10,0.1);}
+.ir-name{font-size:12px;font-weight:500;line-height:1.3;}
+.ir-sub{font-size:10px;color:#aaa;margin-top:2px;}
+.ir-val{font-family:'Noto Serif JP',serif;font-size:14px;font-weight:300;text-align:right;}
+.ir-label{font-size:8px;letter-spacing:0.3em;text-transform:uppercase;color:#aaa;text-align:right;}
+.th-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:0;padding:8px 0 6px;border-bottom:2px solid #0a0a0a;}
+.th-cell{font-size:8px;letter-spacing:0.35em;text-transform:uppercase;color:#aaa;text-align:right;}
+.th-cell:first-child{text-align:left;}
+.badge-low{display:inline-block;font-size:8px;letter-spacing:1px;padding:2px 7px;background:#4a1a1a;color:#fff;}
+.badge-ok{display:inline-block;font-size:8px;letter-spacing:1px;padding:2px 7px;background:#1a4a1a;color:#fff;}
+.grand-total{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:0;padding:12px 0;border-top:2px solid #0a0a0a;margin-top:4px;}
+.gt-label{font-size:10px;font-weight:500;letter-spacing:0.1em;}
+.gt-val{font-family:'Noto Serif JP',serif;font-size:16px;font-weight:300;text-align:right;}
+
+/* sales table */
+.sales-row{display:grid;grid-template-columns:90px 1fr 1fr 90px 110px;gap:0;border-bottom:1px solid rgba(10,10,10,0.05);padding:8px 0;align-items:center;font-size:11px;}
+.sales-row.head{border-bottom:2px solid #0a0a0a;padding:8px 0 6px;}
+.sales-cell{color:#444;}
+.sales-cell.r{text-align:right;font-family:'Noto Serif JP',serif;}
+.sales-cell.muted{color:#999;}
+.sales-cell.lbl{font-size:8px;letter-spacing:0.3em;text-transform:uppercase;color:#aaa;}
+
+/* totals strip */
+.totals-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+.ts-card{background:#f8f7f4;padding:11px 13px;border:1px solid rgba(10,10,10,0.06);}
+.ts-lbl{font-size:8px;letter-spacing:0.4em;text-transform:uppercase;color:#aaa;margin-bottom:5px;}
+.ts-val{font-family:'Noto Serif JP',serif;font-size:16px;font-weight:300;}
+
+/* loading */
+.loading{text-align:center;padding:40px;font-size:10px;color:#aaa;letter-spacing:0.3em;text-transform:uppercase;}
+
+/* empty */
+.empty{text-align:center;padding:40px;font-size:10px;color:#ccc;letter-spacing:0.3em;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div style="display:flex;align-items:center;">
+    <span class="brand">WATCON</span>
+    <span class="bc">/ Stock Reports</span>
+  </div>
+  <span style="font-size:9px;letter-spacing:0.3em;color:#aaa;text-transform:uppercase;" id="gen-time"></span>
+</div>
+
+<div class="layout">
+
+  <!-- SIDEBAR: FILTERS -->
+  <div class="sidebar">
+
+    <div class="pt" style="margin-bottom:14px;">Search &amp; Filter</div>
+
+    <!-- Search -->
+    <div class="search-wrap">
+      <i class="ti ti-search search-icon"></i>
+      <input class="search-input" id="search-box" type="text" placeholder="e.g. pipe, tile, marble…" oninput="onSearch()"/>
+    </div>
+
+    <!-- Family chips -->
+    <div class="filter-section" id="family-section">
+      <div class="filter-label">
+        <span>Item Family</span>
+        <button onclick="clearFilter('family')">Clear</button>
+      </div>
+      <div class="chip-grid" id="family-chips"></div>
+    </div>
+
+    <!-- Variation chips -->
+    <div class="filter-section" id="variation-section" style="display:none;">
+      <div class="filter-label">
+        <span>Variation</span>
+        <button onclick="clearFilter('variation')">Clear</button>
+      </div>
+      <div class="chip-grid" id="variation-chips"></div>
+    </div>
+
+    <!-- Brand chips -->
+    <div class="filter-section" id="brand-section">
+      <div class="filter-label">
+        <span>Brand</span>
+        <button onclick="clearFilter('brand')">Clear</button>
+      </div>
+      <div class="chip-grid" id="brand-chips"></div>
+    </div>
+
+    <!-- Date range -->
+    <div class="filter-section">
+      <div class="filter-label"><span>Report Period</span></div>
+      <div class="date-row">
+        <label>From</label>
+        <input type="date" id="dt-from" value="2026-01-01" onchange="renderAll()"/>
+      </div>
+      <div class="date-row">
+        <label>To</label>
+        <input type="date" id="dt-to" value="2026-05-24" onchange="renderAll()"/>
+      </div>
+    </div>
+
+    <!-- Result summary -->
+    <div class="result-summary">
+      <div>
+        <div class="rs-count" id="result-count">5</div>
+        <div class="rs-label">items selected</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="rs-count" id="result-stock-val">—</div>
+        <div class="rs-label">stock value</div>
+      </div>
+    </div>
+
+    <!-- Share -->
+    <div class="pt" style="margin-bottom:10px;">Export &amp; Share</div>
+    <div class="share-grid">
+      <button class="share-btn black" onclick="doAction('print')"><i class="ti ti-printer"></i>Print</button>
+      <button class="share-btn black" onclick="doAction('pdf')"><i class="ti ti-download"></i>Save PDF</button>
+      <button class="share-btn green" onclick="doAction('whatsapp')" title="Downloads PDF then opens WhatsApp"><i class="ti ti-brand-whatsapp"></i>WhatsApp + PDF</button>
+      <button class="share-btn blue" onclick="doAction('email')"><i class="ti ti-mail"></i>Email PDF</button>
+    </div>
+    <button class="share-btn" style="width:100%;margin-bottom:4px;" onclick="doAction('copy')"><i class="ti ti-copy"></i>Copy as Text</button>
+    <div class="feedback" id="feedback"></div>
+
+  </div>
+
+  <!-- CONTENT: PREVIEW -->
+  <div class="content">
+    <div class="panel">
+      <div class="preview-header">
+        <div>
+          <div class="preview-title" id="report-heading">Complete Stock Report</div>
+          <div class="preview-meta" id="report-sub">All items · All brands</div>
+        </div>
+        <div class="preview-meta" id="report-date"></div>
+      </div>
+
+      <!-- Totals strip -->
+      <div class="totals-strip" id="totals-strip">
+        <div class="ts-card"><div class="ts-lbl">Items</div><div class="ts-val" id="t-items">—</div></div>
+        <div class="ts-card"><div class="ts-lbl">Total Stock</div><div class="ts-val" id="t-stock">—</div></div>
+        <div class="ts-card"><div class="ts-lbl">Stock Cost Value</div><div class="ts-val" id="t-cost">—</div></div>
+        <div class="ts-card"><div class="ts-lbl">Period Sales</div><div class="ts-val" id="t-sales">—</div></div>
+      </div>
+
+      <!-- Stock table -->
+      <div style="font-size:8px;letter-spacing:0.45em;text-transform:uppercase;color:#aaa;margin-bottom:8px;">Current Stock Position</div>
+      <div class="th-row">
+        <div class="th-cell">Item</div>
+        <div class="th-cell">Stock</div>
+        <div class="th-cell">Purchase ₹</div>
+        <div class="th-cell">Selling ₹</div>
+        <div class="th-cell">Stock Value</div>
+      </div>
+      <div id="stock-table"></div>
+      <div class="grand-total" id="grand-total" style="display:none;">
+        <div class="gt-label">Total Stock Value</div>
+        <div></div><div></div><div></div>
+        <div class="gt-val" id="gt-val">—</div>
+      </div>
+
+      <!-- Sales table -->
+      <div style="font-size:8px;letter-spacing:0.45em;text-transform:uppercase;color:#aaa;margin:20px 0 8px;" id="sales-section-label">Sales Movement</div>
+      <div class="sales-row head">
+        <div class="sales-cell lbl">Date</div>
+        <div class="sales-cell lbl">Item</div>
+        <div class="sales-cell lbl">Customer</div>
+        <div class="sales-cell lbl" style="text-align:right;">Qty</div>
+        <div class="sales-cell lbl" style="text-align:right;">Value</div>
+      </div>
+      <div id="sales-table"></div>
+      <div id="sales-total-row" style="display:none;border-top:2px solid #0a0a0a;padding:10px 0;display:none;">
+        <div style="display:grid;grid-template-columns:90px 1fr 1fr 90px 110px;gap:0;">
+          <div></div><div></div><div style="font-weight:500;font-size:11px;padding:2px 0;">Total Revenue</div><div></div>
+          <div style="text-align:right;font-family:'Noto Serif JP',serif;font-size:14px;" id="sales-total-val">—</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+<script>
+// ─── DATA ─────────────────────────────────────────────────────────
+const ITEMS = [
+  {id:'PIPE-001',family:'GI Pipe',variantLabel:'20mm · Medium Duty',brand:'Jindal',unit:'MTR',purchasePrice:185,sellingPrice:280,stock:420,isImported:false,
+   history:[{date:'2026-04-10',qty:80,customer:'Rahul Constructions',value:22400},{date:'2026-03-05',qty:120,customer:'City Infra Ltd',value:33600}],stockLog:[{date:'2026-03-01',type:'add',qty:500,reason:'Purchase order #PO-2210'}]},
+  {id:'PIPE-002',family:'GI Pipe',variantLabel:'25mm · Medium Duty',brand:'Jindal',unit:'MTR',purchasePrice:220,sellingPrice:340,stock:310,isImported:false,
+   history:[{date:'2026-04-18',qty:60,customer:'Metro Works',value:20400}],stockLog:[]},
+  {id:'PIPE-003',family:'GI Pipe',variantLabel:'32mm · Heavy Duty',brand:'Tata Steel',unit:'MTR',purchasePrice:310,sellingPrice:480,stock:195,isImported:false,
+   history:[{date:'2026-05-02',qty:40,customer:'City Infra Ltd',value:19200}],stockLog:[]},
+  {id:'PIPE-004',family:'GI Pipe',variantLabel:'20mm · Light Duty',brand:'Tata Steel',unit:'MTR',purchasePrice:155,sellingPrice:240,stock:88,isImported:false,
+   history:[],stockLog:[]},
+  {id:'TILE-001',family:'Porcelain Floor Tile',variantLabel:'600×600 · Matte',brand:'Kajaria',unit:'SQM',purchasePrice:420,sellingPrice:680,stock:1240,isImported:false,
+   history:[{date:'2026-05-10',qty:400,customer:'Rahul Constructions',value:272000},{date:'2026-04-22',qty:250,customer:'GreenBuild Pvt Ltd',value:170000},{date:'2026-04-01',qty:590,customer:'Metro Interiors',value:401200},{date:'2026-03-15',qty:180,customer:'Rahul Constructions',value:122400}],
+   stockLog:[{date:'2026-05-01',type:'add',qty:500,reason:'Purchase receipt'}]},
+  {id:'TILE-002',family:'Porcelain Floor Tile',variantLabel:'600×600 · Gloss',brand:'Kajaria',unit:'SQM',purchasePrice:450,sellingPrice:720,stock:380,isImported:false,
+   history:[{date:'2026-04-12',qty:200,customer:'Elite Residences',value:144000}],stockLog:[]},
+  {id:'TILE-003',family:'Porcelain Floor Tile',variantLabel:'800×800 · Matte',brand:'Somany',unit:'SQM',purchasePrice:580,sellingPrice:920,stock:620,isImported:false,
+   history:[{date:'2026-05-08',qty:200,customer:'Skyline Developers',value:184000},{date:'2026-04-15',qty:180,customer:'Rahul Constructions',value:165600}],
+   stockLog:[]},
+  {id:'MARB-001',family:'Italian Marble',variantLabel:'2400×1200 · Polished',brand:'Carrara',unit:'SQM',purchasePrice:3800,sellingPrice:6200,stock:88,isImported:true,
+   history:[{date:'2026-05-12',qty:18,customer:'Elite Residences',value:111600},{date:'2026-04-28',qty:22,customer:'The Arch Studio',value:136400},{date:'2026-03-30',qty:30,customer:'Peninsula Hotels',value:186000}],
+   stockLog:[{date:'2026-04-20',type:'add',qty:100,reason:'Container arrival — BL#CH2026042'}]},
+  {id:'WOOD-001',family:'Engineered Wood Plank',variantLabel:'1200×120 · Oak · Matte',brand:'Pergo',unit:'SQF',purchasePrice:240,sellingPrice:380,stock:860,isImported:false,
+   history:[{date:'2026-05-02',qty:300,customer:'Metro Interiors',value:114000}],stockLog:[]},
+  {id:'WOOD-002',family:'Engineered Wood Plank',variantLabel:'1200×120 · Walnut · Gloss',brand:'Pergo',unit:'SQF',purchasePrice:260,sellingPrice:410,stock:420,isImported:false,
+   history:[{date:'2026-04-10',qty:200,customer:'The Arch Studio',value:82000}],stockLog:[]},
+];
+
+const fmt = n => new Intl.NumberFormat('en-IN',{maximumFractionDigits:2}).format(n);
+const fmtC = n => 'Rs. ' + fmt(n);
+const today = new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+document.getElementById('gen-time').textContent = today;
+document.getElementById('report-date').textContent = today;
+
+// ─── STATE ────────────────────────────────────────────────────────
+let selFamilies = new Set();
+let selVariations = new Set();
+let selBrands = new Set();
+let searchText = '';
+
+// ─── DERIVED LISTS ────────────────────────────────────────────────
+const allFamilies = [...new Set(ITEMS.map(i => i.family))].sort();
+const allBrands   = [...new Set(ITEMS.map(i => i.brand))].sort();
+
+// ─── BUILD CHIPS ─────────────────────────────────────────────────
+function buildFamilyChips(){
+  const g = document.getElementById('family-chips');
+  g.innerHTML = '';
+  allFamilies.forEach(f => {
+    const b = document.createElement('button');
+    b.className = 'chip' + (selFamilies.has(f) ? ' active' : '');
+    b.textContent = f;
+    b.onclick = () => toggleFilter('family', f, b);
+    g.appendChild(b);
+  });
+}
+
+function buildVariationChips(families){
+  const sec = document.getElementById('variation-section');
+  const g = document.getElementById('variation-chips');
+  const vars = [...new Set(
+    ITEMS.filter(i => families.size === 0 || families.has(i.family))
+         .map(i => i.variantLabel).filter(Boolean)
+  )].sort();
+  if(vars.length === 0){ sec.style.display = 'none'; return; }
+  sec.style.display = 'block';
+  g.innerHTML = '';
+  vars.forEach(v => {
+    const b = document.createElement('button');
+    b.className = 'chip' + (selVariations.has(v) ? ' active' : '');
+    b.textContent = v;
+    b.onclick = () => toggleFilter('variation', v, b);
+    g.appendChild(b);
+  });
+}
+
+function buildBrandChips(families, variations){
+  const g = document.getElementById('brand-chips');
+  const visible = filteredItems(families, variations, new Set(), '');
+  const brands = [...new Set(visible.map(i => i.brand))].sort();
+  g.innerHTML = '';
+  brands.forEach(br => {
+    const b = document.createElement('button');
+    b.className = 'chip' + (selBrands.has(br) ? ' active' : '');
+    b.textContent = br;
+    b.onclick = () => toggleFilter('brand', br, b);
+    g.appendChild(b);
+  });
+}
+
+function toggleFilter(type, val, btn){
+  if(type === 'family'){
+    selFamilies.has(val) ? selFamilies.delete(val) : selFamilies.add(val);
+    selVariations.clear(); // reset downstream
+    selBrands.clear();
+  } else if(type === 'variation'){
+    selVariations.has(val) ? selVariations.delete(val) : selVariations.add(val);
+    selBrands.clear();
+  } else if(type === 'brand'){
+    selBrands.has(val) ? selBrands.delete(val) : selBrands.add(val);
+  }
+  renderAll();
+}
+
+function clearFilter(type){
+  if(type === 'family'){ selFamilies.clear(); selVariations.clear(); selBrands.clear(); }
+  if(type === 'variation'){ selVariations.clear(); selBrands.clear(); }
+  if(type === 'brand'){ selBrands.clear(); }
+  renderAll();
+}
+
+function onSearch(){
+  searchText = document.getElementById('search-box').value.toLowerCase().trim();
+  selFamilies.clear(); selVariations.clear(); selBrands.clear();
+  // auto-select matching families
+  if(searchText){
+    allFamilies.forEach(f => {
+      if(f.toLowerCase().includes(searchText)) selFamilies.add(f);
+    });
+  }
+  renderAll();
+}
+
+// ─── FILTER ───────────────────────────────────────────────────────
+function filteredItems(families, variations, brands, search){
+  return ITEMS.filter(i => {
+    const mSearch = !search || i.family.toLowerCase().includes(search) || i.variantLabel.toLowerCase().includes(search) || i.brand.toLowerCase().includes(search) || i.id.toLowerCase().includes(search);
+    const mFamily = families.size === 0 || families.has(i.family);
+    const mVar    = variations.size === 0 || variations.has(i.variantLabel);
+    const mBrand  = brands.size === 0 || brands.has(i.brand);
+    return mSearch && mFamily && mVar && mBrand;
+  });
+}
+
+function getFiltered(){
+  return filteredItems(selFamilies, selVariations, selBrands, searchText);
+}
+
+// ─── RENDER ALL ───────────────────────────────────────────────────
+function renderAll(){
+  buildFamilyChips();
+  buildVariationChips(selFamilies);
+  buildBrandChips(selFamilies, selVariations);
+
+  const items = getFiltered();
+  const from = document.getElementById('dt-from').value;
+  const to   = document.getElementById('dt-to').value;
+
+  // heading
+  let heading = 'Stock Report';
+  let sub = [];
+  if(selFamilies.size > 0) heading = [...selFamilies].join(', ');
+  if(selVariations.size > 0) sub.push([...selVariations].join(', '));
+  if(selBrands.size > 0) sub.push([...selBrands].join(', '));
+  if(sub.length === 0 && selFamilies.size === 0) sub.push('All items · All brands');
+  document.getElementById('report-heading').textContent = heading;
+  document.getElementById('report-sub').textContent = sub.join(' · ');
+  document.getElementById('sales-section-label').textContent = 'Sales Movement ('+from+' to '+to+')';
+
+  // totals
+  const totalStock = items.reduce((s,i) => s + i.stock, 0);
+  const totalCost  = items.reduce((s,i) => s + i.stock * i.purchasePrice, 0);
+  const allSales   = items.flatMap(i => i.history.filter(h => h.date >= from && h.date <= to));
+  const totalSales = allSales.reduce((s,h) => s + h.value, 0);
+  const totalSalesQty = allSales.reduce((s,h) => s + h.qty, 0);
+
+  document.getElementById('t-items').textContent = items.length;
+  document.getElementById('t-stock').textContent = items.length > 0 ? (totalStock > 0 ? fmt(totalStock)+' units' : '0') : '—';
+  document.getElementById('t-cost').textContent  = items.length > 0 ? fmtC(totalCost) : '—';
+  document.getElementById('t-sales').textContent = items.length > 0 ? fmtC(totalSales) : '—';
+  document.getElementById('result-count').textContent = items.length;
+  document.getElementById('result-stock-val').textContent = items.length > 0 ? fmtC(totalCost) : '—';
+
+  // stock table
+  const st = document.getElementById('stock-table');
+  if(items.length === 0){
+    st.innerHTML = '<div class="empty">No items match your filters</div>';
+    document.getElementById('grand-total').style.display = 'none';
+    document.getElementById('sales-table').innerHTML = '';
+    document.getElementById('sales-total-row').style.display = 'none';
+    return;
+  }
+
+  st.innerHTML = items.map(i => `
+    <div class="item-row">
+      <div>
+        <div class="ir-name">${i.family}</div>
+        <div class="ir-sub">${i.variantLabel} · ${i.id}</div>
+        <div style="margin-top:4px;">${i.stock < 100 ? '<span class="badge-low">Low Stock</span>' : '<span class="badge-ok">In Stock</span>'} ${i.isImported ? '<span style="font-size:8px;letter-spacing:1px;padding:2px 6px;background:#0a0a0a;color:#fff;margin-left:4px;">Imported</span>' : ''}</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="ir-val">${fmt(i.stock)}</div>
+        <div class="ir-label">${i.unit}</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="ir-val" style="font-size:13px;">${fmtC(i.purchasePrice)}</div>
+        <div class="ir-label">per ${i.unit}</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="ir-val" style="font-size:13px;">${fmtC(i.sellingPrice)}</div>
+        <div class="ir-label">per ${i.unit}</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="ir-val">${fmtC(i.stock * i.purchasePrice)}</div>
+        <div class="ir-label">${i.brand}</div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('gt-val').textContent = fmtC(totalCost);
+  document.getElementById('grand-total').style.display = 'grid';
+
+  // sales table
+  const salesRows = items.flatMap(i =>
+    i.history.filter(h => h.date >= from && h.date <= to).map(h => ({...h, item: i}))
+  ).sort((a,b) => b.date.localeCompare(a.date));
+
+  const stt = document.getElementById('sales-table');
+  if(salesRows.length === 0){
+    stt.innerHTML = '<div class="empty" style="padding:16px 0;">No sales transactions in this period</div>';
+    document.getElementById('sales-total-row').style.display = 'none';
+  } else {
+    stt.innerHTML = salesRows.map(h => `
+      <div class="sales-row">
+        <div class="sales-cell muted">${h.date}</div>
+        <div class="sales-cell">${h.item.family}<span style="font-size:10px;color:#aaa;"> · ${h.item.variantLabel}</span></div>
+        <div class="sales-cell">${h.customer}</div>
+        <div class="sales-cell r">${fmt(h.qty)} ${h.item.unit}</div>
+        <div class="sales-cell r">${fmtC(h.value)}</div>
+      </div>`).join('');
+    const str = document.getElementById('sales-total-row');
+    str.style.display = 'block';
+    document.getElementById('sales-total-val').textContent = fmtC(totalSales);
+  }
+}
+
+// ─── PDF GENERATION ───────────────────────────────────────────────
+function generatePDF(){
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
+  const items = getFiltered();
+  const from  = document.getElementById('dt-from').value;
+  const to    = document.getElementById('dt-to').value;
+  const ts    = new Date().toLocaleString('en-IN');
+
+  const totalCost  = items.reduce((s,i) => s + i.stock * i.purchasePrice, 0);
+  const allSales   = items.flatMap(i => i.history.filter(h => h.date >= from && h.date <= to));
+  const totalSales = allSales.reduce((s,h) => s + h.value, 0);
+
+  let heading = items.length > 0 ? ([...selFamilies].length > 0 ? [...selFamilies].join(', ') : 'Complete Stock Report') : 'Stock Report';
+  let sub = [];
+  if(selVariations.size > 0) sub.push([...selVariations].join(', '));
+  if(selBrands.size > 0) sub.push([...selBrands].join(', '));
+
+  const W = doc.internal.pageSize.getWidth();
+  const margin = 18;
+  let y = margin;
+
+  // Header
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(7);
+  doc.setTextColor(170,170,170);
+  doc.text('WATCON MANAGEMENT SOFTWARE', margin, y);
+  doc.text('Generated: ' + ts, W - margin, y, {align:'right'});
+  y += 5;
+
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(18);
+  doc.setTextColor(10,10,10);
+  doc.text(heading, margin, y);
+  y += 5;
+
+  if(sub.length > 0){
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(9);
+    doc.setTextColor(130,130,130);
+    doc.text(sub.join(' · '), margin, y);
+    y += 4;
+  }
+
+  doc.setFontSize(8);
+  doc.setTextColor(150,150,150);
+  doc.text('Period: ' + from + ' to ' + to, margin, y);
+  y += 4;
+
+  // Separator
+  doc.setDrawColor(10,10,10);
+  doc.setLineWidth(0.5);
+  doc.line(margin, y, W - margin, y);
+  y += 6;
+
+  // Summary boxes (4 inline)
+  const bw = (W - margin * 2 - 9) / 4;
+  const summaries = [
+    ['ITEMS', String(items.length)],
+    ['STOCK VALUE', fmtC(totalCost)],
+    ['PERIOD SALES', fmtC(totalSales)],
+    ['PERIOD', from + ' — ' + to],
+  ];
+  summaries.forEach(([l, v], idx) => {
+    const bx = margin + idx * (bw + 3);
+    doc.setFillColor(248, 247, 244);
+    doc.rect(bx, y, bw, 14, 'F');
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(6);
+    doc.setTextColor(170,170,170);
+    doc.text(l, bx + 3, y + 4);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(idx < 3 ? 9 : 7);
+    doc.setTextColor(10,10,10);
+    doc.text(v, bx + 3, y + 10);
+  });
+  y += 20;
+
+  // Stock table
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(7);
+  doc.setTextColor(150,150,150);
+  doc.text('CURRENT STOCK POSITION', margin, y);
+  y += 4;
+
+  const stockCols = [
+    {header:'Item / Variation', dataKey:'name'},
+    {header:'Brand', dataKey:'brand'},
+    {header:'Stock', dataKey:'stock'},
+    {header:'Purchase ₹', dataKey:'purchase'},
+    {header:'Selling ₹', dataKey:'selling'},
+    {header:'Stock Value', dataKey:'value'},
+    {header:'Status', dataKey:'status'},
+  ];
+  const stockRows = items.map(i => ({
+    name: i.family + '\n' + i.variantLabel + '\n' + i.id,
+    brand: i.brand,
+    stock: fmt(i.stock) + ' ' + i.unit,
+    purchase: fmtC(i.purchasePrice),
+    selling: fmtC(i.sellingPrice),
+    value: fmtC(i.stock * i.purchasePrice),
+    status: i.stock < 100 ? 'LOW' : 'OK',
+  }));
+
+  doc.autoTable({
+    startY: y,
+    columns: stockCols,
+    body: stockRows,
+    margin: {left: margin, right: margin},
+    styles: {fontSize: 8, cellPadding: 3, textColor: [60,60,60], font: 'helvetica'},
+    headStyles: {fillColor: [10,10,10], textColor: [255,255,255], fontSize: 7, fontStyle: 'bold', cellPadding: 3},
+    columnStyles: {
+      0: {cellWidth: 55, fontStyle: 'bold'},
+      2: {halign: 'right'},
+      3: {halign: 'right'},
+      4: {halign: 'right'},
+      5: {halign: 'right', fontStyle: 'bold'},
+      6: {halign: 'center'},
+    },
+    didDrawCell: (data) => {
+      if(data.section === 'body' && data.column.dataKey === 'status'){
+        const val = data.cell.raw;
+        doc.setFillColor(val === 'LOW' ? 74 : 26, val === 'LOW' ? 26 : 74, val === 'LOW' ? 26 : 26);
+        doc.setTextColor(255,255,255);
+        doc.setFontSize(6);
+        const cx = data.cell.x + data.cell.width/2;
+        const cy = data.cell.y + data.cell.height/2 + 2;
+        doc.roundedRect(data.cell.x+2, data.cell.y+2, data.cell.width-4, data.cell.height-4, 0, 0, 'F');
+        doc.text(val, cx, cy, {align:'center'});
+      }
+    },
+    foot: [[{content:'Total Stock Cost Value', colSpan:5, styles:{fontStyle:'bold', fillColor:[240,239,233]}}, {content: fmtC(totalCost), styles:{halign:'right', fontStyle:'bold', fillColor:[240,239,233]}}, {content:'', styles:{fillColor:[240,239,233]}}]],
+    footStyles: {textColor:[10,10,10], fontSize: 9},
+  });
+
+  y = doc.lastAutoTable.finalY + 10;
+
+  // Sales table
+  const salesRows = items.flatMap(i =>
+    i.history.filter(h => h.date >= from && h.date <= to).map(h => ({...h, item: i}))
+  ).sort((a,b) => b.date.localeCompare(a.date));
+
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(7);
+  doc.setTextColor(150,150,150);
+  doc.text('SALES MOVEMENT (' + from + ' TO ' + to + ')', margin, y);
+  y += 4;
+
+  if(salesRows.length === 0){
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(9);
+    doc.setTextColor(180,180,180);
+    doc.text('No sales transactions in selected period', margin, y + 4);
+  } else {
+    doc.autoTable({
+      startY: y,
+      columns: [
+        {header:'Date', dataKey:'date'},
+        {header:'Item', dataKey:'item'},
+        {header:'Customer', dataKey:'customer'},
+        {header:'Qty', dataKey:'qty'},
+        {header:'Value', dataKey:'value'},
+      ],
+      body: salesRows.map(h => ({
+        date: h.date,
+        item: h.item.family + ' · ' + h.item.variantLabel,
+        customer: h.customer,
+        qty: fmt(h.qty) + ' ' + h.item.unit,
+        value: fmtC(h.value),
+      })),
+      margin: {left: margin, right: margin},
+      styles: {fontSize: 8, cellPadding: 3, textColor: [60,60,60]},
+      headStyles: {fillColor: [10,10,10], textColor: [255,255,255], fontSize: 7, fontStyle: 'bold'},
+      columnStyles: {
+        0: {cellWidth: 22, textColor: [150,150,150]},
+        3: {halign: 'right'},
+        4: {halign: 'right', fontStyle: 'bold'},
+      },
+      foot: [[{content:'Total Revenue', colSpan:4, styles:{fontStyle:'bold', fillColor:[240,239,233]}}, {content: fmtC(totalSales), styles:{halign:'right', fontStyle:'bold', fillColor:[240,239,233]}}]],
+      footStyles: {textColor:[10,10,10], fontSize: 9},
+    });
+  }
+
+  // Footer on each page
+  const pageCount = doc.internal.getNumberOfPages();
+  for(let p = 1; p <= pageCount; p++){
+    doc.setPage(p);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(7);
+    doc.setTextColor(180,180,180);
+    doc.text('Watcon Management Software · Confidential · ' + ts, margin, 290);
+    doc.text('Page ' + p + ' of ' + pageCount, W - margin, 290, {align:'right'});
+  }
+
+  const fileName = 'Watcon_Stock_Report_' + from + '_to_' + to + '.pdf';
+  return {doc, fileName};
+}
+
+// ─── ACTIONS ─────────────────────────────────────────────────────
+function doAction(type){
+  const fb = document.getElementById('feedback');
+  fb.style.display = 'none';
+
+  const items = getFiltered();
+  const from  = document.getElementById('dt-from').value;
+  const to    = document.getElementById('dt-to').value;
+
+  if(type === 'pdf'){
+    const {doc, fileName} = generatePDF();
+    doc.save(fileName);
+
+  } else if(type === 'print'){
+    const {doc} = generatePDF();
+    doc.autoPrint();
+    const blob = doc.output('bloburl');
+    window.open(blob, '_blank');
+
+  } else if(type === 'email'){
+    // Generate PDF as base64 data URI, open in new window with mailto fallback
+    try{
+      const {doc, fileName} = generatePDF();
+      // Open PDF in new window so user can manually attach or save+attach
+      const pdfBlob = doc.output('blob');
+      const url = URL.createObjectURL(pdfBlob);
+      const w = window.open('', '_blank');
+      w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>Email PDF</title>
+      <style>body{font-family:Arial,sans-serif;padding:30px;background:#f8f7f4;color:#0a0a0a;}
+      .box{background:#fff;border:1px solid #ddd;padding:24px;max-width:500px;margin:0 auto;}
+      h2{font-weight:300;margin-bottom:12px;}p{font-size:13px;color:#555;line-height:1.7;margin-bottom:12px;}
+      .btn{display:inline-block;padding:10px 20px;background:#0a0a0a;color:#fff;text-decoration:none;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border:none;margin-right:8px;}
+      .btn2{background:transparent;color:#0a0a0a;border:1px solid #0a0a0a;}
+      </style></head><body><div class="box">
+      <h2>Email Stock Report PDF</h2>
+      <p>Your PDF report <strong>${fileName}</strong> is ready.</p>
+      <p>Steps:<br/>
+      1. Click <strong>Download PDF</strong> below to save the file.<br/>
+      2. Click <strong>Open Email</strong> to compose a new email.<br/>
+      3. Attach the downloaded PDF to your email.</p>
+      <a class="btn" href="${url}" download="${fileName}">Download PDF</a>
+      <a class="btn btn2" href="mailto:?subject=${encodeURIComponent('Watcon Stock Report — '+from+' to '+to)}&body=${encodeURIComponent('Please find the Watcon stock report attached.\n\nPeriod: '+from+' to '+to+'\n\nWatcon Management Software')}">Open Email</a>
+      </div></body></html>`);
+      w.document.close();
+    } catch(e){
+      // mailto fallback with plain text
+      const text = buildPlainText();
+      window.open('mailto:?subject='+encodeURIComponent('Watcon Stock Report')+'&body='+encodeURIComponent(text),'_blank');
+    }
+
+  } else if(type === 'whatsapp'){
+    // Step 1: auto-download the PDF
+    const {doc, fileName} = generatePDF();
+    doc.save(fileName);
+    // Step 2: after a short delay, open WhatsApp with an instruction message
+    const items2 = getFiltered();
+    const from2  = document.getElementById('dt-from').value;
+    const to2    = document.getElementById('dt-to').value;
+    const totalCost2 = items2.reduce((s,i) => s + i.stock * i.purchasePrice, 0);
+    const allSales2  = items2.flatMap(i => i.history.filter(h => h.date >= from2 && h.date <= to2));
+    const totalSales2 = allSales2.reduce((s,h) => s + h.value, 0);
+    const waMsg =
+      'WATCON MANAGEMENT SOFTWARE\n' +
+      'Stock Report — ' + from2 + ' to ' + to2 + '\n' +
+      '─────────────────────────\n' +
+      'Items: ' + items2.length + '\n' +
+      'Stock Value: ' + fmtC(totalCost2) + '\n' +
+      'Period Sales: ' + fmtC(totalSales2) + '\n' +
+      '─────────────────────────\n' +
+      'PDF report: ' + fileName + '\n' +
+      '(PDF has been downloaded to your device — tap the attachment icon in WhatsApp to attach it)';
+    fb.style.display = 'block';
+    fb.style.color = '#1a7a3a';
+    fb.innerHTML = '<i class="ti ti-download" style="vertical-align:-2px;margin-right:4px;"></i>PDF downloading... WhatsApp opening in 2 seconds. Tap the <strong>attachment icon</strong> in WhatsApp to attach the PDF.';
+    setTimeout(() => {
+      window.open('https://wa.me/?text=' + encodeURIComponent(waMsg), '_blank');
+      setTimeout(() => { fb.style.display = 'none'; }, 5000);
+    }, 1800);
+
+  } else if(type === 'copy'){
+    navigator.clipboard.writeText(buildPlainText()).then(() => {
+      fb.style.display='block'; fb.style.color='#3a6a3a'; fb.textContent='Report text copied to clipboard ✓';
+      setTimeout(() => fb.style.display='none', 2500);
+    }).catch(() => {
+      fb.style.display='block'; fb.style.color='#8a3030'; fb.textContent='Could not access clipboard — please copy the preview manually';
+      setTimeout(() => fb.style.display='none', 3000);
+    });
+  }
+}
+
+function buildPlainText(){
+  const items = getFiltered();
+  const from  = document.getElementById('dt-from').value;
+  const to    = document.getElementById('dt-to').value;
+  const ts    = new Date().toLocaleString('en-IN');
+  let txt = 'WATCON MANAGEMENT SOFTWARE\nSTOCK REPORT\nGenerated: ' + ts + '\nPeriod: ' + from + ' to ' + to + '\n' + '='.repeat(60) + '\n\n';
+  txt += 'CURRENT STOCK\n' + '-'.repeat(60) + '\n';
+  items.forEach(i => {
+    txt += i.family + ' · ' + i.variantLabel + ' (' + i.id + ')\n';
+    txt += '  Brand: ' + i.brand + ' | Stock: ' + fmt(i.stock) + ' ' + i.unit + ' | Purchase: ' + fmtC(i.purchasePrice) + ' | Sell: ' + fmtC(i.sellingPrice) + '\n';
+    txt += '  Stock Value: ' + fmtC(i.stock * i.purchasePrice) + (i.stock < 100 ? '  [LOW STOCK]' : '') + '\n\n';
+  });
+  txt += 'Total Stock Value: ' + fmtC(items.reduce((s,i) => s + i.stock * i.purchasePrice, 0)) + '\n\n';
+  const allSales = items.flatMap(i => i.history.filter(h => h.date >= from && h.date <= to).map(h => ({...h, item:i}))).sort((a,b) => b.date.localeCompare(a.date));
+  if(allSales.length > 0){
+    txt += 'SALES MOVEMENT (' + from + ' to ' + to + ')\n' + '-'.repeat(60) + '\n';
+    allSales.forEach(h => txt += h.date + ' | ' + h.item.family + ' · ' + h.item.variantLabel + ' | ' + h.customer + ' | ' + fmt(h.qty) + ' ' + h.item.unit + ' | ' + fmtC(h.value) + '\n');
+    txt += '\nTotal Sales: ' + fmtC(allSales.reduce((s,h) => s + h.value, 0)) + '\n';
+  }
+  txt += '\nWatcon Management Software · Confidential';
+  return txt;
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────
+renderAll();
+</script>
+</body>
+</html>
