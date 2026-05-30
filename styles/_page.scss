@@ -1,0 +1,121 @@
+// Shared page-level patterns — Watcon Design System v2.
+@use 'mixins' as *;
+
+// ── Page wrapper ──────────────────────────────────────────────────────────────
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  font-family: var(--font-body);
+}
+
+// ── Page header ───────────────────────────────────────────────────────────────
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+// Editorial heading — Cormorant Garamond, light
+.pageTitle {
+  font-family: var(--font-heading);
+  font-weight: var(--fw-light);
+  font-size: var(--fsh-md);
+  letter-spacing: 0.02em;
+  color: var(--c-ink);
+  line-height: var(--lh-tight);
+}
+
+.pageSubtitle {
+  font-family: var(--font-body);
+  font-size: var(--fs-400);
+  color: var(--c-tertiary);
+  margin-top: 4px;
+}
+
+.pageActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+// ── Panel ─────────────────────────────────────────────────────────────────────
+.panel {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  padding: 22px;
+}
+
+.panelTitle {
+  font-family: var(--font-body);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-tertiary);
+  font-weight: var(--fw-medium);
+}
+
+// ── Table ─────────────────────────────────────────────────────────────────────
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-body);
+  font-size: var(--fs-400);
+}
+
+.th {
+  text-align: left;
+  font-size: 10px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--c-tertiary);
+  font-weight: var(--fw-medium);
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--c-border);
+  background: var(--c-bg);
+  white-space: nowrap;
+}
+
+.td {
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--c-border);
+  color: var(--c-secondary);
+  vertical-align: middle;
+}
+
+// ── Form ─────────────────────────────────────────────────────────────────────
+.fieldLabel {
+  font-family: var(--font-body);
+  font-size: 10px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--c-tertiary);
+  font-weight: var(--fw-medium);
+  display: block;
+  margin-bottom: 7px;
+}
+
+// ── Empty state ───────────────────────────────────────────────────────────────
+.empty {
+  text-align: center;
+  padding: 72px 24px;
+  font-family: var(--font-body);
+}
+
+.emptyTitle {
+  font-family: var(--font-heading);
+  font-weight: var(--fw-light);
+  font-size: var(--fsh-sm);
+  color: var(--c-ink);
+  letter-spacing: 0.02em;
+}
+
+.emptyBody {
+  font-size: var(--fs-400);
+  color: var(--c-tertiary);
+  margin-top: 8px;
+}

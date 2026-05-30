@@ -1,180 +1,193 @@
-// Global stylesheet — imported once in app/layout.tsx.
-// Holds the canonical CSS-variable design tokens (DESIGN_TOKENS.md §1–11),
-// then the reset + base element styles. Components reference tokens only.
+// globals.scss — Watcon Design System v2.
+// Visual reference: Customer Management screenshot (luxury enterprise SaaS).
+// Architecture & Construction industry aesthetic. Premium, timeless, editorial.
 
 @use 'reset';
 @use 'base';
 
 :root {
-  // ── Neutral ramp (washi paper → sumi ink) ──────────────────────────────
-  --gray-0: #ffffff;
-  --gray-25: #fafaf8;
-  --gray-50: #f5f5f3;
-  --gray-100: #ececea;
-  --gray-200: #dcdcd9;
-  --gray-300: #c4c4c0;
-  --gray-400: #a3a3a0;
-  --gray-500: #808080;
-  --gray-600: #5f5f5d;
-  --gray-700: #444443;
-  --gray-800: #2a2a29;
-  --gray-900: #161615;
-  --gray-950: #0a0a0a;
+  // ── Palette ───────────────────────────────────────────────────────────────
+  --c-bg:          #F8F8F6;   // warm off-white canvas
+  --c-surface:     #FFFFFF;   // card / panel surface
+  --c-surface-2:   #F4F4F1;   // input bg, subtle fills, hover
+  --c-surface-3:   #EEECEA;   // deeper subtle bg
 
-  // ── Semantic: surfaces & text ──────────────────────────────────────────
-  --color-bg: var(--gray-25);
-  --color-surface: var(--gray-0);
-  --color-surface-2: var(--gray-50);
-  --color-border: var(--gray-200);
-  --color-border-strong: var(--gray-300);
-  --color-text: var(--gray-950);
-  --color-text-muted: var(--gray-600);
-  --color-text-subtle: var(--gray-500);
-  --color-text-inverse: var(--gray-0);
+  --c-sidebar:     #0B0B0B;   // sidebar background
+  --c-sidebar-2:   #1A1A1A;   // sidebar hover
 
-  // ── Semantic: primary action (= ink; monochrome) ───────────────────────
-  --color-primary: var(--gray-950);
-  --color-primary-hover: var(--gray-800);
-  --color-on-primary: var(--gray-0);
-  --color-accent: var(--color-primary);
+  --c-ink:         #111111;   // primary text
+  --c-ink-2:       #3D3D3D;   // strong secondary
+  --c-secondary:   #7A7A7A;   // secondary text
+  --c-tertiary:    #ABABAB;   // placeholder, faint
+  --c-inverse:     #F8F8F6;   // text on dark bg
 
-  // ── Focus & overlay ─────────────────────────────────────────────────────
-  --color-focus: var(--gray-950);
-  --color-overlay: rgba(10, 10, 10, 0.4);
+  --c-border:      #E7E4DF;   // default border
+  --c-border-2:    #D5D2CC;   // strong border, focus
+  --c-border-3:    #C2BFBA;   // extra strong
 
-  // ── Status (desaturated) — fg + bg pairs ─────────────────────────────────
-  --color-success-fg: #2f6b4a;
-  --color-success-bg: #eef4f0;
-  --color-warning-fg: #8a6a2c;
-  --color-warning-bg: #f6f1e7;
-  --color-danger-fg: #9b3838;
-  --color-danger-bg: #f7eded;
-  --color-info-fg: #36567a;
-  --color-info-bg: #eef2f6;
+  --c-success:     #0E7A3E;
+  --c-success-bg:  #EBF5EF;
+  --c-success-2:   #0A5C2F;   // dark success
+  --c-warning:     #B66A1C;
+  --c-warning-bg:  #FBF3EA;
+  --c-danger:      #A63D3D;
+  --c-danger-bg:   #F8EDED;
+  --c-info:        #1A5BA0;
+  --c-info-bg:     #EBF1FA;
 
-  // ── Typography ───────────────────────────────────────────────────────────
-  --font-display: var(--font-noto-serif, 'Noto Serif JP'), Georgia, 'Times New Roman', serif;
-  --font-sans: var(--font-inter, 'Inter'), system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: var(--font-jetbrains-mono, 'JetBrains Mono'), ui-monospace, 'SFMono-Regular', monospace;
+  // ── Legacy aliases (keep existing components working) ─────────────────────
+  --gray-0:    #ffffff;
+  --gray-25:   var(--c-bg);
+  --gray-50:   var(--c-surface-2);
+  --gray-100:  #ececea;
+  --gray-200:  var(--c-border);
+  --gray-300:  var(--c-border-2);
+  --gray-400:  var(--c-tertiary);
+  --gray-500:  var(--c-secondary);
+  --gray-600:  #5a5a5a;
+  --gray-700:  var(--c-ink-2);
+  --gray-800:  #2a2a28;
+  --gray-900:  #161615;
+  --gray-950:  var(--c-ink);
 
-  --fs-100: 0.6875rem;
-  --fs-200: 0.75rem;
-  --fs-300: 0.8125rem;
-  --fs-400: 0.875rem;
-  --fs-500: 1rem;
-  --fs-600: 1.125rem;
-  --fs-700: 1.375rem;
-  --fs-800: 1.75rem;
-  --fs-900: 2.25rem;
+  --color-bg:            var(--c-bg);
+  --color-surface:       var(--c-surface);
+  --color-surface-2:     var(--c-surface-2);
+  --color-surface-3:     var(--c-surface-3);
+  --color-border:        var(--c-border);
+  --color-border-mid:    var(--c-border-2);
+  --color-border-strong: var(--c-border-3);
+  --color-border-panel:  #EDEBE8;
+  --color-border-solid:  var(--c-border);
+  --color-text:          var(--c-ink);
+  --color-text-muted:    var(--c-secondary);
+  --color-text-subtle:   var(--c-secondary);
+  --color-text-faint:    var(--c-tertiary);
+  --color-text-inverse:  var(--c-inverse);
+  --color-primary:       var(--c-ink);
+  --color-primary-hover: var(--c-ink-2);
+  --color-on-primary:    var(--c-inverse);
+  --color-focus:         var(--c-ink);
+  --color-overlay:       rgba(11, 11, 11, 0.45);
+  --color-success-fg:    var(--c-success);
+  --color-success-bg:    var(--c-success-bg);
+  --color-success-mid:   var(--c-success-2);
+  --color-warning-fg:    var(--c-warning);
+  --color-warning-bg:    var(--c-warning-bg);
+  --color-warning-border:#D4A870;
+  --color-danger-fg:     var(--c-danger);
+  --color-danger-bg:     var(--c-danger-bg);
+  --color-danger-mid:    #7A2020;
+  --color-info-fg:       var(--c-info);
+  --color-info-bg:       var(--c-info-bg);
+  --color-stock-bar:     var(--c-ink);
+  --color-stock-bar-low: var(--c-danger);
+  --color-stock-track:   var(--c-border);
 
-  --fw-regular: 400;
-  --fw-medium: 500;
+  // ── Typography ────────────────────────────────────────────────────────────
+  // --noto-serif is the CSS variable injected by next/font for Noto Serif JP
+  --font-heading: var(--noto-serif, 'Noto Serif JP'), Georgia, serif;
+  --font-display: var(--font-heading);  // alias
+  --font-body:    var(--font-inter, 'Inter'), system-ui, -apple-system, sans-serif;
+  --font-sans:    var(--font-body);
+  --font-mono:    var(--font-mono, 'JetBrains Mono'), ui-monospace, monospace;
+
+  // Type scale — Inter body (13-14px base), Cormorant headings (large, light)
+  --fs-75:   0.5rem;       // 8px
+  --fs-100:  0.5625rem;    // 9px
+  --fs-200:  0.625rem;     // 10px
+  --fs-300:  0.6875rem;    // 11px
+  --fs-400:  0.75rem;      // 12px
+  --fs-500:  0.8125rem;    // 13px  — base body
+  --fs-600:  0.9375rem;    // 15px
+  --fs-700:  1.0625rem;    // 17px
+  --fs-800:  1.25rem;      // 20px
+  --fs-900:  1.5rem;       // 24px  — page title
+  --fs-1000: 1.875rem;     // 30px  — large heading
+  --fs-1100: 2.25rem;      // 36px  — display
+  --fs-1200: 3rem;         // 48px  — hero
+
+  // Heading scale (Cormorant Garamond — displayed larger for editorial feel)
+  --fsh-sm:   1.75rem;     // 28px  — card title, widget heading
+  --fsh-md:   2.25rem;     // 36px  — page heading
+  --fsh-lg:   3rem;        // 48px  — hero, landing
+
+  --fw-light:    300;
+  --fw-regular:  400;
+  --fw-medium:   500;
   --fw-semibold: 600;
-  --fw-bold: 700;
 
-  --lh-tight: 1.2;
-  --lh-snug: 1.35;
-  --lh-normal: 1.5;
-  --lh-relaxed: 1.65;
+  --lh-tight:    1.15;
+  --lh-snug:     1.3;
+  --lh-normal:   1.5;
+  --lh-relaxed:  1.7;
 
-  --tracking-tight: -0.01em;
+  --tracking-tight:  -0.02em;
   --tracking-normal: 0;
-  --tracking-label: 0.04em;
+  --tracking-wide:   0.04em;
+  --tracking-label:  0.08em;    // form labels
+  --tracking-title:  0.10em;    // section titles
+  --tracking-badge:  0.06em;    // badges
+  --tracking-btn:    0.12em;    // button text
+  --tracking-brand:  0.25em;    // brand logotype
+  --tracking-caps:   0.12em;    // nav, small caps
+  --tracking-micro:  0.08em;
 
-  // ── Spacing (4px base, 8px rhythm) ───────────────────────────────────────
-  --space-0: 0;
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-5: 1.25rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
-  --space-10: 2.5rem;
-  --space-12: 3rem;
-  --space-16: 4rem;
-  --space-20: 5rem;
+  // ── Spacing ───────────────────────────────────────────────────────────────
+  --space-0:  0;
+  --space-1:  0.25rem;    // 4px
+  --space-2:  0.5rem;     // 8px
+  --space-3:  0.75rem;    // 12px
+  --space-4:  1rem;       // 16px
+  --space-5:  1.25rem;    // 20px
+  --space-6:  1.5rem;     // 24px
+  --space-7:  1.75rem;    // 28px
+  --space-8:  2rem;       // 32px
+  --space-10: 2.5rem;     // 40px
+  --space-12: 3rem;       // 48px
+  --space-16: 4rem;       // 64px
 
   // ── Radius ────────────────────────────────────────────────────────────────
   --radius-none: 0;
-  --radius-sm: 2px;
-  --radius-md: 4px;
-  --radius-lg: 8px;
+  --radius-sm:   2px;
+  --radius-md:   4px;
+  --radius-lg:   6px;
   --radius-full: 9999px;
 
-  // ── Borders ──────────────────────────────────────────────────────────────
-  --border-width: 1px;
-  --border-color: var(--color-border);
-  --border-color-strong: var(--color-border-strong);
-  --border: var(--border-width) solid var(--color-border);
-  --border-strong: var(--border-width) solid var(--color-border-strong);
-  --border-focus: 2px solid var(--color-focus);
+  // ── Borders ───────────────────────────────────────────────────────────────
+  --border:        1px solid var(--c-border);
+  --border-mid:    1px solid var(--c-border-2);
+  --border-strong: 1px solid var(--c-border-3);
+  --border-panel:  1px solid #EDEBE8;
 
-  // ── Shadows ──────────────────────────────────────────────────────────────
+  // ── Shadows ───────────────────────────────────────────────────────────────
   --shadow-none: none;
-  --shadow-sm: 0 1px 2px rgba(10, 10, 10, 0.04);
-  --shadow-md: 0 2px 8px rgba(10, 10, 10, 0.06);
-  --shadow-lg: 0 8px 24px rgba(10, 10, 10, 0.08);
+  --shadow-sm:   0 1px 3px rgba(17,17,17,0.06);
+  --shadow-md:   0 2px 10px rgba(17,17,17,0.07);
+  --shadow-lg:   0 8px 32px rgba(17,17,17,0.08);
 
-  // ── Z-index ──────────────────────────────────────────────────────────────
-  --z-base: 0;
-  --z-dropdown: 1000;
-  --z-sticky: 1100;
-  --z-overlay: 1200;
-  --z-modal: 1300;
-  --z-popover: 1400;
-  --z-toast: 1500;
-  --z-tooltip: 1600;
-
-  // ── Layout ───────────────────────────────────────────────────────────────
-  --container-max: 1280px;
-  --sidebar-w: 248px;
+  // ── Layout ────────────────────────────────────────────────────────────────
+  --sidebar-w:           224px;
   --sidebar-w-collapsed: 64px;
-  --topbar-h: 56px;
-  --content-pad: var(--space-6);
+  --topbar-h:            64px;
+  --content-pad-x:       32px;
+  --content-pad-y:       32px;
+  --z-base:      0;
+  --z-dropdown:  100;
+  --z-topbar:    100;
+  --z-overlay:   200;
+  --z-modal:     999;
+  --z-toast:     1000;
+  --z-tooltip:   1100;
 
-  // ── Motion ───────────────────────────────────────────────────────────────
-  --dur-fast: 120ms;
-  --dur-base: 180ms;
-  --dur-slow: 240ms;
-  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
-  --ease-emphasized: cubic-bezier(0.3, 0, 0, 1);
-}
-
-// ── Dark theme: only semantic tokens flip; ramp + non-color tokens stay ────
-[data-theme='dark'] {
-  --color-bg: var(--gray-950);
-  --color-surface: var(--gray-900);
-  --color-surface-2: var(--gray-800);
-  --color-border: var(--gray-800);
-  --color-border-strong: var(--gray-700);
-  --color-text: var(--gray-25);
-  --color-text-muted: var(--gray-400);
-  --color-text-subtle: var(--gray-500);
-  --color-text-inverse: var(--gray-950);
-
-  --color-primary: var(--gray-25);
-  --color-primary-hover: var(--gray-100);
-  --color-on-primary: var(--gray-950);
-  --color-accent: var(--color-primary);
-
-  --color-focus: var(--gray-25);
-  --color-overlay: rgba(0, 0, 0, 0.6);
-
-  --color-success-fg: #6fae87;
-  --color-success-bg: #16241c;
-  --color-warning-fg: #c9a44e;
-  --color-warning-bg: #2a2417;
-  --color-danger-fg: #cf7373;
-  --color-danger-bg: #2a1717;
-  --color-info-fg: #7aa0c5;
-  --color-info-bg: #161f29;
+  // ── Motion ────────────────────────────────────────────────────────────────
+  --dur-fast:  100ms;
+  --dur-base:  160ms;
+  --dur-slow:  240ms;
+  --ease-std:  cubic-bezier(0.2, 0, 0, 1);
+  --ease-emph: cubic-bezier(0.3, 0, 0, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :root {
-    --dur-fast: 0ms;
-    --dur-base: 0ms;
-    --dur-slow: 0ms;
-  }
+  :root { --dur-fast: 0ms; --dur-base: 0ms; --dur-slow: 0ms; }
 }

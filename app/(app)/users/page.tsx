@@ -1,13 +1,12 @@
-import Link from 'next/link'
 import { getActionContext } from '@/lib/auth/action-context'
 import { listMembers } from '@/features/admin/server/queries'
 import { UserList } from '@/features/admin/components/user-list'
-import { Alert } from '@/components/ui'
+import { Alert, Button } from '@/components/ui'
+import Link from 'next/link'
 import styles from './page.module.scss'
 
 export const metadata = { title: 'Users · Watcon' }
 
-/** User List — org roster. Gated by `admin.users` (page + action defense-in-depth). */
 export default async function UsersPage() {
   const ctx = await getActionContext()
   const canManage = ctx.has('admin.users')
@@ -15,24 +14,23 @@ export default async function UsersPage() {
   return (
     <main className={styles.main}>
       <header className={styles.header}>
-        <div>
-          <h1>Users</h1>
-          <p className={styles.subtitle}>People in your organization.</p>
+        <div className={styles.titleGroup}>
+          <div className={styles.title}>Users</div>
+          <div className={styles.subtitle}>People in your organization.</div>
         </div>
         <div className={styles.headerActions}>
           {canManage && (
-            <Link href="/settings/team" className={styles.back}>
-              Invite members →
+            <Link href="/settings/team">
+              <Button variant="ghost" size="sm">Invite member</Button>
             </Link>
           )}
-          <Link href="/dashboard" className={styles.back}>← Dashboard</Link>
         </div>
       </header>
 
       {canManage ? (
         <UserList members={await listMembers()} />
       ) : (
-        <Alert tone="warning">You don&rsquo;t have permission to manage users.</Alert>
+        <Alert tone="warning">You don&apos;t have permission to manage users.</Alert>
       )}
     </main>
   )

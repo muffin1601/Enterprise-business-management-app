@@ -1,11 +1,10 @@
-// SCSS tokens — values that must exist at COMPILE time (CSS variables can't be
-// used inside @media). DESIGN_TOKENS.md §8/§9. Runtime tokens (colors, spacing,
-// etc.) live as CSS variables in app/globals.scss.
+// SCSS compile-time tokens — values needed inside @media queries.
+// Runtime tokens (colors, spacing, etc.) live in app/globals.scss as CSS vars.
 
 $breakpoints: (
-  sm: 480px,
-  md: 768px,
-  lg: 1024px,
-  xl: 1280px,
+  sm:  480px,
+  md:  768px,
+  lg:  1024px,
+  xl:  1280px,
   xxl: 1536px,
 );

@@ -1,143 +1,120 @@
 @use 'mixins' as *;
 
-// ── list ──────────────────────────────────────────────────────────────────
+// ── Table ─────────────────────────────────────────────────────────────────────
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: var(--fs-300);
+  font-family: var(--font-body);
+  font-size: var(--fs-500);
 }
 
 .table th {
   text-align: left;
-  font-weight: var(--fw-medium);
-  color: var(--color-text-muted);
-  font-size: var(--fs-200);
+  font-size: 10px;
+  letter-spacing: 0.10em;
   text-transform: uppercase;
-  letter-spacing: var(--tracking-label);
-  padding: var(--space-2) var(--space-3);
-  border-bottom: var(--border);
+  color: var(--c-tertiary);
+  font-weight: var(--fw-medium);
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--c-border);
+  background: var(--c-bg);
+  white-space: nowrap;
 }
 
 .table td {
-  padding: var(--space-3);
-  border-bottom: var(--border);
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--c-border);
   vertical-align: middle;
+  font-family: var(--font-body);
+  color: var(--c-secondary);
 }
 
-.row {
-  &:hover {
-    background: var(--color-surface-2);
-  }
-}
+.row:hover td { background: var(--c-bg); }
+.row:last-child td { border-bottom: none; }
 
-.name {
-  font-weight: var(--fw-medium);
-  color: var(--color-text);
-}
+.name { font-family: var(--font-body); font-weight: var(--fw-medium); color: var(--c-ink); font-size: var(--fs-500); }
+.sub  { font-family: var(--font-body); color: var(--c-tertiary); font-size: var(--fs-400); margin-top: 2px; }
 
-.sub {
-  color: var(--color-text-muted);
-  font-size: var(--fs-200);
-}
-
-.roleChips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-1);
-}
+.roleChips { display: flex; flex-wrap: wrap; gap: 5px; }
 
 .empty {
-  font-size: var(--fs-300);
-  color: var(--color-text-muted);
-  padding: var(--space-6) 0;
+  font-family: var(--font-body);
+  font-size: var(--fs-400);
+  color: var(--c-tertiary);
+  padding: var(--space-8) 0;
   text-align: center;
+  letter-spacing: 0.04em;
 }
 
 .linkCell a {
-  color: var(--color-primary);
+  font-family: var(--font-body);
+  color: var(--c-ink);
   font-weight: var(--fw-medium);
-  &:hover {
-    text-decoration: underline;
-  }
+  text-underline-offset: 3px;
+  &:hover { text-decoration: underline; }
 }
 
-// ── detail ────────────────────────────────────────────────────────────────
+// ── Detail ────────────────────────────────────────────────────────────────────
 .cardHeader {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: var(--space-3);
-  margin-bottom: var(--space-4);
+  gap: 12px;
+  margin-bottom: 20px;
 }
 
 .cardTitle {
-  font-size: var(--fs-600);
-  font-weight: var(--fw-semibold);
+  font-family: var(--font-heading);
+  font-weight: var(--fw-light);
+  font-size: 24px;
+  letter-spacing: 0.03em;
+  color: var(--c-ink);
 }
 
-.cardSubtitle {
-  font-size: var(--fs-300);
-  color: var(--color-text-muted);
-  margin-top: var(--space-1);
-}
+.cardSubtitle { font-family: var(--font-body); font-size: var(--fs-400); color: var(--c-tertiary); margin-top: 4px; }
 
-.facts {
-  display: flex;
-  flex-direction: column;
-}
+.facts { display: flex; flex-direction: column; }
 
 .fact {
   display: flex;
   justify-content: space-between;
   gap: var(--space-4);
-  padding: var(--space-2) 0;
-  font-size: var(--fs-300);
-  & + & {
-    border-top: var(--border);
-  }
+  padding: 12px 0;
+  font-family: var(--font-body);
+  font-size: var(--fs-500);
+  & + & { border-top: 1px solid var(--c-border); }
 }
 
-.factLabel {
-  color: var(--color-text-muted);
-}
+.factLabel { color: var(--c-tertiary); }
 
-// ── role manager / status ───────────────────────────────────────────────────
-.roleList {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  margin-bottom: var(--space-4);
-}
+.roleList { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
 
 .roleItem {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-3);
-  padding: var(--space-2) var(--space-3);
-  border: var(--border);
-  border-radius: var(--radius-md);
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: var(--fs-500);
+  color: var(--c-secondary);
 }
 
-.addRole {
-  display: flex;
-  gap: var(--space-2);
-  align-items: flex-end;
-}
-
-.addRole > :first-child {
-  flex: 1;
-}
+.addRole { display: flex; gap: 10px; align-items: flex-end; }
+.addRole > :first-child { flex: 1; }
 
 .statusRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-3);
+  gap: 12px;
 }
 
 .note {
-  font-size: var(--fs-200);
-  color: var(--color-text-subtle);
-  margin-top: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--fs-400);
+  color: var(--c-tertiary);
+  margin-top: 8px;
 }

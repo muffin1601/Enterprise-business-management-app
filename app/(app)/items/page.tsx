@@ -17,7 +17,7 @@ import { ItemPagination } from '@/features/items/components/item-pagination'
 import { Alert, Button } from '@/components/ui'
 import styles from '@/features/items/components/items.module.scss'
 
-export const metadata = { title: 'Items · Watcon' }
+export const metadata = { title: 'Inventory · Watcon' }
 
 export default async function ItemsPage({
   searchParams,
@@ -32,8 +32,13 @@ export default async function ItemsPage({
   if (!ctx.has('items.view')) {
     return (
       <main className={styles.page}>
-        <h1>Items</h1>
-        <Alert tone="warning">You don&rsquo;t have permission to view the catalogue.</Alert>
+        <header className={styles.header}>
+          <div>
+            <div className={styles.title}>Inventory</div>
+            <div className={styles.subtitle}>Item catalogue, pricing and stock.</div>
+          </div>
+        </header>
+        <Alert tone="warning">You don&apos;t have permission to view the catalogue.</Alert>
       </main>
     )
   }
@@ -50,19 +55,18 @@ export default async function ItemsPage({
     <main className={styles.page}>
       <header className={styles.header}>
         <div>
-          <h1>Items</h1>
-          <p className={styles.subtitle}>Catalogue, pricing, and stock.</p>
+          <div className={styles.title}>Inventory</div>
+          <div className={styles.subtitle}>Catalogue, pricing and stock. {page.total} items.</div>
         </div>
         <div className={styles.headerActions}>
           <Link href={'/items/lookups' as Route}>
-            <Button variant="ghost" size="sm">Categories & brands</Button>
+            <Button variant="ghost" size="sm">Categories &amp; brands</Button>
           </Link>
           {ctx.has('items.create') && (
             <Link href={'/items/new' as Route}>
-              <Button variant="primary" size="sm">New item</Button>
+              <Button variant="primary" size="sm">+ New item</Button>
             </Link>
           )}
-          <Link href="/dashboard" className={styles.back}>← Dashboard</Link>
         </div>
       </header>
 

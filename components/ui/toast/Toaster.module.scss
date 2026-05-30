@@ -1,41 +1,69 @@
+// Toast — Watcon Design System v2.
 .region {
   position: fixed;
-  bottom: var(--space-4);
-  right: var(--space-4);
+  bottom: 28px;
+  right: 28px;
   z-index: var(--z-toast);
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
-  max-width: min(360px, calc(100vw - var(--space-8)));
+  gap: 10px;
+  pointer-events: none;
+  max-width: min(380px, calc(100vw - 56px));
 }
 
 .toast {
   display: flex;
   align-items: flex-start;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  border: var(--border-width) solid;
+  gap: 12px;
+  padding: 14px 18px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-left: 3px solid var(--c-ink);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
-  font-size: var(--fs-300);
-  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+  pointer-events: all;
+  font-family: var(--font-body);
+  font-size: var(--fs-500);
+  animation: toastIn var(--dur-base) var(--ease-emph);
 
-  &[data-tone='success'] { color: var(--color-success-fg); border-color: var(--color-success-fg); background: var(--color-success-bg); }
-  &[data-tone='danger']  { color: var(--color-danger-fg);  border-color: var(--color-danger-fg);  background: var(--color-danger-bg); }
-  &[data-tone='warning'] { color: var(--color-warning-fg); border-color: var(--color-warning-fg); background: var(--color-warning-bg); }
-  &[data-tone='info']    { color: var(--color-info-fg);    border-color: var(--color-info-fg);    background: var(--color-info-bg); }
+  &[data-tone='success'] { border-left-color: var(--c-success); }
+  &[data-tone='warning'] { border-left-color: var(--c-warning); }
+  &[data-tone='danger']  { border-left-color: var(--c-danger); }
+  &[data-tone='info']    { border-left-color: var(--c-info); }
 }
 
-.message {
-  flex: 1;
-  line-height: var(--lh-snug);
+.icon {
+  font-size: 17px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--c-tertiary);
+
+  [data-tone='success'] & { color: var(--c-success); }
+  [data-tone='warning'] & { color: var(--c-warning); }
+  [data-tone='danger']  & { color: var(--c-danger); }
+  [data-tone='info']    & { color: var(--c-info); }
 }
+
+.message { flex: 1; color: var(--c-ink); font-weight: var(--fw-medium); }
 
 .close {
-  flex: none;
-  font-size: var(--fs-500);
+  flex-shrink: 0;
+  color: var(--c-tertiary);
+  font-size: 17px;
   line-height: 1;
-  color: inherit;
-  opacity: 0.7;
-  &:hover { opacity: 1; }
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-top: 1px;
+  &:hover { color: var(--c-ink); }
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(14px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast { animation: none; }
 }

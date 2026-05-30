@@ -1,39 +1,37 @@
-.grid {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
+@use 'mixins' as *;
 
-.cardHeader {
-  margin-bottom: var(--space-4);
-}
+.grid { display: flex; flex-direction: column; gap: 16px; }
+
+.cardHeader { margin-bottom: 20px; }
 
 .cardTitle {
-  font-size: var(--fs-600);
-  font-weight: var(--fw-semibold);
+  font-family: var(--font-heading);
+  font-weight: var(--fw-light);
+  font-size: 24px;
+  letter-spacing: 0.03em;
+  color: var(--c-ink);
 }
 
 .cardSubtitle {
-  font-size: var(--fs-300);
-  color: var(--color-text-muted);
-  margin-top: var(--space-1);
+  font-family: var(--font-body);
+  font-size: var(--fs-400);
+  color: var(--c-tertiary);
+  margin-top: 4px;
 }
 
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
+.form { display: flex; flex-direction: column; gap: 20px; font-family: var(--font-body); }
 
 .actions {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  margin-top: var(--space-2);
+  gap: 10px;
+  margin-top: 6px;
+  padding-top: 16px;
+  border-top: 1px solid var(--c-border);
 }
 
 .readonly {
   font-family: var(--font-mono);
-  font-size: var(--fs-300);
-  color: var(--color-text-muted);
+  font-size: var(--fs-400);
+  color: var(--c-tertiary);
 }

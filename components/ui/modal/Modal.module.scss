@@ -1,0 +1,175 @@
+// Modal — prototype: background:#fff; border:1px solid rgba(10,10,10,0.15);
+// padding:24px; width:380px. Zero radius. Overlay: rgba(0,0,0,0.40).
+@use 'mixins' as *;
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--color-overlay); // rgba(0,0,0,0.40)
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal);
+  padding: var(--space-4);
+  animation: overlayIn var(--dur-base) var(--ease-std);
+}
+
+// ── Panel ─────────────────────────────────────────────────────────────────────
+.panel {
+  position: relative;
+  background: var(--color-surface);
+  border: 1px solid rgba(10, 10, 10, 0.15);
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  max-height: 88vh;
+  width: 100%;
+  animation: panelIn var(--dur-base) var(--ease-emph);
+  box-shadow: var(--shadow-lg);
+
+  // Size variants — prototype defaults to ~380px
+  &[data-size='sm']  { max-width: 380px; }
+  &[data-size='md']  { max-width: 520px; }
+  &[data-size='lg']  { max-width: 720px; }
+  &[data-size='xl']  { max-width: 920px; }
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: var(--space-6);          // 24px
+  padding-bottom: var(--space-4);
+  flex-shrink: 0;
+}
+
+// prototype .modal-title: Noto Serif JP; font-size:18px; font-weight:300
+.title {
+  font-family: var(--font-display);
+  font-weight: var(--fw-light);
+  font-size: var(--fs-700);         // 18px
+  color: var(--color-text);
+  line-height: var(--lh-snug);
+}
+
+.closeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-faint);
+  font-size: 18px;
+  padding: 2px;
+  margin-left: var(--space-3);
+  flex-shrink: 0;
+  transition: color var(--dur-fast);
+  @include focus-ring;
+
+  &:hover { color: var(--color-text); }
+}
+
+// ── Body ──────────────────────────────────────────────────────────────────────
+.body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-6);
+  padding-top: var(--space-4);
+
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-thumb { background: var(--color-border-solid); }
+}
+
+// ── Divider ───────────────────────────────────────────────────────────────────
+.divider {
+  height: 1px;
+  background: var(--color-border-panel);
+  margin: 0 var(--space-6);
+  flex-shrink: 0;
+}
+
+// ── Footer ────────────────────────────────────────────────────────────────────
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-6);
+  border-top: var(--border-panel);
+  flex-shrink: 0;
+}
+
+// ── Context info row in modal (e.g., item name in stock adjust) ───────────────
+.contextRow {
+  font-size: var(--fs-400);
+  color: var(--color-text-subtle);
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-4);
+}
+
+// ── Stock adjust toggle (adj-btns pattern) ────────────────────────────────────
+.toggleGroup {
+  display: flex;
+  border: 1px solid var(--color-border-mid);
+  margin-bottom: var(--space-4);
+}
+
+.toggleBtn {
+  flex: 1;
+  padding: 8px 0;
+  font-size: var(--fs-200);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  border: none;
+  background: transparent;
+  color: var(--color-text-subtle);
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: background var(--dur-fast), color var(--dur-fast);
+
+  &[data-active='true'] {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+
+  &:hover:not([data-active='true']) {
+    background: var(--color-surface-2);
+    color: var(--color-text);
+  }
+}
+
+// ── Animations ────────────────────────────────────────────────────────────────
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes panelIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// ── Mobile: bottom sheet ──────────────────────────────────────────────────────
+@include down(md) {
+  .overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .panel {
+    max-height: 92vh;
+    max-width: 100%;
+    animation: sheetIn var(--dur-base) var(--ease-emph);
+  }
+
+  @keyframes sheetIn {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay, .panel { animation: none; }
+}

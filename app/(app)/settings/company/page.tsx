@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { getActionContext } from '@/lib/auth/action-context'
 import {
   getActiveOrganization,
@@ -10,7 +9,6 @@ import styles from './page.module.scss'
 
 export const metadata = { title: 'Company settings · Watcon' }
 
-/** Company profile (owner-editable) + per-org settings (settings.manage). */
 export default async function CompanySettingsPage() {
   const [ctx, org, settings] = await Promise.all([
     getActionContext(),
@@ -25,12 +23,9 @@ export default async function CompanySettingsPage() {
     <main className={styles.main}>
       <header className={styles.header}>
         <div>
-          <h1>Company settings</h1>
-          <p className={styles.subtitle}>Profile, tax, and financial-year configuration.</p>
+          <div className={styles.title}>Company Settings</div>
+          <div className={styles.subtitle}>Profile, GST, and financial-year configuration.</div>
         </div>
-        <Link href="/dashboard" className={styles.back}>
-          ← Dashboard
-        </Link>
       </header>
 
       <div className={styles.grid}>

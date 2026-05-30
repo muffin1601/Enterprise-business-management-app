@@ -1,0 +1,296 @@
+// Dashboard full-page shell: sidebar + topbar + content.
+@use 'mixins' as *;
+
+.shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+// ── Sidebar ───────────────────────────────────────────────────────────────────
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--gray-950);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: var(--z-topbar);
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  &::-webkit-scrollbar { width: 3px; }
+  &::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.10); }
+
+  @include down(md) {
+    transform: translateX(-100%);
+    transition: transform var(--dur-base) var(--ease-emph);
+    &[data-open='true'] { transform: translateX(0); }
+  }
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  flex-shrink: 0;
+}
+
+.brandName {
+  font-family: var(--font-display);
+  font-weight: var(--fw-light);
+  font-size: var(--fs-600);
+  letter-spacing: 0.20em;
+  color: var(--gray-0);
+  white-space: nowrap;
+}
+
+.brandSub {
+  font-size: 7px;
+  letter-spacing: 0.50em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.22);
+  white-space: nowrap;
+}
+
+.nav {
+  flex: 1;
+  padding: var(--space-3) 0;
+}
+
+.navSection {
+  margin-top: var(--space-2);
+  &:first-child { margin-top: 0; }
+}
+
+.navSectionLabel {
+  font-size: 7px;
+  letter-spacing: 0.50em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.22);
+  padding: var(--space-3) 18px var(--space-1);
+  display: block;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 18px;
+  font-size: var(--fs-300);
+  letter-spacing: 0.06em;
+  color: rgba(255,255,255,0.45);
+  background: transparent;
+  border: none;
+  border-left: 2px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  width: 100%;
+  text-align: left;
+  font-family: var(--font-body);
+  transition: color var(--dur-fast) var(--ease-std),
+              background var(--dur-fast) var(--ease-std),
+              border-left-color var(--dur-fast) var(--ease-std);
+
+  &:focus-visible {
+    outline: 2px solid rgba(255,255,255,0.40);
+    outline-offset: -2px;
+  }
+
+  &:hover {
+    color: rgba(255,255,255,0.80);
+    background: rgba(255,255,255,0.04);
+  }
+
+  &[data-active='true'] {
+    color: var(--gray-0);
+    background: rgba(255,255,255,0.07);
+    border-left-color: var(--gray-0);
+    font-weight: var(--fw-medium);
+  }
+}
+
+.navIcon {
+  font-size: 17px;
+  width: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sidebarFooter {
+  padding: 14px 18px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+.footerAvatar {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  background: rgba(255,255,255,0.10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: var(--fw-light);
+  font-size: var(--fs-400);
+  color: rgba(255,255,255,0.60);
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.footerInfo {
+  min-width: 0;
+  flex: 1;
+}
+
+.footerName {
+  font-size: var(--fs-300);
+  color: rgba(255,255,255,0.55);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.footerRole {
+  font-size: 8px;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.25);
+  margin-top: 2px;
+}
+
+// ── Main ──────────────────────────────────────────────────────────────────────
+.main {
+  margin-left: 220px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
+  @include down(md) { margin-left: 0; }
+}
+
+// ── Topbar ────────────────────────────────────────────────────────────────────
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: calc(var(--z-topbar) - 1);
+  height: 49px;
+  background: var(--color-surface);
+  border-bottom: var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 22px;
+  gap: var(--space-4);
+  flex-shrink: 0;
+}
+
+.topbarLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  font-size: 20px;
+  padding: var(--space-1);
+  @include focus-ring;
+  &:hover { color: var(--color-text); }
+
+  @include down(md) { display: flex; }
+}
+
+.pageTitle {
+  font-family: var(--font-display);
+  font-weight: var(--fw-light);
+  font-size: var(--fs-600);
+  letter-spacing: 0.15em;
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+.breadcrumb {
+  font-size: var(--fs-100);
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--color-text-faint);
+
+  @include down(sm) { display: none; }
+}
+
+.topbarRight {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.topbarDate {
+  font-size: var(--fs-100);
+  letter-spacing: 0.15em;
+  color: var(--color-text-faint);
+  white-space: nowrap;
+
+  @include down(sm) { display: none; }
+}
+
+.iconBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-faint);
+  font-size: 19px;
+  padding: var(--space-1);
+  text-decoration: none;
+  transition: color var(--dur-fast);
+  @include focus-ring;
+
+  &:hover { color: var(--color-text); }
+}
+
+// ── Content ───────────────────────────────────────────────────────────────────
+.content {
+  flex: 1;
+  padding: 20px 22px 32px;
+}
+
+// ── Mobile overlay ────────────────────────────────────────────────────────────
+.overlay {
+  display: none;
+
+  @include down(md) {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: var(--color-overlay);
+    z-index: calc(var(--z-topbar) - 1);
+    animation: fadeIn var(--dur-base) var(--ease-std);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}

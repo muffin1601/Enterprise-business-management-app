@@ -1,6 +1,5 @@
-// Single entry for component modules: `@use 'index' as t;` exposes the SCSS
-// tools (breakpoints, functions, mixins). Reset/base emit global CSS and are
-// @use'd once in app/globals.scss instead — not here.
+// Barrel: @use 'index' as * in component modules exposes all SCSS tools.
+// Reset/base emit global CSS and are @use'd once in app/globals.scss only.
 @forward 'tokens';
 @forward 'functions';
 @forward 'mixins';

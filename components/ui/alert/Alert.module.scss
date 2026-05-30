@@ -1,35 +1,24 @@
+// Alert — Watcon Design System v2.
 .alert {
-  padding: var(--space-3) var(--space-4);
-  border: var(--border-width) solid;
-  border-radius: var(--radius-md);
-  font-size: var(--fs-300);
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 18px;
+  border: 1px solid;
+  border-left-width: 3px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: var(--fs-500);
+  line-height: var(--lh-normal);
 
-  &[data-tone='success'] {
-    color: var(--color-success-fg);
-    background: var(--color-success-bg);
-    border-color: var(--color-success-fg);
-  }
-  &[data-tone='warning'] {
-    color: var(--color-warning-fg);
-    background: var(--color-warning-bg);
-    border-color: var(--color-warning-fg);
-  }
-  &[data-tone='danger'] {
-    color: var(--color-danger-fg);
-    background: var(--color-danger-bg);
-    border-color: var(--color-danger-fg);
-  }
-  &[data-tone='info'] {
-    color: var(--color-info-fg);
-    background: var(--color-info-bg);
-    border-color: var(--color-info-fg);
-  }
+  &[data-tone='success'] { background: var(--c-success-bg); color: var(--c-success); border-color: var(--c-success); }
+  &[data-tone='warning'] { background: var(--c-warning-bg); color: var(--c-warning); border-color: var(--c-warning); }
+  &[data-tone='danger']  { background: var(--c-danger-bg);  color: var(--c-danger);  border-color: var(--c-danger); }
+  &[data-tone='info']    { background: var(--c-info-bg);    color: var(--c-info);    border-color: var(--c-info); }
+  &[data-tone='neutral'] { background: var(--c-surface-2);  color: var(--c-secondary); border-color: var(--c-border-2); }
 }
 
-.title {
-  font-weight: var(--fw-semibold);
-}
-
-.body {
-  margin-top: var(--space-1);
-}
+.icon  { font-size: 17px; flex-shrink: 0; margin-top: 1px; }
+.body  { flex: 1; min-width: 0; }
+.title { font-weight: var(--fw-semibold); margin-bottom: 2px; }
+.description { font-size: var(--fs-400); opacity: 0.85; }

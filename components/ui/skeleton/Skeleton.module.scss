@@ -1,0 +1,62 @@
+// Skeleton loading state — shimmer on surface-2.
+@use 'mixins' as *;
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-2) 25%,
+    var(--color-surface)   50%,
+    var(--color-surface-2) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: 0;
+
+  // Shape variants
+  &[data-shape='text']    { height: 10px; }
+  &[data-shape='label']   { height: 8px; }
+  &[data-shape='heading'] { height: 18px; }
+  &[data-shape='price']   { height: 26px; }
+  &[data-shape='btn']     { height: 32px; }
+  &[data-shape='thumb']   { height: 76px; }
+  &[data-shape='image']   { height: 180px; }
+  &[data-shape='circle']  { border-radius: 50%; }
+  &[data-shape='row']     { height: 40px; }
+  &[data-shape='card']    { height: 160px; }
+}
+
+// Card skeleton (item card fill)
+.cardSkeleton {
+  background: var(--color-surface);
+  border: var(--border);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+// Table row skeleton
+.tableSkeleton {
+  display: flex;
+  flex-direction: column;
+}
+
+.tableRowSkeleton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 8px 0;
+  border-bottom: var(--border-panel);
+}
+
+@keyframes shimmer {
+  0%   { background-position:  200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+    background: var(--color-surface-2);
+  }
+}

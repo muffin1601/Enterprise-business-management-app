@@ -3,28 +3,24 @@ import { Inter, Noto_Serif_JP, JetBrains_Mono } from 'next/font/google'
 import { Toaster } from '@/components/ui'
 import './globals.scss'
 
-/**
- * Root layout — the single top-level Server Component that wraps every route.
- *
- * Fonts are loaded with next/font and exposed as CSS variables consumed by the
- * design tokens in globals.scss (`--font-inter`, `--font-noto-serif`,
- * `--font-jetbrains-mono` → `--font-sans` / `--font-display` / `--font-mono`).
- * Japanese-minimal monochrome aesthetic (FRONTEND_DESIGN_SYSTEM.md / DESIGN_TOKENS.md).
- */
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
   display: 'swap',
 })
+
+// Noto Serif JP — the display/heading font.
+// variable name --noto-serif avoids circular reference with --font-heading token.
 const notoSerif = Noto_Serif_JP({
   subsets: ['latin'],
-  weight: ['400', '600'],
-  variable: '--font-noto-serif',
+  weight: ['200', '300', '400', '500', '600'],
+  variable: '--noto-serif',
   display: 'swap',
 })
+
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
-  variable: '--font-jetbrains-mono',
+  variable: '--font-mono',
   display: 'swap',
 })
 
@@ -41,6 +37,12 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${notoSerif.variable} ${jetbrainsMono.variable}`}
     >
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.x/dist/tabler-icons.min.css"
+        />
+      </head>
       <body>
         {children}
         <Toaster />

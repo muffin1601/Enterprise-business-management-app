@@ -1,0 +1,350 @@
+// AppShell — Watcon Design System v2.
+// Visual reference: Customer Management screenshot.
+// Dark sidebar with serif brand. White topbar. Full-width content.
+@use 'mixins' as *;
+
+// ── Root ──────────────────────────────────────────────────────────────────────
+.shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--c-bg);
+  font-family: var(--font-body);
+  color: var(--c-ink);
+}
+
+// ── Sidebar ───────────────────────────────────────────────────────────────────
+.sidebar {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  background: var(--c-sidebar);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: var(--z-topbar);
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  &::-webkit-scrollbar { width: 0; }
+
+  @include down(md) {
+    transform: translateX(-100%);
+    transition: transform var(--dur-base) var(--ease-emph);
+    &[data-open='true'] { transform: translateX(0); }
+  }
+}
+
+// ── Brand ─────────────────────────────────────────────────────────────────────
+.brand {
+  padding: 28px 24px 22px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
+}
+
+.brandLogo {
+  display: block;
+  line-height: 0;   // collapse inline spacing around the image
+
+  img {
+    max-width: 100%;
+    height: auto;
+    filter: brightness(0) invert(1);  // make any dark logo white on the dark sidebar
+  }
+}
+
+// kept for fallback text if logo fails
+.brandName {
+  font-family: var(--font-heading);
+  font-weight: var(--fw-light);
+  font-size: 22px;
+  letter-spacing: var(--tracking-brand);
+  color: #FFFFFF;
+  line-height: 1;
+  display: block;
+}
+
+.brandSub {
+  font-family: var(--font-body);
+  font-size: 8px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.28);
+  margin-top: 6px;
+  display: block;
+}
+
+// ── Nav ───────────────────────────────────────────────────────────────────────
+.nav {
+  flex: 1;
+  padding: 16px 0;
+}
+
+.navGroup { margin-top: 8px; &:first-child { margin-top: 0; } }
+
+.navGroupLabel {
+  font-family: var(--font-body);
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.22);
+  padding: 14px 24px 6px;
+  display: block;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 24px;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.40);
+  background: transparent;
+  border: none;
+  border-left: 2px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  width: 100%;
+  text-align: left;
+  transition:
+    color var(--dur-fast) var(--ease-std),
+    background var(--dur-fast) var(--ease-std),
+    border-left-color var(--dur-fast) var(--ease-std);
+
+  &:focus-visible {
+    outline: 2px solid rgba(255,255,255,0.3);
+    outline-offset: -2px;
+  }
+
+  &:hover {
+    color: rgba(255,255,255,0.75);
+    background: rgba(255,255,255,0.04);
+  }
+
+  &[data-active='true'] {
+    color: rgba(255,255,255,0.95);
+    background: rgba(255,255,255,0.07);
+    border-left-color: rgba(255,255,255,0.7);
+  }
+}
+
+.navIcon {
+  font-size: 15px;
+  width: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+// ── Sidebar footer ────────────────────────────────────────────────────────────
+// Date above footer
+.sidebarDate {
+  padding: 10px 24px 6px;
+  font-family: var(--font-body);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.20);
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.sidebarFooter {
+  padding: 16px 24px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.footerAvatar {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-full);
+  background: rgba(255,255,255,0.10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: var(--fw-medium);
+  color: rgba(255,255,255,0.60);
+  flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.footerText { min-width: 0; flex: 1; }
+
+.footerName {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: rgba(255,255,255,0.50);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.footerOrg {
+  font-family: var(--font-body);
+  font-size: 9px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.20);
+  margin-top: 3px;
+}
+
+.footerSignOut {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgba(255,255,255,0.22);
+  font-size: 15px;
+  padding: 2px;
+  display: flex;
+  flex-shrink: 0;
+  transition: color var(--dur-fast);
+  &:hover { color: rgba(255,255,255,0.55); }
+}
+
+// ── Main ──────────────────────────────────────────────────────────────────────
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
+  @include down(md) { margin-left: 0; }
+}
+
+// ── Topbar ────────────────────────────────────────────────────────────────────
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: calc(var(--z-topbar) - 1);
+  height: var(--topbar-h);
+  background: var(--c-surface);
+  border-bottom: 1px solid var(--c-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--content-pad-x);
+  gap: var(--space-4);
+  flex-shrink: 0;
+}
+
+.topbarLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--c-secondary);
+  font-size: 20px;
+  padding: var(--space-1);
+  line-height: 1;
+  &:hover { color: var(--c-ink); }
+  @include down(md) { display: flex; }
+}
+
+// Page title in topbar — Cormorant Garamond editorial style
+.topbarTitle {
+  font-family: var(--font-heading);
+  font-weight: var(--fw-light);
+  font-size: 26px;
+  letter-spacing: 0.04em;
+  color: var(--c-ink);
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.topbarSep {
+  font-size: var(--fs-400);
+  color: var(--c-border-2);
+  font-weight: var(--fw-light);
+}
+
+.topbarOrg {
+  font-family: var(--font-body);
+  font-size: 11px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--c-tertiary);
+  white-space: nowrap;
+
+  @include down(sm) { display: none; }
+}
+
+.topbarRight {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+.topbarDate {
+  font-family: var(--font-body);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--c-tertiary);
+  padding-right: var(--space-3);
+  border-right: 1px solid var(--c-border);
+  white-space: nowrap;
+
+  @include down(sm) { display: none; }
+}
+
+.iconBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--c-secondary);
+  font-size: 17px;
+  padding: 8px;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: color var(--dur-fast), background var(--dur-fast);
+
+  &:hover {
+    color: var(--c-ink);
+    background: var(--c-surface-2);
+  }
+}
+
+// ── Content ───────────────────────────────────────────────────────────────────
+.content {
+  flex: 1;
+  padding: var(--content-pad-y) var(--content-pad-x) 48px;
+  width: 100%;
+}
+
+// ── Mobile overlay ────────────────────────────────────────────────────────────
+.overlay {
+  display: none;
+
+  @include down(md) {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(11,11,11,0.50);
+    z-index: calc(var(--z-topbar) - 1);
+  }
+}

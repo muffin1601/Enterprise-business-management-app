@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { getMyProfile } from '@/features/account/server/queries'
 import { ProfileForm } from '@/features/account/components/profile-form'
 import { ChangePasswordForm } from '@/features/account/components/change-password-form'
@@ -6,10 +5,6 @@ import styles from './page.module.scss'
 
 export const metadata = { title: 'Account · Watcon' }
 
-/**
- * User Profile (self-service). Lives in the protected (app) group, so it
- * requires a session + active org (the (app) layout enforces both).
- */
 export default async function AccountPage() {
   const profile = await getMyProfile()
 
@@ -17,12 +12,9 @@ export default async function AccountPage() {
     <main className={styles.main}>
       <header className={styles.header}>
         <div>
-          <h1>Account</h1>
-          <p className={styles.subtitle}>Manage your profile and password.</p>
+          <div className={styles.title}>Account</div>
+          <div className={styles.subtitle}>Manage your profile and password.</div>
         </div>
-        <Link href="/dashboard" className={styles.back}>
-          ← Dashboard
-        </Link>
       </header>
 
       <div className={styles.grid}>

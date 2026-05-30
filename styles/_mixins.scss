@@ -1,51 +1,51 @@
-// Reusable SCSS mixins (DESIGN_TOKENS.md §9, FRONTEND_DESIGN_SYSTEM.md §6).
+// SCSS mixins. All component modules @use this file.
 @use 'sass:map';
 @use 'tokens' as *;
 
-/// Mobile-first media query. `@include respond-to(md) { … }`
-@mixin respond-to($bp) {
+// ── Responsive ────────────────────────────────────────────────────────────────
+
+/// Mobile-first: `@include up(md) { … }`
+@mixin up($bp) {
   @if map.has-key($breakpoints, $bp) {
-    @media (min-width: map.get($breakpoints, $bp)) {
-      @content;
-    }
+    @media (min-width: map.get($breakpoints, $bp)) { @content; }
   } @else {
-    @error "respond-to: unknown breakpoint `#{$bp}`. Known: #{map.keys($breakpoints)}.";
+    @error "up(): unknown breakpoint `#{$bp}`.";
   }
 }
 
-/// Down-to (max-width) query, for the rare desktop-first override.
-@mixin respond-to-max($bp) {
+/// Desktop-first: `@include down(md) { … }`
+@mixin down($bp) {
   @if map.has-key($breakpoints, $bp) {
-    @media (max-width: (map.get($breakpoints, $bp) - 0.02px)) {
-      @content;
-    }
+    @media (max-width: (map.get($breakpoints, $bp) - 0.02px)) { @content; }
   } @else {
-    @error "respond-to-max: unknown breakpoint `#{$bp}`.";
+    @error "down(): unknown breakpoint `#{$bp}`.";
   }
 }
 
-/// Keyboard-only focus ring using the focus token.
-@mixin focus-ring {
+// Legacy aliases (used in existing files)
+@mixin respond-to($bp)     { @include up($bp) { @content; } }
+@mixin respond-to-max($bp) { @include down($bp) { @content; } }
+
+// ── Focus ─────────────────────────────────────────────────────────────────────
+
+/// Standard keyboard focus ring.
+@mixin focus-ring($offset: 2px) {
   &:focus-visible {
     outline: 2px solid var(--color-focus);
-    outline-offset: 2px;
+    outline-offset: $offset;
   }
 }
 
-/// Screen-reader-only (accessible) content.
-@mixin visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-  border: 0;
+/// Focus ring inset (for elements with solid borders).
+@mixin focus-ring-inset {
+  &:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: -2px;
+  }
 }
 
-/// Single- or multi-line truncation.
+// ── Text helpers ──────────────────────────────────────────────────────────────
+
 @mixin truncate($lines: 1) {
   @if $lines == 1 {
     overflow: hidden;
@@ -58,4 +58,54 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+}
+
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// ── Section label ─────────────────────────────────────────────────────────────
+// Prototype pattern: 8px, 0.45em tracking, uppercase, muted
+@mixin section-label {
+  font-size: var(--fs-75);
+  letter-spacing: var(--tracking-title);
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+  font-weight: var(--fw-regular);
+  font-family: var(--font-body);
+}
+
+// ── Field label ───────────────────────────────────────────────────────────────
+// Prototype pattern: 8-9px, 0.35em tracking, uppercase, #aaa
+@mixin field-label {
+  font-size: var(--fs-75);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-text-faint);
+  font-weight: var(--fw-regular);
+  font-family: var(--font-body);
+  display: block;
+}
+
+// ── Price / value display ─────────────────────────────────────────────────────
+// Prototype: Noto Serif JP, 300 weight
+@mixin price-display($size: var(--fs-700)) {
+  font-family: var(--font-display);
+  font-weight: var(--fw-light);
+  font-size: $size;
+  line-height: var(--lh-tight);
+}
+
+// ── Panel ─────────────────────────────────────────────────────────────────────
+@mixin panel {
+  background: var(--color-surface);
+  border: var(--border);
 }

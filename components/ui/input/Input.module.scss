@@ -1,50 +1,94 @@
+// Input — Watcon Design System v2. Large elegant inputs.
 @use 'mixins' as *;
 
+.wrapper { position: relative; display: flex; align-items: center; }
+
+// Default: full bordered input (44px height)
 .input {
   display: block;
   width: 100%;
-  font-family: var(--font-sans);
-  font-size: var(--fs-400);
-  color: var(--color-text);
-  background: var(--color-surface);
-  padding: var(--space-2) var(--space-3);
-  border: var(--border);
-  border-radius: var(--radius-md);
-  transition: border-color var(--dur-fast) var(--ease-standard);
-  @include focus-ring;
+  height: 44px;
+  font-family: var(--font-body);
+  font-size: var(--fs-500);
+  color: var(--c-ink);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  padding: 0 14px;
+  outline: none;
+  transition: border-color var(--dur-fast) var(--ease-std);
 
-  &::placeholder {
-    color: var(--color-text-subtle);
-  }
+  &:focus { border-color: var(--c-border-2); }
+  &::placeholder { color: var(--c-tertiary); font-size: var(--fs-400); }
+  &:disabled { opacity: 0.45; cursor: not-allowed; background: var(--c-surface-2); }
+  &[aria-invalid='true'] { border-color: var(--c-danger); }
+  &[data-has-icon-left='true']  { padding-left: 42px; }
+  &[data-has-icon-right='true'] { padding-right: 42px; }
 
-  &:hover:not(:disabled) {
-    border-color: var(--color-border-strong);
-  }
-
-  &:disabled {
-    background: var(--color-surface-2);
-    color: var(--color-text-subtle);
-    cursor: not-allowed;
-  }
-
-  &[aria-invalid='true'] {
-    border-color: var(--color-danger-fg);
-    &:focus-visible {
-      outline-color: var(--color-danger-fg);
-    }
-  }
+  &[data-size='lg'] { height: 50px; font-size: var(--fs-600); }
 }
 
-// Reuse for <textarea> via the same class.
-textarea.input {
-  resize: vertical;
-  min-height: calc(var(--space-10) + var(--space-2));
-  line-height: var(--lh-normal);
+// Bordered variant (search etc)
+.inputBordered {
+  @extend .input;
 }
 
-// <select> via the same class — native control, just sized to match.
+// Select
 .select {
+  display: block;
+  width: 100%;
+  height: 44px;
+  font-family: var(--font-body);
+  font-size: var(--fs-500);
+  color: var(--c-ink);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  padding: 0 36px 0 14px;
+  outline: none;
   cursor: pointer;
   appearance: none;
-  padding-right: var(--space-8);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23ABABAB' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  transition: border-color var(--dur-fast);
+
+  &:focus { border-color: var(--c-border-2); outline: none; }
+  &:disabled { opacity: 0.45; cursor: not-allowed; }
 }
+
+// Textarea
+.textarea {
+  display: block;
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: var(--fs-500);
+  color: var(--c-ink);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  outline: none;
+  resize: vertical;
+  min-height: 90px;
+  line-height: var(--lh-relaxed);
+  transition: border-color var(--dur-fast);
+
+  &:focus { border-color: var(--c-border-2); }
+  &::placeholder { color: var(--c-tertiary); }
+}
+
+// Icon slots
+.iconLeft, .iconRight {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--c-tertiary);
+  font-size: 16px;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+
+.iconLeft  { left: 14px; }
+.iconRight { right: 14px; }

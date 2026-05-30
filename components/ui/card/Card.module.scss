@@ -1,10 +1,13 @@
+// Card — Watcon Design System v2.
 .card {
-  background: var(--color-surface);
-  border: var(--border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-6);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  padding: 22px;
+  font-family: var(--font-body);
 
-  &[data-borderless='true'] {
-    border-color: transparent;
-  }
+  &[data-padding='none']  { padding: 0; }
+  &[data-padding='sm']    { padding: 16px; }
+  &[data-padding='lg']    { padding: 28px; }
+  &[data-borderless='true'] { border-color: transparent; }
 }

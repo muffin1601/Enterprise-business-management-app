@@ -1,11 +1,5 @@
 import { pgEnum } from 'drizzle-orm/pg-core'
 
-/**
- * pgEnum definitions. Only the enums needed by the identity domain are declared
- * here for the Authentication module (DATABASE_SCHEMA.md §2.1). Subsequent
- * modules add their enums to this file as they are implemented — the names and
- * value order MUST match the SQL migrations exactly.
- */
 export const recordStatus = pgEnum('record_status', ['active', 'inactive'])
 
 export const auditAction = pgEnum('audit_action', [
@@ -18,6 +12,31 @@ export const auditAction = pgEnum('audit_action', [
 ])
 
 export const currencyCode = pgEnum('currency_code', ['INR', 'USD', 'EUR', 'CNY'])
-
-// Inventory / catalogue (DATABASE_SCHEMA.md §2.1).
 export const transportType = pgEnum('transport_type', ['lumpsum', 'percent'])
+
+// ── Customer enums ────────────────────────────────────────────────────────────
+export const customerType = pgEnum('customer_type', [
+  'retail',
+  'wholesale',
+  'distributor',
+  'contractor',
+  'architect',
+  'government',
+  'other',
+])
+
+export const customerStatus = pgEnum('customer_status', [
+  'active',
+  'inactive',
+  'blocked',
+])
+
+export const paymentTerms = pgEnum('payment_terms', [
+  'immediate',
+  'net_7',
+  'net_15',
+  'net_30',
+  'net_45',
+  'net_60',
+  'net_90',
+])

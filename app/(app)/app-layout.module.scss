@@ -1,5 +1,371 @@
+// App shell — sidebar + topbar + content.
+// Light sidebar variant (from watcon_item_module.jsx prototype).
+@use 'mixins' as *;
+
+// ── Page shell ────────────────────────────────────────────────────────────────
 .shell {
+  display: flex;
   min-height: 100vh;
   background: var(--color-bg);
   color: var(--color-text);
+}
+
+// ── Sidebar ───────────────────────────────────────────────────────────────────
+// Prototype: width:220px; background:#fff; borderRight:1px solid rgba(10,10,10,0.08)
+.sidebar {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border); // rgba(10,10,10,0.08-0.10)
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: var(--z-topbar);
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: width var(--dur-base) var(--ease-std),
+              transform var(--dur-base) var(--ease-emph);
+
+  &::-webkit-scrollbar { width: 3px; }
+  &::-webkit-scrollbar-thumb { background: var(--color-border-solid); }
+
+  &[data-collapsed='true'] {
+    width: var(--sidebar-w-collapsed);
+
+    .navLabel,
+    .sectionLabel {
+      opacity: 0;
+      width: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .navItem {
+      justify-content: center;
+      padding: var(--space-3);
+      gap: 0;
+    }
+
+    .brandSub,
+    .brandName { opacity: 0; width: 0; overflow: hidden; }
+
+    .brand {
+      justify-content: center;
+      padding: var(--space-4) var(--space-2);
+    }
+  }
+}
+
+// ── Brand block ───────────────────────────────────────────────────────────────
+// prototype: font-family:Noto Serif JP; font-weight:300; font-size:15px; 0.20em tracking
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px 18px 14px;
+  border-bottom: 1px solid var(--color-border-panel);
+  flex-shrink: 0;
+}
+
+.brandName {
+  font-family: var(--font-display);
+  font-weight: var(--fw-light);
+  font-size: var(--fs-600);         // 15px
+  letter-spacing: var(--tracking-brand); // 0.20em
+  color: var(--color-text);
+  white-space: nowrap;
+  transition: opacity var(--dur-fast), width var(--dur-fast);
+}
+
+.brandSub {
+  font-size: var(--fs-75);
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: var(--color-text-faint);
+  white-space: nowrap;
+  transition: opacity var(--dur-fast), width var(--dur-fast);
+}
+
+// ── Nav body ──────────────────────────────────────────────────────────────────
+.nav {
+  flex: 1;
+  padding: var(--space-3) 0;
+}
+
+.navSection {
+  margin-top: var(--space-2);
+
+  &:first-child { margin-top: 0; }
+}
+
+// prototype: font-size:8px; letter-spacing:0.45em; uppercase; color:#999; padding 0 18px
+.sectionLabel {
+  font-size: 8px;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: var(--color-text-faint);
+  padding: 14px 18px 6px;
+  white-space: nowrap;
+  display: block;
+  transition: opacity var(--dur-fast), width var(--dur-fast);
+}
+
+// prototype .navItem: display:flex; gap:9px; padding:8px 18px; font-size:11px;
+// letter-spacing:0.06em; color:#555 (inactive), #0a0a0a (active);
+// background active:#f8f7f4; border-left:2px solid (transparent → #0a0a0a)
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 18px;
+  font-size: var(--fs-300);         // 11px
+  letter-spacing: var(--tracking-wide); // 0.06em
+  font-family: var(--font-body);
+  color: var(--color-text-muted);
+  background: transparent;
+  border: none;
+  border-left: 2px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  width: 100%;
+  text-align: left;
+  transition:
+    color var(--dur-fast) var(--ease-std),
+    background var(--dur-fast) var(--ease-std),
+    border-left-color var(--dur-fast) var(--ease-std);
+  @include focus-ring;
+
+  &:hover {
+    color: var(--color-text);
+    background: var(--color-surface-2);
+  }
+
+  &[data-active='true'] {
+    color: var(--color-text);
+    background: var(--color-surface-2);
+    border-left-color: var(--color-primary);
+    font-weight: var(--fw-medium);
+  }
+}
+
+.navIcon {
+  font-size: 17px;
+  flex-shrink: 0;
+  width: 18px;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.navLabel {
+  transition: opacity var(--dur-fast), width var(--dur-fast);
+}
+
+// ── Sidebar footer ────────────────────────────────────────────────────────────
+.sidebarFooter {
+  padding: 14px 18px;
+  border-top: 1px solid var(--color-border-panel);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+.footerAvatar {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-2);
+  border: var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-75);
+  font-weight: var(--fw-medium);
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.footerInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.footerName {
+  font-size: var(--fs-300);
+  color: var(--color-text-muted);
+  @include truncate(1);
+}
+
+.footerRole {
+  font-size: 8px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--color-text-faint);
+}
+
+// ── Main content area ─────────────────────────────────────────────────────────
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  transition: margin-left var(--dur-base) var(--ease-std);
+
+  &[data-collapsed='true'] {
+    margin-left: var(--sidebar-w-collapsed);
+  }
+
+  @include down(md) {
+    margin-left: 0;
+  }
+}
+
+// ── Topbar ────────────────────────────────────────────────────────────────────
+// prototype: padding:11px 20px; border-bottom:1px solid rgba(10,10,10,0.1); background:#fff; sticky
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-topbar);
+  height: var(--topbar-h);
+  background: var(--color-surface);
+  border-bottom: var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--content-pad-x);
+  gap: var(--space-4);
+  flex-shrink: 0;
+}
+
+.topbarLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.topbarBrand {
+  // visible on mobile when sidebar hidden
+  font-family: var(--font-display);
+  font-weight: var(--fw-light);
+  font-size: var(--fs-600);
+  letter-spacing: var(--tracking-brand);
+  white-space: nowrap;
+
+  @include up(md) { display: none; } // sidebar handles branding on desktop
+}
+
+// prototype .breadcrumb: font-size:9px; letter-spacing:0.4em; color:#aaa; uppercase
+.breadcrumb {
+  font-size: var(--fs-100);         // 9px
+  letter-spacing: 0.40em;
+  text-transform: uppercase;
+  color: var(--color-text-faint);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  @include truncate(1);
+}
+
+.breadcrumbSep {
+  opacity: 0.5;
+}
+
+.breadcrumbCurrent {
+  color: var(--color-text-muted);
+}
+
+.topbarRight {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+// Role pill — prototype: font-size:9px; letter-spacing:0.3em; uppercase; border:1px
+.rolePill {
+  font-size: var(--fs-100);
+  letter-spacing: 0.30em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border: var(--border-mid);
+  color: var(--color-text-subtle);
+  background: transparent;
+  white-space: nowrap;
+
+  &[data-role='admin'],
+  &[data-role='owner'] {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    border-color: var(--color-primary);
+  }
+}
+
+// Hamburger (mobile only)
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  font-size: 20px;
+  padding: var(--space-1);
+  @include focus-ring;
+
+  &:hover { color: var(--color-text); }
+  @include down(md) { display: flex; }
+}
+
+// ── Content wrapper ───────────────────────────────────────────────────────────
+.content {
+  flex: 1;
+  padding: var(--content-pad-y) var(--content-pad-x);
+  max-width: var(--container-max);
+  width: 100%;
+  margin: 0 auto;
+
+  @include down(sm) {
+    padding: var(--space-4);
+  }
+}
+
+// ── Mobile overlay ─────────────────────────────────────────────────────────────
+.mobileOverlay {
+  display: none;
+
+  @include down(md) {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: var(--color-overlay);
+    z-index: calc(var(--z-topbar) - 1);
+    animation: overlayIn var(--dur-base) var(--ease-std);
+  }
+}
+
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+// Mobile: sidebar off-canvas
+@include down(md) {
+  .sidebar {
+    transform: translateX(-100%);
+
+    &[data-open='true'] {
+      transform: translateX(0);
+    }
+  }
 }

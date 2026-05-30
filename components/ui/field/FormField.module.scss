@@ -1,29 +1,29 @@
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-
-  & + & {
-    margin-top: var(--space-4);
-  }
-}
+// FormField — Watcon Design System v2.
+.field { display: flex; flex-direction: column; }
 
 .label {
-  font-size: var(--fs-300);
-  font-weight: var(--fw-medium);
-  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 10px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--c-tertiary);
+  font-weight: var(--font-medium, 500);
+  display: block;
+  margin-bottom: 7px;
 }
 
-.required {
-  color: var(--color-danger-fg);
-}
+.required { color: var(--c-danger); margin-left: 3px; }
 
 .hint {
-  font-size: var(--fs-200);
-  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: var(--fs-300);
+  color: var(--c-tertiary);
+  margin-top: 5px;
 }
 
 .error {
-  font-size: var(--fs-200);
-  color: var(--color-danger-fg);
+  font-family: var(--font-body);
+  font-size: var(--fs-300);
+  color: var(--c-danger);
+  margin-top: 5px;
 }

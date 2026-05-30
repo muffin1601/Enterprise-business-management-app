@@ -1,10 +1,10 @@
+@use 'mixins' as *;
+
 .main {
-  max-width: 640px;
-  margin: 0 auto;
-  padding: var(--space-8) var(--space-6);
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
+  gap: 14px;
+  font-family: var(--font-body);
 }
 
 .header {
@@ -12,26 +12,38 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-4);
+  flex-wrap: wrap;
+  padding-bottom: 14px;
+  border-bottom: var(--border);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-weight: var(--fw-light);
+  font-size: var(--fs-900);
+  letter-spacing: 0.05em;
+  color: var(--color-text);
+  line-height: var(--lh-tight);
 }
 
 .subtitle {
+  font-family: var(--font-body);
   font-size: var(--fs-300);
-  color: var(--color-text-muted);
-  margin-top: var(--space-1);
+  color: var(--color-text-faint);
+  margin-top: 4px;
 }
 
 .back {
+  font-family: var(--font-body);
   font-size: var(--fs-300);
   color: var(--color-text-muted);
-  white-space: nowrap;
-  &:hover {
-    color: var(--color-text);
-    text-decoration: underline;
-  }
+  transition: color var(--dur-fast);
+  flex-shrink: 0;
+  &:hover { color: var(--color-text); }
 }
 
 .grid {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: 14px;
 }

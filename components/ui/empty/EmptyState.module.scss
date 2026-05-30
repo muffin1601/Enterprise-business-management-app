@@ -1,0 +1,53 @@
+// EmptyState — prototype .no-items: text-align:center; padding:50px 0; 10px; #ccc; 0.3em
+@use 'mixins' as *;
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 50px var(--space-6);  // matches prototype
+}
+
+.icon {
+  font-size: 40px;
+  color: var(--color-text-faint);
+  margin-bottom: var(--space-4);
+  opacity: 0.6;
+}
+
+.title {
+  font-size: var(--fs-400);
+  color: var(--color-text-muted);
+  font-weight: var(--fw-medium);
+  margin-bottom: var(--space-2);
+}
+
+.body {
+  font-size: var(--fs-300);
+  color: var(--color-text-faint);
+  letter-spacing: var(--tracking-micro); // 0.30em — prototype
+  max-width: 280px;
+  line-height: var(--lh-relaxed);
+}
+
+.action {
+  margin-top: var(--space-5);
+}
+
+// ── Inline table empty — compact version ───────────────────────────────────────
+// prototype: padding:22-24px 0; 10px; #ccc; 0.3em
+.emptyInline {
+  text-align: center;
+  padding: var(--space-6) 0;
+  font-size: var(--fs-200);
+  color: var(--color-text-faint);
+  letter-spacing: var(--tracking-micro);
+}
+
+// ── Search empty — with filter context ────────────────────────────────────────
+.searchEmpty {
+  @extend .empty;
+  padding: var(--space-8) var(--space-6);
+}
