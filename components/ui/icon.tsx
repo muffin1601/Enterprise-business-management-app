@@ -152,7 +152,6 @@ const ICON_MAP: Record<string, React.ComponentType<LucideProps>> = {
   'adjustments-horizontal': SlidersHorizontal,
   'star':                Star,
   'receipt':             Receipt,
-  'file-invoice':        Receipt,
 }
 
 // ── Icon component ─────────────────────────────────────────────────────────────
