@@ -400,8 +400,6 @@ export async function reviseQuote(id: string): Promise<ActionResult<{ id: string
           installation_note: loc.installation_note,
           material_subtotal: 0,
           location_total: 0,
-          created_by: r.c.userId,
-          updated_by: r.c.userId,
         })
         .select('id')
         .single()
@@ -429,10 +427,9 @@ export async function reviseQuote(id: string): Promise<ActionResult<{ id: string
             rate: item.rate,
             qty: item.qty,
             discount_pct: item.discount_pct,
+            taxable_value: Number(item.taxable_value) || 0,
             total: item.total,
             sort_order: item.sort_order,
-            created_by: r.c.userId,
-            updated_by: r.c.userId,
           })),
         )
       }
@@ -487,28 +484,29 @@ export async function upsertQuoteLocations(
     return ok({ locationIds: [] })
   }
 
-  const { data: inserted, error: insErr } = await supabase
-    .from('quote_locations')
-    .insert(
-      locations.map((loc, i) => ({
+  // Insert each location individually so IDs come back in guaranteed order
+  const locationIds: string[] = []
+  for (let i = 0; i < locations.length; i++) {
+    const loc = locations[i]!
+    const { data: row, error: insErr } = await supabase
+      .from('quote_locations')
+      .insert({
         org_id: r.c.orgId,
         quote_id: quoteId,
         name: loc.name,
-        sort_order: loc.sortOrder ?? i,
+        sort_order: i,
         is_included: loc.isIncluded ?? true,
         installation_charge: loc.installationCharge ?? 0,
         installation_note: loc.installationNote ?? null,
         material_subtotal: 0,
         location_total: 0,
-        created_by: r.c.userId,
-        updated_by: r.c.userId,
-      })),
-    )
-    .select('id')
+      })
+      .select('id')
+      .single()
 
-  if (insErr || !inserted) return err('internal', insErr?.message ?? 'Failed to insert locations.')
-
-  const locationIds = inserted.map((l: { id: string }) => l.id as string)
+    if (insErr || !row) return err('internal', insErr?.message ?? `Failed to insert location ${i + 1}.`)
+    locationIds.push(row.id as string)
+  }
 
   // Recalculate totals
   await calculateQuoteTotals(supabase, quoteId, r.c.orgId)
@@ -538,35 +536,31 @@ export async function upsertQuoteItems(
   if (delErr) return err('internal', delErr.message)
 
   if (items.length > 0) {
-    const { error: insErr } = await supabase
-      .from('quote_items')
-      .insert(
-        items.map((item, i) => {
-          const rate = Number(item.rate) || 0
-          const qty = Number(item.qty) || 1
-          const discPct = Number(item.discountPct) || 0
-          const total = rate * qty * (1 - discPct / 100)
-          return {
-            org_id: r.c.orgId,
-            quote_id: quoteId,
-            location_id: locationId,
-            item_id: item.itemId ?? null,
-            name: item.name,
-            description: item.description ?? null,
-            brand: item.brand ?? null,
-            unit: item.unit ?? null,
-            rate,
-            qty,
-            discount_pct: discPct,
-            total,
-            sort_order: i,
-            created_by: r.c.userId,
-            updated_by: r.c.userId,
-          }
-        }),
-      )
+    const rows = items.map((item, i) => {
+      const rate    = Number(item.rate)        || 0
+      const qty     = Number(item.qty)         || 1
+      const discPct = Number(item.discountPct) || 0
+      const total   = +(rate * qty * (1 - discPct / 100)).toFixed(2)
+      return {
+        org_id:        r.c.orgId,
+        quote_id:      quoteId,
+        location_id:   locationId,
+        item_id:       item.itemId ?? null,
+        name:          item.name,
+        description:   item.description  ?? null,
+        brand:         item.brand        ?? null,
+        unit:          item.unit         ?? null,
+        rate,
+        qty,
+        discount_pct:  discPct,
+        taxable_value: +(rate * qty).toFixed(2),
+        total,
+        sort_order:    i,
+      }
+    })
 
-    if (insErr) return err('internal', insErr.message)
+    const { error: insErr } = await supabase.from('quote_items').insert(rows)
+    if (insErr) return err('internal', `quote_items insert: ${insErr.message}`)
   }
 
   // Update location subtotals
@@ -608,10 +602,9 @@ export async function deleteQuote(id: string): Promise<ActionResult<void>> {
 
   const { error } = await supabase
     .from('quotes')
-    .update({ deleted_at: new Date().toISOString(), updated_by: r.c.userId })
+    .delete()
     .eq('id', id)
     .eq('org_id', r.c.orgId)
-    .is('deleted_at', null)
 
   if (error) return err('internal', error.message)
 

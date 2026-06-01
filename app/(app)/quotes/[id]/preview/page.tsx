@@ -8,14 +8,24 @@ import {
   type QuoteDetail as PreviewQuoteDetail,
 } from '@/features/quotes/components/quote-preview'
 
+// Always fetch fresh data — never serve a cached preview
+export const dynamic = 'force-dynamic'
+
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const quote = await getQuote(id)
   return { title: quote ? `${quote.quoteNo} · Preview · Watcon` : 'Quote Preview · Watcon' }
 }
 
-export default async function QuotePreviewPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
+export default async function QuotePreviewPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>
+  searchParams: Promise<Record<string, string | undefined>>
+}) {
+  const [{ id }, sp] = await Promise.all([params, searchParams])
+  const autoPrint = sp.print === '1'
 
   const ctx = await getActionContext()
   if (!ctx.has('quotes.view')) {
@@ -29,9 +39,9 @@ export default async function QuotePreviewPage({ params }: { params: Promise<{ i
   const [q, org] = await Promise.all([getQuote(id), getActiveOrganization()])
   if (!q) notFound()
 
-  // Adapt camelCase query result → snake_case preview type
   const previewQuote: PreviewQuoteDetail = {
     id:                  q.id,
+    logo_url:            q.logoUrl,
     quote_no:            q.quoteNo,
     revision:            q.revision,
     date:                q.date,
@@ -84,19 +94,36 @@ export default async function QuotePreviewPage({ params }: { params: Promise<{ i
     })),
   }
 
+  const previewProps = {
+    quote: previewQuote,
+    orgName: org?.name ?? '',
+    orgAddress: org?.address ?? undefined,
+    orgGstin: org?.gstin ?? undefined,
+  }
+
   return (
     <>
-      <QuotePreviewPrintBar
-        quoteId={q.id}
-        quoteNo={q.quoteNo}
-        includeBoqSummary={q.includeBoqSummary}
-      />
-      <QuotePreviewView
-        quote={previewQuote}
-        orgName={org?.name ?? ''}
-        orgAddress={org?.address ?? undefined}
-        orgGstin={org?.gstin ?? undefined}
-      />
+      {/* ── Screen: PDF-viewer dark overlay ── */}
+      <div className="no-print" style={{
+        position: 'fixed', inset: 0, zIndex: 9999,
+        background: '#404040', overflowY: 'auto',
+        display: 'flex', flexDirection: 'column',
+      }}>
+        <QuotePreviewPrintBar
+          quoteId={q.id}
+          quoteNo={q.quoteNo}
+          includeBoqSummary={q.includeBoqSummary}
+          autoPrint={autoPrint}
+        />
+        <div style={{ flex: 1, overflowY: 'auto', padding: '32px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24 }}>
+          <QuotePreviewView {...previewProps} />
+        </div>
+      </div>
+
+      {/* ── Print-only: rendered in normal flow, hidden on screen ── */}
+      <div id="quote-print-area" aria-hidden="true">
+        <QuotePreviewView {...previewProps} />
+      </div>
     </>
   )
 }

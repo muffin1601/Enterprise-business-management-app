@@ -191,3 +191,68 @@
 @media (prefers-reduced-motion: reduce) {
   :root { --dur-fast: 0ms; --dur-base: 0ms; --dur-slow: 0ms; }
 }
+
+// ── Quote print-only container (hidden on screen, shown only in @media print) ─
+#quote-print-area { display: none; }
+
+// ── Quote preview A4 print ────────────────────────────────────────────────────
+@media print {
+  // @page margin = padding on EVERY physical page including overflow pages
+  @page { size: A4 portrait; margin: 10mm 12mm; }
+
+  html, body {
+    background: #ffffff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  // Hide EVERYTHING — then selectively reveal only print area
+  body * { visibility: hidden !important; }
+
+  // Show only the dedicated print container and its children
+  #quote-print-area { display: block !important; visibility: visible !important; }
+  #quote-print-area * { visibility: visible !important; }
+
+  // Selective printing (quote only / BOQ only / both)
+  body[data-print="quote"] #quote-print-area .boq-page   { display: none !important; }
+  body[data-print="boq"]   #quote-print-area .quote-page { display: none !important; }
+
+  // Each A4 card — no padding here, @page margin handles all edges
+  .print-page {
+    display: block !important;
+    width: 186mm !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    box-sizing: border-box !important;
+    // NO page-break-after — only boq-page has page-break-before to separate sheets
+  }
+
+  // BOQ page always starts on a fresh sheet
+  .boq-page {
+    page-break-before: always !important;
+    break-before: page !important;
+  }
+
+  // Outer wrapper: no flex gap in print (gap creates phantom blank space)
+  #quote-print-area > div {
+    display: block !important;
+    gap: 0 !important;
+  }
+
+  // Keep location sections together — don't split across pages
+  .location-block { page-break-inside: avoid; break-inside: avoid; }
+
+  // Don't split table rows or subtotal rows
+  tr,
+  .sub-row { page-break-inside: avoid; break-inside: avoid; }
+
+  // Print dark bars and colours correctly
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}

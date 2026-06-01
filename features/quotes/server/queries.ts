@@ -91,12 +91,15 @@ export async function listQuotes(filter: QuoteFilter): Promise<QuotePage> {
   // ── Fetch location meta for cards ─────────────────────────────────────────
   let locationsByQuote: Record<string, { name: string; installation: boolean }[]> = {}
 
+  // itemCountByQuote tracks total items across all locations per quote
+  const itemCountByQuote: Record<string, number> = {}
+
   if (ids.length > 0) {
+    // quote_locations has NO deleted_at column — do not filter on it
     const { data: locs } = await supabase
       .from('quote_locations')
-      .select('quote_id,name,installation_charge')
+      .select('id,quote_id,name,installation_charge')
       .in('quote_id', ids)
-      .is('deleted_at', null)
       .order('sort_order', { ascending: true })
 
     for (const l of locs ?? []) {
@@ -106,6 +109,24 @@ export async function listQuotes(filter: QuoteFilter): Promise<QuotePage> {
         name:         l.name as string,
         installation: n(l.installation_charge) > 0,
       })
+    }
+
+    // Fetch item counts per location, then roll up to quote level
+    const locIds = (locs ?? []).map(l => l.id as string)
+    if (locIds.length > 0) {
+      const { data: items } = await supabase
+        .from('quote_items')
+        .select('location_id')
+        .in('location_id', locIds)
+
+      // Map location → quote for rollup
+      const locToQuote: Record<string, string> = {}
+      for (const l of locs ?? []) locToQuote[l.id as string] = l.quote_id as string
+
+      for (const item of items ?? []) {
+        const qid = locToQuote[item.location_id as string]
+        if (qid) itemCountByQuote[qid] = (itemCountByQuote[qid] ?? 0) + 1
+      }
     }
   }
 
@@ -129,7 +150,7 @@ export async function listQuotes(filter: QuoteFilter): Promise<QuotePage> {
       materialSubtotal: n(r.material_subtotal),
       gstAmount:        n(r.gst_amount),
       locationCount:    locs.length,
-      itemCount:        0,
+      itemCount:        itemCountByQuote[r.id as string] ?? 0,
       locationNames:    locs.map(l => l.name),
       hasInstallation:  locs.some(l => l.installation),
       createdAt:        r.created_at as string,
@@ -148,7 +169,7 @@ export async function getQuote(id: string): Promise<QuoteDetail | null> {
     .from('quotes')
     .select(
       `id,quote_no,revision,parent_id,customer_id,subject,date,valid_until,
-       status,gst_mode,gst_pct,transport,transport_note,
+       status,gst_mode,gst_pct,transport,transport_note,logo_url,
        include_boq_summary,notes,terms,
        material_subtotal,gst_amount,grand_total,created_at,updated_at,
        customers(id,code,name,phone,email,billing_address,contact_person)`,
@@ -170,7 +191,7 @@ export async function getQuote(id: string): Promise<QuoteDetail | null> {
     .from('quote_locations')
     .select('id,name,sort_order,is_included,material_subtotal,installation_charge,installation_note,location_total')
     .eq('quote_id', id)
-    .is('deleted_at', null)
+    // quote_locations has no deleted_at column — do NOT filter on it
     .order('sort_order', { ascending: true })
 
   const locIds = (locData ?? []).map(l => l.id as string)
@@ -247,7 +268,7 @@ export async function getQuote(id: string): Promise<QuoteDetail | null> {
     gstPct:                 n(r.gst_pct),
     transport:              n(r.transport),
     transportNote:          r.transport_note as string | null,
-    logoUrl:                null,
+    logoUrl:                (r.logo_url as string | null) ?? null,
     includeBoqSummary:      Boolean(r.include_boq_summary),
     grandTotal:             n(r.grand_total),
     materialSubtotal:       n(r.material_subtotal),

@@ -45,9 +45,10 @@ function QuoteCard({
 
   return (
     <div className={styles.cardWrap}>
-      <Link href={`/quotes/${row.id}/edit` as Route} className={styles.cardLink} prefetch>
+      {/* ── Card body (not clickable — use buttons below) ─── */}
+      <div className={styles.cardBody}>
 
-        {/* ── Top: quote no + REV badge ─────────────────────────── */}
+        {/* ── Top: quote no + REV badge ─────────────────────── */}
         <div className={styles.cardTop}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span className={styles.quoteNo}>{row.quoteNo}</span>
@@ -57,28 +58,24 @@ function QuoteCard({
           </div>
         </div>
 
-        {/* ── Customer + subject ────────────────────────────────── */}
+        {/* ── Customer + subject ────────────────────────────── */}
         <div className={styles.cardCustomer}>{row.customerName ?? 'Unknown'}</div>
         <div className={styles.cardSubject}>{row.subject ?? <span style={{ color: 'var(--c-tertiary)' }}>—</span>}</div>
 
-        {/* ── Meta: status + gst + location chips ──────────────── */}
+        {/* ── Meta: status + gst + chips ────────────────────── */}
         <div className={styles.cardMeta}>
           <StatusBadge status={row.status} />
-          {row.gstMode === 'none' && (
-            <span className={styles.gstBadge}>No GST</span>
-          )}
-          {locationNames.map((name, i) => (
-            <span key={i} className={styles.chip}>{name}</span>
-          ))}
+          {row.gstMode === 'none' && <span className={styles.gstBadge}>No GST</span>}
+          {locationNames.map((name, i) => <span key={i} className={styles.chip}>{name}</span>)}
           {extra > 0 && <span className={styles.chip}>+{extra}</span>}
         </div>
 
-        {/* ── Count row ────────────────────────────────────────── */}
+        {/* ── Count row ─────────────────────────────────────── */}
         <div className={styles.cardCountRow}>
           <span>{row.locationCount ?? 0} location{(row.locationCount ?? 0) !== 1 ? 's' : ''}</span>
           <span className={styles.dot}>·</span>
           <span>{row.itemCount ?? 0} item{(row.itemCount ?? 0) !== 1 ? 's' : ''}</span>
-          {(row.hasInstallation) && (
+          {row.hasInstallation && (
             <span className={styles.installTag}>
               <Icon name="settings" size={10} />
               Installation
@@ -86,22 +83,52 @@ function QuoteCard({
           )}
         </div>
 
-        {/* ── Footer: amount + date ─────────────────────────────── */}
+        {/* ── Amount + date ─────────────────────────────────── */}
         <div className={styles.cardFooter}>
           <span className={styles.cardAmount}>{fmtINR(row.grandTotal)}</span>
           <span className={styles.cardDate}>{fmtDate(row.date)}</span>
         </div>
-      </Link>
+      </div>
 
-      {canDelete && (
-        <button
-          className={styles.cardDeleteBtn}
-          title={`Delete ${row.quoteNo}`}
-          onClick={(e) => { e.stopPropagation(); onDelete(row.id, row.quoteNo) }}
+      {/* ── Action bar ────────────────────────────────────────── */}
+      <div className={styles.cardActions}>
+        <Link
+          href={`/quotes/${row.id}/edit` as Route}
+          className={styles.cardActionBtn}
+          title="Open editor"
         >
-          <Icon name="trash" size={13} />
-        </button>
-      )}
+          <Icon name="pencil" size={13} />
+          Edit
+        </Link>
+        <Link
+          href={`/quotes/${row.id}/preview` as Route}
+          className={styles.cardActionBtn}
+          title="Open preview"
+        >
+          <Icon name="eye" size={13} />
+          Preview
+        </Link>
+        <a
+          href={`/quotes/${row.id}/preview?print=1`}
+          target="_blank"
+          rel="noreferrer"
+          className={styles.cardActionBtn}
+          title="Print / Save as PDF"
+        >
+          <Icon name="download" size={13} />
+          Print
+        </a>
+        {canDelete && (
+          <button
+            className={`${styles.cardActionBtn} ${styles.cardActionDanger}`}
+            title={`Delete ${row.quoteNo}`}
+            onClick={() => onDelete(row.id, row.quoteNo)}
+          >
+            <Icon name="trash" size={13} />
+            Delete
+          </button>
+        )}
+      </div>
     </div>
   )
 }

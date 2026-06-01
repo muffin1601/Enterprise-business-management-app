@@ -94,6 +94,7 @@ const ICON_MAP: Record<string, React.ComponentType<LucideProps>> = {
   'map-pin':             MapPin,
 
   // Files / docs
+  'file':                FileText,
   'file-text':           FileText,
   'notes':               FileText,
   'file-edit':           FileEdit,

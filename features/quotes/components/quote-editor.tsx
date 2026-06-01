@@ -1,6 +1,6 @@
 'use client'
 
-import {
+import React, {
   useState,
   useEffect,
   useCallback,
@@ -9,7 +9,6 @@ import {
 } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import type { ActionResult } from '@/types/action'
 import {
   updateQuote,
   upsertQuoteLocations,
@@ -111,6 +110,7 @@ type LocalLocation = QuoteLocationInput & {
   id: string | null
   localId: string
   items: LocalItem[]
+  showInstallation: boolean   // separate flag — installationCharge can be 0
 }
 
 type LocalTerm = {
@@ -243,113 +243,191 @@ interface ItemRowProps {
 }
 
 function ItemRow({ item, itemRefs, onChange, onRemove, disabled }: ItemRowProps) {
-  const listId = `items-${item.localId}`
   const total = calcItemTotal(item.rate, item.qty, item.discountPct ?? 0)
+  const [search, setSearch] = React.useState(item.name)
+  const [open, setOpen] = React.useState(false)
+  const [dropPos, setDropPos] = React.useState({ top: 0, left: 0, width: 0 })
+  const inputRef = React.useRef<HTMLInputElement>(null)
+  const wrapRef = React.useRef<HTMLDivElement>(null)
 
-  function handleNameChange(value: string) {
-    // Try to auto-fill from item catalog
-    const matched = itemRefs.find(
-      (r) => r.name.toLowerCase() === value.toLowerCase() || r.sku.toLowerCase() === value.toLowerCase(),
-    )
-    if (matched) {
-      onChange({
-        ...item,
-        name: matched.name,
-        itemId: matched.id,
-        brand: matched.brand ?? item.brand,
-        unit: matched.unit ?? item.unit,
-        rate: matched.sellingPrice ?? item.rate,
-      })
-    } else {
-      onChange({ ...item, name: value, itemId: undefined })
+  const filtered = search.trim()
+    ? itemRefs.filter(r =>
+        r.name.toLowerCase().includes(search.toLowerCase()) ||
+        (r.sku && r.sku.toLowerCase().includes(search.toLowerCase())) ||
+        (r.brand && r.brand.toLowerCase().includes(search.toLowerCase()))
+      ).slice(0, 15)
+    : itemRefs.slice(0, 15)
+
+  // Close on outside click
+  React.useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false)
     }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  function openDropdown() {
+    if (!inputRef.current) return
+    const rect = inputRef.current.getBoundingClientRect()
+    // position: fixed is viewport-relative — do NOT add scrollY/scrollX
+    setDropPos({ top: rect.bottom + 2, left: rect.left, width: Math.max(rect.width, 340) })
+    setOpen(true)
   }
+
+  function selectItem(r: ItemRef) {
+    setSearch(r.name)
+    setOpen(false)
+    onChange({ ...item, name: r.name, itemId: r.id, brand: r.brand ?? item.brand, unit: r.unit ?? item.unit, rate: r.sellingPrice || item.rate })
+  }
+
+  function handleSearchChange(v: string) {
+    setSearch(v)
+    onChange({ ...item, name: v, itemId: undefined })
+    openDropdown()
+  }
+
+  React.useEffect(() => { setSearch(item.name) }, [item.name])
 
   return (
     <tr className={styles.itemRow}>
-      <td className={styles.itemNameCell}>
-        <input
-          list={listId}
-          className={styles.itemInput}
-          value={item.name}
-          placeholder="Item / description"
-          disabled={disabled}
-          onChange={(e) => handleNameChange(e.target.value)}
-        />
-        <datalist id={listId}>
-          {itemRefs.map((r) => (
-            <option key={r.id} value={r.name} data-sku={r.sku} />
-          ))}
-        </datalist>
+      {/* Item search combobox */}
+      <td className={`${styles.itemTd} ${styles.itemNameCell}`}>
+        <div ref={wrapRef}>
+          <input
+            ref={inputRef}
+            className={styles.itemInput}
+            value={search}
+            placeholder="Search or type item…"
+            disabled={disabled}
+            autoComplete="off"
+            onChange={(e) => handleSearchChange(e.target.value)}
+            onFocus={() => openDropdown()}
+            onKeyDown={(e) => { if (e.key === 'Escape') setOpen(false) }}
+          />
+          {open && !disabled && (
+            <div
+              className={styles.itemDropdown}
+              style={{ position: 'fixed', top: dropPos.top, left: dropPos.left, width: dropPos.width, zIndex: 9999 }}
+            >
+              {filtered.length === 0 ? (
+                <div style={{ padding: '12px 14px', fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--c-tertiary)', fontStyle: 'italic' }}>
+                  {search.trim() ? `No items matching "${search}"` : 'No items in catalogue'}
+                </div>
+              ) : (
+                <>
+                  {search.trim() === '' && (
+                    <div style={{ padding: '8px 12px 4px', fontFamily: 'var(--font-body)', fontSize: 9, letterSpacing: '0.10em', textTransform: 'uppercase', color: 'var(--c-tertiary)' }}>
+                      All items — type to search
+                    </div>
+                  )}
+                  {filtered.map(r => (
+                    <div key={r.id} className={styles.itemDropdownOption} onMouseDown={() => selectItem(r)}>
+                      <span className={styles.itemDropdownName}>{r.name}</span>
+                      <span className={styles.itemDropdownMeta}>
+                        {r.sku && <span className={styles.itemDropdownSku}>{r.sku}</span>}
+                        {r.brand && <span>{r.brand}</span>}
+                        {r.sellingPrice > 0 && <span className={styles.itemDropdownPrice}>{fmtINR(r.sellingPrice)}</span>}
+                      </span>
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
+          )}
+        </div>
       </td>
-      <td>
-        <input
-          className={styles.itemInput}
-          value={item.brand ?? ''}
-          placeholder="Brand"
-          disabled={disabled}
-          onChange={(e) => onChange({ ...item, brand: e.target.value })}
-        />
+      <td className={styles.itemTd}>
+        <input className={styles.itemInput} value={item.brand ?? ''} placeholder="Brand"
+          disabled={disabled} onChange={(e) => onChange({ ...item, brand: e.target.value })} />
       </td>
-      <td>
-        <input
-          className={styles.itemInput}
-          value={item.unit ?? ''}
-          placeholder="Unit"
-          disabled={disabled}
-          onChange={(e) => onChange({ ...item, unit: e.target.value })}
-        />
+      <td className={styles.itemTd}>
+        <input className={styles.itemInput} value={item.unit ?? ''} placeholder="Unit"
+          disabled={disabled} onChange={(e) => onChange({ ...item, unit: e.target.value })} />
       </td>
-      <td>
-        <input
-          type="number"
-          className={`${styles.itemInput} ${styles.textRight}`}
-          value={item.rate === 0 ? '' : item.rate}
-          placeholder="0"
-          min={0}
-          disabled={disabled}
-          onChange={(e) => onChange({ ...item, rate: parseFloat(e.target.value) || 0 })}
-        />
+      <td className={`${styles.itemTd} ${styles.textRight}`}>
+        <input type="number" className={styles.itemInput}
+          value={item.rate === 0 ? '' : item.rate} placeholder="0.00" min={0} disabled={disabled}
+          onChange={(e) => onChange({ ...item, rate: parseFloat(e.target.value) || 0 })} />
       </td>
-      <td>
-        <input
-          type="number"
-          className={`${styles.itemInput} ${styles.textRight}`}
-          value={item.qty === 1 ? item.qty : item.qty || ''}
-          placeholder="1"
-          min={0}
-          disabled={disabled}
-          onChange={(e) => onChange({ ...item, qty: parseFloat(e.target.value) || 1 })}
-        />
+      <td className={`${styles.itemTd} ${styles.textRight}`}>
+        <input type="number" className={styles.itemInput}
+          value={item.qty === 1 ? item.qty : item.qty || ''} placeholder="1" min={0} disabled={disabled}
+          onChange={(e) => onChange({ ...item, qty: parseFloat(e.target.value) || 1 })} />
       </td>
-      <td>
-        <input
-          type="number"
-          className={`${styles.itemInput} ${styles.textRight}`}
+      <td className={`${styles.itemTd} ${styles.textRight}`}>
+        <input type="number" className={styles.itemInput}
           value={(item.discountPct ?? 0) === 0 ? '' : (item.discountPct ?? 0)}
-          placeholder="0"
-          min={0}
-          max={100}
-          disabled={disabled}
-          onChange={(e) => onChange({ ...item, discountPct: parseFloat(e.target.value) || 0 })}
-        />
+          placeholder="0" min={0} max={100} disabled={disabled}
+          onChange={(e) => onChange({ ...item, discountPct: parseFloat(e.target.value) || 0 })} />
       </td>
-      <td className={`${styles.itemTotalCell} ${styles.textRight}`}>
-        {fmtINR(total)}
-      </td>
-      <td className={styles.itemDeleteCell}>
+      <td className={`${styles.itemTd} ${styles.textRight} ${styles.mono}`}>{fmtINR(total)}</td>
+      <td className={`${styles.itemTd} ${styles.itemDeleteCell}`}>
         {!disabled && (
-          <button
-            className={styles.rowDeleteBtn}
-            title="Remove item"
-            type="button"
-            onClick={onRemove}
-          >
-            <Icon name="x" size={14} />
+          <button className={styles.rowDeleteBtn} title="Remove item" type="button" onClick={onRemove}>
+            <Icon name="x" size={13} />
           </button>
         )}
       </td>
     </tr>
+  )
+}
+
+// ── Logo Upload component ─────────────────────────────────────────────────────
+function LogoUpload({ quoteId, logoUrl: initialUrl, canEdit, onUploaded }: {
+  quoteId: string; logoUrl: string | null; canEdit: boolean; onUploaded: (url: string | null) => void
+}) {
+  const inputRef = React.useRef<HTMLInputElement>(null)
+  const [preview, setPreview] = React.useState<string | null>(initialUrl)
+  const [uploading, setUploading] = React.useState(false)
+
+  async function handleFile(file: File) {
+    if (!file.type.startsWith('image/')) return
+    setUploading(true)
+    try {
+      const { createSupabaseBrowserClient } = await import('@/lib/supabase/client')
+      const supabase = createSupabaseBrowserClient()
+      const path = `quotes/${quoteId}/logo.${file.name.split('.').pop() ?? 'png'}`
+      const { error } = await supabase.storage.from('item-images').upload(path, file, { upsert: true, contentType: file.type })
+      if (error) { console.error(error); return }
+      const { data: { publicUrl } } = supabase.storage.from('item-images').getPublicUrl(path)
+      setPreview(publicUrl)
+      // Notify parent — saveAll's next debounce will persist logoUrl with full quote data
+      onUploaded(publicUrl)
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  async function handleRemove() {
+    setPreview(null)
+    onUploaded(null)
+    // Parent saveAll will persist logoUrl: null on next debounce
+  }
+
+  return (
+    <div className={styles.logoUploadBox} onClick={() => canEdit && !uploading && inputRef.current?.click()}>
+      {preview ? (
+        <>
+          <img src={preview} alt="Logo" />
+          {canEdit && (
+            <button className={styles.logoRemoveBtn} type="button"
+              onClick={(e) => { e.stopPropagation(); handleRemove() }} title="Remove">
+              <Icon name="x" size={11} />
+            </button>
+          )}
+        </>
+      ) : (
+        <>
+          <Icon name="camera" size={22} style={{ color: 'var(--c-border-2)' }} />
+          <span className={styles.logoUploadHint}>{uploading ? 'Uploading…' : canEdit ? 'Click to upload logo' : 'No logo'}</span>
+        </>
+      )}
+      {canEdit && (
+        <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }}
+          onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = '' }} />
+      )}
+    </div>
   )
 }
 
@@ -376,6 +454,7 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
   const [transport, setTransport] = useState(quote.transport ?? 0)
   const [transportNote, setTransportNote] = useState(quote.transportNote ?? '')
   const [includeBoqSummary, setIncludeBoqSummary] = useState(quote.includeBoqSummary ?? true)
+  const [logoUrl, setLogoUrl] = useState<string | null>(quote.logoUrl ?? null)
 
   // ── Locations/items state ───────────────────────────────────────────────────
   const [locations, setLocations] = useState<LocalLocation[]>(() =>
@@ -387,6 +466,7 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
       isIncluded: loc.isIncluded,
       installationCharge: loc.installationCharge,
       installationNote: loc.installationNote ?? '',
+      showInstallation: loc.installationCharge > 0 || !!loc.installationNote,
       items: loc.items.map((item) => ({
         id: item.id,
         localId: uid(),
@@ -413,14 +493,17 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
 
   // ── Auto-save state ─────────────────────────────────────────────────────────
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
-  const debounceRef = useRef<NodeJS.Timeout>(undefined)
+  const debounceRef  = useRef<NodeJS.Timeout>(undefined)
   const isFirstRender = useRef(true)
+  const isSavingRef   = useRef(false)   // prevent concurrent saves
 
   // ── Totals (derived) ────────────────────────────────────────────────────────
   const totals = calculateTotals(locations, gstMode, gstPct, transport)
 
   // ── Save logic ──────────────────────────────────────────────────────────────
   const saveAll = useCallback(async () => {
+    if (isSavingRef.current) return   // already saving — skip
+    isSavingRef.current = true
     setSaveStatus('saving')
     try {
       // 1. Save meta
@@ -434,6 +517,7 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
         transport,
         transportNote: transportNote || undefined,
         includeBoqSummary,
+        logoUrl: logoUrl || undefined,
         terms: terms.map((t) => ({ category: t.category as TermCategory, text: t.text })),
       })
 
@@ -462,31 +546,39 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
       const locationIds = locResult.data.locationIds
 
       // 3. Upsert items per location
-      const itemPromises = locations.map((loc, i) => {
+      // 3. Upsert items per location — run sequentially to avoid race conditions
+      for (let i = 0; i < locations.length; i++) {
         const locationId = locationIds[i]
-        if (!locationId) return Promise.resolve()
-        return upsertQuoteItems(
+        if (!locationId) continue
+        const validItems = locations[i]!.items.filter(item => item.name.trim() !== '')
+        const itemResult = await upsertQuoteItems(
           locationId,
           quote.id,
-          loc.items.map((item) => ({
+          validItems.map((item) => ({
             itemId: item.itemId,
             name: item.name,
             description: item.description,
             brand: item.brand,
             unit: item.unit,
-            rate: item.rate,
-            qty: item.qty,
-            discountPct: item.discountPct ?? 0,
+            rate: Number(item.rate) || 0,
+            qty: Number(item.qty) || 1,
+            discountPct: Number(item.discountPct) || 0,
           })),
         )
-      })
-
-      await Promise.all(itemPromises)
+        if (!itemResult.ok) {
+          setSaveStatus('error')
+          console.error('[saveAll] upsertQuoteItems failed:', itemResult.error.message)
+          return
+        }
+      }
 
       setSaveStatus('saved')
       setTimeout(() => setSaveStatus('idle'), 2500)
-    } catch {
+    } catch (e) {
       setSaveStatus('error')
+      console.error('[saveAll] exception:', e)
+    } finally {
+      isSavingRef.current = false
     }
   }, [
     quote.id,
@@ -574,6 +666,7 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
         isIncluded: true,
         installationCharge: 0,
         installationNote: '',
+        showInstallation: false,
         items: [],
       },
     ])
@@ -692,14 +785,29 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
               REVISE
             </button>
           )}
-          <Link
-            href={`/quotes/${quote.id}/preview`}
+          <button
+            type="button"
             className={styles.previewBtn}
-            target="_blank"
+            onClick={async () => {
+              if (canEdit) { clearTimeout(debounceRef.current); await saveAll() }
+              router.push(`/quotes/${quote.id}/preview` as import('next').Route)
+            }}
           >
             <Icon name="eye" size={14} />
             PREVIEW
-          </Link>
+          </button>
+          <button
+            type="button"
+            className={styles.reviseBtn}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}
+            onClick={async () => {
+              if (canEdit) { clearTimeout(debounceRef.current); await saveAll() }
+              window.open(`/quotes/${quote.id}/preview?print=1`, '_blank')
+            }}
+          >
+            <Icon name="download" size={14} />
+            PRINT
+          </button>
         </div>
       </div>
 
@@ -775,7 +883,7 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
             const locTotals = totals.locationTotals.find((lt) => lt.localId === loc.localId)
             const materialSubtotal = locTotals?.materialSubtotal ?? 0
             const locationTotal = locTotals?.locationTotal ?? 0
-            const hasInstallation = (loc.installationCharge ?? 0) > 0 || loc.installationNote
+            const hasInstallation = loc.showInstallation
 
             return (
               <section key={loc.localId} className={styles.locationBlock}>
@@ -807,14 +915,14 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
                   <table className={styles.itemsTable}>
                     <thead>
                       <tr>
-                        <th className={styles.thName}>ITEM / DESCRIPTION</th>
-                        <th>BRAND</th>
-                        <th>UNIT</th>
-                        <th className={styles.textRight}>RATE (₹)</th>
-                        <th className={styles.textRight}>QTY</th>
-                        <th className={styles.textRight}>DISC %</th>
-                        <th className={styles.textRight}>TOTAL (₹)</th>
-                        <th className={styles.thAction} />
+                        <th className={`${styles.itemTh} ${styles.thName}`}>ITEM / DESCRIPTION</th>
+                        <th className={`${styles.itemTh} ${styles.thBrand}`}>BRAND</th>
+                        <th className={`${styles.itemTh} ${styles.thUnit}`}>UNIT</th>
+                        <th className={`${styles.itemTh} ${styles.thRate}`}>RATE (₹)</th>
+                        <th className={`${styles.itemTh} ${styles.thQty}`}>QTY</th>
+                        <th className={`${styles.itemTh} ${styles.thDisc}`}>DISC %</th>
+                        <th className={`${styles.itemTh} ${styles.thTotal}`}>TOTAL (₹)</th>
+                        <th className={`${styles.itemTh} ${styles.thAction}`} />
                       </tr>
                     </thead>
                     <tbody>
@@ -855,7 +963,7 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
                   <button
                     className={styles.addInstallBtn}
                     type="button"
-                    onClick={() => updateLocation(loc.localId, { installationCharge: 0, installationNote: '' })}
+                    onClick={() => updateLocation(loc.localId, { showInstallation: true, installationCharge: 0, installationNote: '' })}
                   >
                     <Icon name="plus" size={14} />
                     ADD INSTALLATION CHARGE FOR THIS LOCATION
@@ -888,7 +996,7 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
                         type="button"
                         title="Remove installation charge"
                         onClick={() =>
-                          updateLocation(loc.localId, { installationCharge: 0, installationNote: '' })
+                          updateLocation(loc.localId, { showInstallation: false, installationCharge: 0, installationNote: '' })
                         }
                       >
                         <Icon name="x" size={13} />
@@ -1049,6 +1157,41 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
               ))}
             </div>
           </section>
+
+          {/* ── Bottom save bar ── */}
+          {canEdit && (
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              gap: 12, padding: '16px 20px',
+              background: 'var(--c-surface)', border: '1px solid var(--c-border)',
+              borderRadius: 'var(--radius-sm)', marginTop: 4,
+            }}>
+              <SaveStatus status={saveStatus} />
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button
+                  type="button"
+                  className={styles.reviseBtn}
+                  onClick={handleSaveAndExit}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                >
+                  <Icon name="save" size={14} />
+                  Save &amp; Exit
+                </button>
+                <button
+                  type="button"
+                  className={styles.previewBtn}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                  onClick={async () => {
+                    clearTimeout(debounceRef.current)
+                    await saveAll()
+                  }}
+                >
+                  <Icon name="check" size={14} />
+                  Save Quote
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* ── RIGHT SIDEBAR ── */}
@@ -1074,10 +1217,7 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
           {/* Company Logo */}
           <div className={styles.sidebarPanel}>
             <label className={styles.sidebarLabel}>COMPANY LOGO</label>
-            <div className={styles.logoPlaceholder}>
-              <Icon name="camera" size={28} className={styles.logoIcon} />
-              <span className={styles.logoHint}>Upload logo</span>
-            </div>
+            <LogoUpload quoteId={quote.id} logoUrl={quote.logoUrl} canEdit={canEdit} onUploaded={setLogoUrl} />
           </div>
 
           {/* GST Mode */}

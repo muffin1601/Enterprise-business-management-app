@@ -6,6 +6,8 @@ import { getActiveOrgId } from '@/lib/auth/session'
 import { QuoteEditor } from '@/features/quotes/components/quote-editor'
 import type { QuoteDetail, CustomerRef, ItemRef } from '@/features/quotes/components/quote-editor'
 
+export const dynamic = 'force-dynamic'
+
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params
   const supabase = await createSupabaseServerClient()
@@ -37,7 +39,7 @@ export default async function QuoteEditPage({ params }: { params: Promise<{ id: 
     supabase
       .from('quote_locations')
       .select('id,name,sort_order,is_included,installation_charge,installation_note,material_subtotal,location_total')
-      .eq('quote_id', id).is('deleted_at', null)
+      .eq('quote_id', id) // no .is('deleted_at',null) — quote_locations has no deleted_at
       .order('sort_order', { ascending: true }),
 
     // 3. Customers dropdown
@@ -50,7 +52,7 @@ export default async function QuoteEditPage({ params }: { params: Promise<{ id: 
   if (!quoteRes.data) notFound()
   const raw = quoteRes.data
 
-  if (raw.status === 'accepted' || raw.status === 'cancelled') redirect(`/quotes/${id}/preview`)
+  // Allow editing all statuses — readonly banner shown inside the editor for accepted/cancelled
 
   // Fetch items for each location
   const locIds = (locRes.data ?? []).map((l: any) => l.id as string)
@@ -125,19 +127,39 @@ export default async function QuoteEditPage({ params }: { params: Promise<{ id: 
     phone: (c.phone as string | null) ?? null,
   }))
 
-  const items: ItemRef[] = ((itemsRes.data ?? []) as any[]).map((r) => ({
-    id: r.id as string,
-    sku: (r.sku as string | null) ?? '',
-    name: r.name as string,
-    brand: (r.brands as unknown as { name: string } | null)?.name ?? null,
-    unit: (r.units as unknown as { code: string } | null)?.code ?? null,
-    sellingPrice: r.selling_price != null ? Number(r.selling_price) : 0,
-    purchasePrice: r.purchase_price != null ? Number(r.purchase_price) : 0,
-  }))
+  const items: ItemRef[] = ((itemsRes.data ?? []) as any[]).map((r) => {
+    // PostgREST returns joined rows as arrays — handle both array and object
+    const brandsRaw = r.brands
+    const unitsRaw  = r.units
+    const brandName = Array.isArray(brandsRaw) ? (brandsRaw[0]?.name ?? null) : (brandsRaw?.name ?? null)
+    const unitCode  = Array.isArray(unitsRaw)  ? (unitsRaw[0]?.code  ?? null) : (unitsRaw?.code  ?? null)
+    return {
+      id: r.id as string,
+      sku: (r.sku as string | null) ?? '',
+      name: r.name as string,
+      brand: brandName,
+      unit: unitCode,
+      sellingPrice: r.selling_price != null ? Number(r.selling_price) : 0,
+      purchasePrice: r.purchase_price != null ? Number(r.purchase_price) : 0,
+    }
+  })
+
+  const isReadOnly = raw.status === 'accepted' || raw.status === 'cancelled'
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <QuoteEditor quote={quote} customers={customers} items={items} canEdit />
+      {isReadOnly && (
+        <div style={{
+          padding: '10px 20px', background: 'var(--c-warning-bg)',
+          borderBottom: '1px solid var(--c-warning)', flexShrink: 0,
+          fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--c-warning)',
+          display: 'flex', alignItems: 'center', gap: 8,
+        }}>
+          <strong>{raw.status === 'accepted' ? 'Accepted' : 'Cancelled'}</strong>
+          — This quote is locked. Changes will not be saved. Use Revise to create a new version.
+        </div>
+      )}
+      <QuoteEditor quote={quote} customers={customers} items={items} canEdit={!isReadOnly} />
     </div>
   )
 }

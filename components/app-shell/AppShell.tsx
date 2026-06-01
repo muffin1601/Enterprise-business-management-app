@@ -18,11 +18,11 @@ const NAV = [
   },
   {
     group: 'SALES',
-    items: [
+    items: [ 
+      { href: '/customers', label: 'Customers',     icon: 'ti-users' },
       { href: '/quotes',    label: 'Quotes',        icon: 'ti-file-invoice' },
       { href: '/orders',    label: 'Sales Orders',  icon: 'ti-receipt' },
       { href: '/invoices',  label: 'Invoices',      icon: 'ti-file-dollar' },
-      { href: '/customers', label: 'Customers',     icon: 'ti-users' },
     ],
   },
   {
@@ -30,6 +30,7 @@ const NAV = [
     items: [
       { href: '/inventory/items',     label: 'Items',              icon: 'ti-box' },
       { href: '/delivery-challans',   label: 'Delivery Challans',  icon: 'ti-truck' },
+      {href : '/running-invoices', label: 'Running Invoices', icon: 'ti-file' },
       { href: '/reports',             label: 'Stock Reports',      icon: 'ti-bar-chart' },
     ],
   },
@@ -68,6 +69,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/items':            'Inventory',
   '/reports':             'Stock Reports',
   '/delivery-challans':   'Delivery Challans',
+  '/running-invoices':    'Running Invoices',
   '/vendors':             'Vendors',
   '/purchase-orders':     'Procurement',
   '/hr':               'HR',
@@ -134,6 +136,7 @@ export function AppShell({ userName, orgName, children }: Props) {
                     className={styles.navItem}
                     data-active={isActive(item.href) ? 'true' : undefined}
                     onClick={() => setOpen(false)}
+                    prefetch
                   >
                     <Icon name={item.icon.replace(/^ti-/, '')} className={styles.navIcon} />
                     {item.label}
