@@ -82,6 +82,7 @@ const ICON_MAP: Record<string, React.ComponentType<LucideProps>> = {
   'user-circle':         UserCircle,
   'user-plus':           UserPlus,
   'building':            Building2,
+  'building-2':          Building2,
   'logout':              LogOut,
 
   // Communication
@@ -120,6 +121,7 @@ const ICON_MAP: Record<string, React.ComponentType<LucideProps>> = {
   'versions':            Layers,
   'shopping-cart':       ShoppingCart,
   'truck':               Truck,
+  'delivery':            Truck,
 
   // Media
   'photo':               Image,

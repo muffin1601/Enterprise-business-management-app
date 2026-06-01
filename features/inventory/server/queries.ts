@@ -124,11 +124,11 @@ export async function listItems(filter: InventoryFilter): Promise<ItemPage> {
       variantLabel:  r.variant_label as string | null,
       imageUrl:      (r.image_url as string | null) ?? null,
       familyId:      r.family_id as string | null,
-      family:        (r.item_families as {name:string}|null)?.name ?? null,
+      family:        (r.item_families as unknown as {name:string}|null)?.name ?? null,
       brandId:       r.brand_id as string | null,
-      brand:         (r.brands as {name:string}|null)?.name ?? null,
+      brand:         (r.brands as unknown as {name:string}|null)?.name ?? null,
       unitId:        r.unit_id as string | null,
-      unit:          (r.units as {code:string}|null)?.code ?? null,
+      unit:          (r.units as unknown as {code:string}|null)?.code ?? null,
       hsnCode:       r.hsn_code as string | null,
       gstRate:       n(r.gst_rate),
       purchasePrice: r.purchase_price != null ? n(r.purchase_price) : null,
@@ -167,10 +167,11 @@ export async function getItem(id: string): Promise<ItemDetail | null> {
   return {
     id: r.id as string, sku: r.sku as string|null, name: r.name as string,
     variantLabel: r.variant_label as string|null,
+    imageUrl: (r.image_url as string|null) ?? null,
     parentId: r.parent_id as string|null,
-    familyId: r.family_id as string|null, family: (r.item_families as {name:string}|null)?.name ?? null,
-    brandId: r.brand_id as string|null, brand: (r.brands as {name:string}|null)?.name ?? null,
-    unitId: r.unit_id as string|null, unit: (r.units as {code:string}|null)?.code ?? null,
+    familyId: r.family_id as string|null, family: (r.item_families as unknown as {name:string}|null)?.name ?? null,
+    brandId: r.brand_id as string|null, brand: (r.brands as unknown as {name:string}|null)?.name ?? null,
+    unitId: r.unit_id as string|null, unit: (r.units as unknown as {code:string}|null)?.code ?? null,
     hsnCode: r.hsn_code as string|null, gstRate: n(r.gst_rate),
     description: r.description as string|null, barcode: r.barcode as string|null,
     notes: r.notes as string|null,
@@ -285,7 +286,7 @@ export async function getStockMovements(itemId: string): Promise<StockMovementRo
     qty: n(r.qty), value: n(r.value),
     reference: r.reference as string|null, notes: r.notes as string|null,
     createdAt: r.created_at as string,
-    creatorName: (r.users as {full_name:string|null}|null)?.full_name ?? null,
+    creatorName: (r.users as unknown as {full_name:string|null}|null)?.full_name ?? null,
   }))
 }
 
@@ -311,9 +312,9 @@ export async function getAllMovements(page = 1): Promise<{ rows: (StockMovementR
       qty: n(r.qty), value: n(r.value),
       reference: r.reference as string|null, notes: r.notes as string|null,
       createdAt: r.created_at as string,
-      creatorName: (r.users as {full_name:string|null}|null)?.full_name ?? null,
-      itemName: (r.items as {name:string;sku:string|null}|null)?.name ?? '',
-      itemSku:  (r.items as {name:string;sku:string|null}|null)?.sku ?? null,
+      creatorName: (r.users as unknown as {full_name:string|null}|null)?.full_name ?? null,
+      itemName: (r.items as unknown as {name:string;sku:string|null}|null)?.name ?? '',
+      itemSku:  (r.items as unknown as {name:string;sku:string|null}|null)?.sku ?? null,
     }))
   }
 }
@@ -335,7 +336,7 @@ export async function getAdjustments(itemId?: string): Promise<StockAdjustmentRo
     id: r.id as string, type: r.type as 'add'|'sub',
     qty: n(r.qty), reason: r.reason as string, refNo: r.ref_no as string|null,
     at: r.at as string,
-    adjusterName: (r.users as {full_name:string|null}|null)?.full_name ?? null,
+    adjusterName: (r.users as unknown as {full_name:string|null}|null)?.full_name ?? null,
   }))
 }
 

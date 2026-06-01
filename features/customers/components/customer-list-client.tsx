@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import type { Route } from 'next'
 import type { CustomerPage } from '../server/queries'
 import { CustomerCards } from './customer-cards'
 
@@ -13,7 +14,7 @@ interface Props {
 export function CustomerListClient({ page, canEdit, canDelete }: Props) {
   const router   = useRouter()
   const pathname = usePathname()
-  const sp       = useSearchParams()
+  const sp       = useSearchParams() as ReturnType<typeof useSearchParams>
 
   const currentPage = Number(sp.get('page') ?? '1')
 
@@ -23,7 +24,7 @@ export function CustomerListClient({ page, canEdit, canDelete }: Props) {
       if (v) next.set(k, v)
       else next.delete(k)
     })
-    router.push(`${pathname}?${next.toString()}`)
+    router.push(`${pathname}?${next.toString()}` as Route)
   }
 
   return (

@@ -7,7 +7,7 @@ import styles from './inventory.module.scss'
 export function InventoryTopbarAction({ href = '/inventory/items/new', label = '+ New Item' }: { href?: string; label?: string }) {
   return (
     <PageActions>
-      <Link href={href} className={styles.btnPrimary}>{label}</Link>
+      <Link href={href as import('next').Route} className={styles.btnPrimary}>{label}</Link>
     </PageActions>
   )
 }

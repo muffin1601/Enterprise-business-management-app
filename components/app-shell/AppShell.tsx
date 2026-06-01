@@ -21,19 +21,21 @@ const NAV = [
     items: [
       { href: '/quotes',    label: 'Quotes',       icon: 'ti-file-invoice' },
       { href: '/customers', label: 'Customers',    icon: 'ti-users' },
-      // { href: '/orders',    label: 'Sales Orders', icon: 'ti-receipt' },
     ],
   },
   {
     group: 'INVENTORY',
     items: [
-      { href: '/inventory/items', label: 'Items', icon: 'ti-box' },
+      { href: '/inventory/items',     label: 'Items',              icon: 'ti-box' },
+      { href: '/delivery-challans',   label: 'Delivery Challans',  icon: 'ti-truck' },
+      { href: '/reports',             label: 'Stock Reports',      icon: 'ti-bar-chart' },
     ],
   },
   {
     group: 'PROCUREMENT',
     items: [
       { href: '/purchase-orders', label: 'Purchase Orders', icon: 'ti-shopping-cart' },
+      { href: '/vendors',         label: 'Vendors',         icon: 'ti-building' },
     ],
   },
   {
@@ -46,7 +48,7 @@ const NAV = [
     group: 'ADMINISTRATION',
     items: [
       { href: '/settings',         label: 'Settings',     icon: 'ti-settings' },
-      { href: '/settings/company', label: 'Organization', icon: 'ti-building' },
+      { href: '/settings/company', label: 'Organization', icon: 'ti-building-2' },
       { href: '/account',          label: 'Account',      icon: 'ti-user-circle' },
     ],
   },
@@ -62,8 +64,10 @@ const PAGE_TITLES: Record<string, string> = {
   '/inventory/movements':   'Stock Movements',
   '/inventory/adjustments': 'Adjustments',
   '/items':            'Inventory',
-  '/reports':          'Stock Reports',
-  '/purchase-orders':  'Procurement',
+  '/reports':             'Stock Reports',
+  '/delivery-challans':   'Delivery Challans',
+  '/vendors':             'Vendors',
+  '/purchase-orders':     'Procurement',
   '/hr':               'HR',
   '/users':            'Users',
   '/settings/company': 'Organization',

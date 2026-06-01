@@ -83,7 +83,7 @@ export function DashboardShell({ userName, orgName }: Props) {
                 return (
                   <Link
                     key={item.href}
-                    href={item.href}
+                    href={item.href as import('next').Route}
                     className={styles.navItem}
                     data-active={isActive ? 'true' : undefined}
                     onClick={() => setMobileOpen(false)}

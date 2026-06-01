@@ -18,10 +18,8 @@ const nextConfig: NextConfig = {
   sassOptions: {
     includePaths: ['styles'],
   },
-  experimental: {
-    // Type-safe Link hrefs and router params across the App Router.
-    typedRoutes: true,
-  },
+  // Type-safe Link hrefs and router params across the App Router.
+  typedRoutes: true,
 }
 
 export default nextConfig

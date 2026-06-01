@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
+import type { Route } from 'next'
 import type { Lookup } from '../server/queries'
 import { Icon } from '@/components/ui'
 import styles from './inventory.module.scss'
@@ -23,8 +24,8 @@ interface Props {
 export function ItemFilters({ total, families, brands }: Props) {
   const router   = useRouter()
   const pathname = usePathname()
-  const sp       = useSearchParams()
-  const debounce = useRef<NodeJS.Timeout>()
+  const sp       = useSearchParams() as ReturnType<typeof useSearchParams>
+  const debounce = useRef<NodeJS.Timeout>(undefined)
 
   const [search, setSearch] = useState(sp.get('q') ?? '')
   const status   = sp.get('status') ?? 'all'
@@ -39,7 +40,7 @@ export function ItemFilters({ total, families, brands }: Props) {
       else next.set(k, v)
     })
     next.delete('page')
-    router.push(`${pathname}?${next.toString()}`)
+    router.push(`${pathname}?${next.toString()}` as Route)
   }
 
   function onSearch(v: string) {

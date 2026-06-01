@@ -75,7 +75,7 @@ export function CustomerTable({
       <th
         className={`${styles.th} ${styles.sortable}`}
         onClick={() => onSort(col)}
-        aria-sort={active ? order : undefined}
+        aria-sort={active ? (order === 'asc' ? 'ascending' : 'descending') : undefined}
       >
         <span className={styles.thSort}>
           {label}

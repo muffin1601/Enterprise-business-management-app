@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
+import type { Route } from 'next'
 import { Icon } from '@/components/ui'
 import styles from './customers.module.scss'
 
@@ -15,8 +16,8 @@ const STATUSES = [
 export function CustomerFilters({ total }: { total: number }) {
   const router   = useRouter()
   const pathname = usePathname()
-  const sp       = useSearchParams()
-  const debounce = useRef<NodeJS.Timeout>()
+  const sp       = useSearchParams() as ReturnType<typeof useSearchParams>
+  const debounce = useRef<NodeJS.Timeout>(undefined)
 
   const [search, setSearch] = useState(sp.get('q') ?? '')
   const status = sp.get('status') ?? 'all'
@@ -28,7 +29,7 @@ export function CustomerFilters({ total }: { total: number }) {
       else next.set(k, v)
     })
     next.delete('page')
-    router.push(`${pathname}?${next.toString()}`)
+    router.push(`${pathname}?${next.toString()}` as Route)
   }
 
   function onSearch(v: string) {

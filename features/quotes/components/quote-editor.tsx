@@ -413,7 +413,7 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
 
   // ── Auto-save state ─────────────────────────────────────────────────────────
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
-  const debounceRef = useRef<NodeJS.Timeout>()
+  const debounceRef = useRef<NodeJS.Timeout>(undefined)
   const isFirstRender = useRef(true)
 
   // ── Totals (derived) ────────────────────────────────────────────────────────

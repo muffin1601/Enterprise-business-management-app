@@ -216,7 +216,7 @@ export function CustomerDetailView({
 
   function goTab(key: string) {
     const url = key === 'overview' ? pathname : `${pathname}?tab=${key}`
-    router.push(url)
+    router.push(url as import('next').Route)
   }
 
   return (

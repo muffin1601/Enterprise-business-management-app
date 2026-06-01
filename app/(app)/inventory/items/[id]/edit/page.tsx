@@ -50,7 +50,10 @@ export default async function EditItemPage({ params }: { params: Promise<{ id: s
           costPrice: item.costPrice ?? undefined,
           minStock: item.minStock, reorderLevel: item.reorderLevel, maxStock: item.maxStock,
           leadTimeDays: item.leadTimeDays, deliveryDays: item.deliveryDays ?? undefined,
-          weightKg: item.weightKg ?? undefined, dimensions: item.dimensions ?? undefined,
+          weightKg: item.weightKg ?? undefined,
+          dimensions: item.dimensions
+            ? { ...item.dimensions, unit: (item.dimensions.unit ?? 'cm') as 'm' | 'cm' | 'mm' | 'inch' }
+            : undefined,
           tags: item.tags, notes: item.notes ?? undefined,
           isActive: item.isActive, isImported: item.isImported,
           importCurrency: item.importCurrency as any, importPrice: item.importPrice ?? undefined,

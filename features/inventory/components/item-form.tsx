@@ -225,9 +225,25 @@ export function ItemForm({ mode, itemId, families, brands, units, defaultValues 
         <div className={styles.panelHeader}><span className={styles.panelTitle}>Physical Attributes</span></div>
         <div className={styles.formGrid4}>
           <F name="weightKg" label="Weight (kg)" type="number" step="0.001" placeholder="0.000" />
-          <F name="dimensions.l" label="Length" type="number" step="0.1" placeholder="0" />
-          <F name="dimensions.w" label="Width"  type="number" step="0.1" placeholder="0" />
-          <F name="dimensions.h" label="Height" type="number" step="0.1" placeholder="0" />
+          <div>
+            <label className={styles.fieldLabel}>Length</label>
+            <input type="number" step="0.1" placeholder="0" className={styles.fieldInput}
+              {...register('dimensions', { setValueAs: (v) => v })}
+              onChange={e => setValue('dimensions', { unit: (watch('dimensions') as any)?.unit ?? 'cm' as const, ...(watch('dimensions') ?? {}), l: parseFloat(e.target.value) || undefined })}
+              value={(watch('dimensions') as any)?.l ?? ''} />
+          </div>
+          <div>
+            <label className={styles.fieldLabel}>Width</label>
+            <input type="number" step="0.1" placeholder="0" className={styles.fieldInput}
+              onChange={e => setValue('dimensions', { unit: (watch('dimensions') as any)?.unit ?? 'cm' as const, ...(watch('dimensions') ?? {}), w: parseFloat(e.target.value) || undefined })}
+              value={(watch('dimensions') as any)?.w ?? ''} />
+          </div>
+          <div>
+            <label className={styles.fieldLabel}>Height</label>
+            <input type="number" step="0.1" placeholder="0" className={styles.fieldInput}
+              onChange={e => setValue('dimensions', { unit: (watch('dimensions') as any)?.unit ?? 'cm' as const, ...(watch('dimensions') ?? {}), h: parseFloat(e.target.value) || undefined })}
+              value={(watch('dimensions') as any)?.h ?? ''} />
+          </div>
         </div>
       </div>
 
