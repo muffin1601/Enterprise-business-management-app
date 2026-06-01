@@ -1037,7 +1037,7 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
                   />
                   {canEdit && (
                     <button
-                      className={styles.rowDeleteBtn}
+                      className={styles.termRemove}
                       type="button"
                       title="Remove term"
                       onClick={() => removeTerm(term.localId)}

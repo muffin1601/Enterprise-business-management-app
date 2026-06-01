@@ -456,10 +456,11 @@
 
 .rowDeleteBtn {
   background: none; border: none; cursor: pointer; color: var(--c-tertiary);
-  font-size: 14px; padding: 2px; display: flex; align-items: center;
-  transition: color var(--dur-fast); opacity: 0;
-  tr:hover & { opacity: 1; }
-  &:hover { color: var(--c-danger); }
+  font-size: 14px; padding: 4px; display: flex; align-items: center;
+  border-radius: var(--radius-sm);
+  transition: color var(--dur-fast), background var(--dur-fast);
+  flex-shrink: 0;
+  &:hover { color: var(--c-danger); background: var(--c-danger-bg); }
 }
 
 .addItemBtn {
