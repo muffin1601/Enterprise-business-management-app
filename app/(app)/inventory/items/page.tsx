@@ -1,8 +1,7 @@
 import { Suspense } from 'react'
 import { getActionContext } from '@/lib/auth/action-context'
-import { listItems, getInventoryKPIs, listFamilies, listBrands } from '@/features/inventory/server/queries'
+import { listItems, listFamilies, listBrands } from '@/features/inventory/server/queries'
 import { inventoryFilterSchema } from '@/validations/inventory'
-import { InventoryKpiCards } from '@/features/inventory/components/inventory-kpis'
 import { ItemFilters } from '@/features/inventory/components/item-filters'
 import { ItemListClient } from '@/features/inventory/components/item-list-client'
 import { InventoryTopbarAction } from '@/features/inventory/components/inventory-topbar-action'
@@ -28,8 +27,7 @@ export default async function InventoryItemsPage({
     )
   }
 
-  const [kpis, page, families, brands] = await Promise.all([
-    getInventoryKPIs(),
+  const [page, families, brands] = await Promise.all([
     listItems(filter),
     listFamilies(),
     listBrands(),
@@ -38,8 +36,6 @@ export default async function InventoryItemsPage({
   return (
     <main className={styles.page}>
       {(ctx.has('inventory.create') || ctx.has('items.create')) && <InventoryTopbarAction />}
-
-      <InventoryKpiCards kpis={kpis} />
 
       <Suspense>
         <ItemFilters total={page.total} families={families} brands={brands} />

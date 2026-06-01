@@ -1,8 +1,7 @@
 import { Suspense } from 'react'
 import { getActionContext } from '@/lib/auth/action-context'
-import { listCustomers, getCustomerStats } from '@/features/customers/server/queries'
+import { listCustomers } from '@/features/customers/server/queries'
 import { customerFilterSchema } from '@/validations/customer'
-import { CustomerStatCards } from '@/features/customers/components/customer-stats'
 import { CustomerFilters } from '@/features/customers/components/customer-filters'
 import { CustomerListClient } from '@/features/customers/components/customer-list-client'
 import { CustomerTopbarAction } from '@/features/customers/components/customer-topbar-action'
@@ -26,13 +25,9 @@ export default async function CustomersPage({
       <main className={styles.page}>
         <div style={{
           padding: '14px 18px',
-          background: 'var(--c-danger-bg)',
-          color: 'var(--c-danger)',
-          border: '1px solid var(--c-danger)',
-          borderLeft: '3px solid var(--c-danger)',
-          borderRadius: 'var(--radius-sm)',
-          fontFamily: 'var(--font-body)',
-          fontSize: 'var(--fs-500)',
+          background: 'var(--c-danger-bg)', color: 'var(--c-danger)',
+          border: '1px solid var(--c-danger)', borderLeft: '3px solid var(--c-danger)',
+          borderRadius: 'var(--radius-sm)', fontFamily: 'var(--font-body)', fontSize: 'var(--fs-500)',
         }}>
           You do not have permission to view customers.
         </div>
@@ -40,20 +35,14 @@ export default async function CustomersPage({
     )
   }
 
-  const [stats, page] = await Promise.all([
-    getCustomerStats(),
-    listCustomers(filter),
-  ])
+  const page = await listCustomers(filter)
 
   const canEdit   = ctx.has('customers.edit')
   const canDelete = ctx.has('customers.delete')
 
   return (
     <main className={styles.page}>
-      {/* Injects "+ New Customer" button into the AppShell topbar */}
       {ctx.has('customers.create') && <CustomerTopbarAction />}
-
-      <CustomerStatCards stats={stats} />
 
       <Suspense>
         <CustomerFilters total={page.total} />

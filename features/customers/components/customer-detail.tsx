@@ -2,6 +2,7 @@
 
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
+import { Icon } from '@/components/ui'
 import type {
   CustomerDetail, ActivityItem,
   BillingKPIs, AgingBucket,
@@ -31,7 +32,7 @@ function ActivityTimeline({ items }: { items: ActivityItem[] }) {
   if (!items.length) {
     return (
       <div style={{ padding: '48px 0', textAlign: 'center' }}>
-        <i className="ti ti-history" style={{ fontSize: 40, color: 'var(--c-border-2)', display: 'block', marginBottom: 12 }} />
+        <Icon name="history" size={40} style={{ color: 'var(--c-border-2)', display: 'block', marginBottom: 12 }} />
         <div style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--c-secondary)', fontWeight: 500 }}>No activity yet</div>
         <div style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--c-tertiary)', marginTop: 4 }}>Changes to this customer will appear here</div>
       </div>
@@ -252,7 +253,7 @@ export function CustomerDetailView({
               letterSpacing: '0.10em', textTransform: 'uppercase', cursor: 'pointer',
               borderRadius: 'var(--radius-sm)',
             }}>
-              <i className="ti ti-pencil" />
+              <Icon name="pencil" />
               Edit
             </button>
           </Link>

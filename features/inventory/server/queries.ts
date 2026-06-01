@@ -16,6 +16,7 @@ async function ctx() {
 // ── Return types ──────────────────────────────────────────────────────────────
 export type ItemRow = {
   id: string; sku: string | null; name: string; variantLabel: string | null
+  imageUrl: string | null
   family: string | null; familyId: string | null
   brand: string | null;  brandId: string | null
   unit: string | null;   unitId: string | null
@@ -73,13 +74,13 @@ export async function listItems(filter: InventoryFilter): Promise<ItemPage> {
 
   let q = supabase
     .from('items')
-    .select(`id,sku,name,variant_label,family_id,brand_id,unit_id,
+    .select(`id,sku,name,variant_label,image_url,family_id,brand_id,unit_id,
              hsn_code,gst_rate,purchase_price,selling_price,cost_price,
              stock,min_stock,reorder_level,is_active,is_imported,is_template,
              tags,created_at,updated_at,
-             item_families!items_family_id_fkey(name),
-             brands!items_brand_id_fkey(name),
-             units!items_unit_id_fkey(code)`,
+             item_families!items_family_fkey(name),
+             brands!items_brand_fkey(name),
+             units!items_unit_fkey(code)`,
     { count: 'exact' })
     .eq('org_id', orgId).is('deleted_at', null).eq('is_template', false)
 
@@ -121,6 +122,7 @@ export async function listItems(filter: InventoryFilter): Promise<ItemPage> {
       sku:           r.sku as string | null,
       name:          r.name as string,
       variantLabel:  r.variant_label as string | null,
+      imageUrl:      (r.image_url as string | null) ?? null,
       familyId:      r.family_id as string | null,
       family:        (r.item_families as {name:string}|null)?.name ?? null,
       brandId:       r.brand_id as string | null,
@@ -155,7 +157,7 @@ export async function getItem(id: string): Promise<ItemDetail | null> {
   if (!orgId) return null
 
   const { data: r } = await supabase
-    .from('items').select('*,item_families!items_family_id_fkey(name),brands!items_brand_id_fkey(name),units!items_unit_id_fkey(code)')
+    .from('items').select('*,item_families!items_family_fkey(name),brands!items_brand_fkey(name),units!items_unit_fkey(code)')
     .eq('id', id).eq('org_id', orgId).is('deleted_at', null).maybeSingle()
 
   if (!r) return null
@@ -194,6 +196,52 @@ export async function getItem(id: string): Promise<ItemDetail | null> {
     profitMultiplier: r.profit_multiplier != null ? n(r.profit_multiplier) : null,
     createdAt: r.created_at as string, updatedAt: r.updated_at as string,
   }
+}
+
+// ── Variation types ───────────────────────────────────────────────────────────
+export type VariationInput = {
+  size: string; finish: string; make: string; brand: string
+  stock: number; sellingPrice: number | null; purchasePrice: number | null
+}
+
+export type ItemVariantRow = {
+  id: string; sku: string | null; name: string; variantLabel: string | null
+  size: string | null; finish: string | null; make: string | null; brand: string | null
+  stock: number; sellingPrice: number | null; purchasePrice: number | null
+  isActive: boolean; createdAt: string
+}
+
+// ── getItemVariants ───────────────────────────────────────────────────────────
+export async function getItemVariants(parentId: string): Promise<ItemVariantRow[]> {
+  const { orgId, supabase } = await ctx()
+  if (!orgId) return []
+
+  const { data } = await supabase
+    .from('items')
+    .select('id,sku,name,variant_label,stock,selling_price,purchase_price,is_active,created_at,item_variations!itemvar_item_fkey(size,make,finish,brand)')
+    .eq('org_id', orgId)
+    .eq('parent_id', parentId)
+    .is('deleted_at', null)
+    .order('created_at', { ascending: true })
+
+  return (data ?? []).map(r => {
+    const v = (r.item_variations as {size:string|null;make:string|null;finish:string|null;brand:string|null}[] | null)?.[0]
+    return {
+      id: r.id as string,
+      sku: r.sku as string | null,
+      name: r.name as string,
+      variantLabel: r.variant_label as string | null,
+      size: v?.size ?? null,
+      finish: v?.finish ?? null,
+      make: v?.make ?? null,
+      brand: v?.brand ?? null,
+      stock: n(r.stock) ?? 0,
+      sellingPrice: r.selling_price != null ? n(r.selling_price) : null,
+      purchasePrice: r.purchase_price != null ? n(r.purchase_price) : null,
+      isActive: Boolean(r.is_active),
+      createdAt: r.created_at as string,
+    }
+  })
 }
 
 // ── getInventoryKPIs ──────────────────────────────────────────────────────────

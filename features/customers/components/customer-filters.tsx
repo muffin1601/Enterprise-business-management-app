@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
+import { Icon } from '@/components/ui'
 import styles from './customers.module.scss'
 
 const STATUSES = [
@@ -40,7 +41,7 @@ export function CustomerFilters({ total }: { total: number }) {
     <div className={styles.filterBar}>
       {/* Search */}
       <div className={styles.searchWrap}>
-        <i className={`ti ti-search ${styles.searchIcon}`} />
+        <Icon name="search" className={styles.searchIcon} />
         <input
           type="search"
           className={styles.searchInput}

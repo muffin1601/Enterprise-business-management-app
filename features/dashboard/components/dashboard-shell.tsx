@@ -5,37 +5,38 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut } from '@/features/auth/server/actions'
 import { DashboardGrid } from './dashboard-grid'
+import { Icon } from '@/components/ui'
 import styles from './shell.module.scss'
 
 const NAV = [
   {
     section: 'OVERVIEW',
     items: [
-      { href: '/dashboard',       label: 'Dashboard',   icon: 'ti-layout-dashboard' },
+      { href: '/dashboard',       label: 'Dashboard',   icon: 'layout-dashboard' },
     ],
   },
   {
     section: 'BUSINESS',
     items: [
-      { href: '/customers',       label: 'Customers',       icon: 'ti-users' },
-      { href: '/items',           label: 'Inventory',        icon: 'ti-box' },
-      { href: '/quotes',          label: 'Quotes',           icon: 'ti-file-invoice' },
-      { href: '/orders',          label: 'Sales Orders',     icon: 'ti-receipt' },
-      { href: '/purchase-orders', label: 'Procurement',      icon: 'ti-shopping-cart' },
+      { href: '/customers',       label: 'Customers',       icon: 'users' },
+      { href: '/items',           label: 'Inventory',        icon: 'box' },
+      { href: '/quotes',          label: 'Quotes',           icon: 'file-invoice' },
+      { href: '/orders',          label: 'Sales Orders',     icon: 'receipt' },
+      { href: '/purchase-orders', label: 'Procurement',      icon: 'shopping-cart' },
     ],
   },
   {
     section: 'FINANCE',
     items: [
-      { href: '/invoices',        label: 'Invoices',    icon: 'ti-file-dollar' },
-      { href: '/reports',         label: 'Reports',     icon: 'ti-chart-bar' },
+      { href: '/invoices',        label: 'Invoices',    icon: 'file-dollar' },
+      { href: '/reports',         label: 'Reports',     icon: 'chart-bar' },
     ],
   },
   {
     section: 'PEOPLE',
     items: [
-      { href: '/hr',              label: 'HR',          icon: 'ti-id' },
-      { href: '/settings',        label: 'Settings',    icon: 'ti-settings' },
+      { href: '/hr',              label: 'HR',          icon: 'id' },
+      { href: '/settings',        label: 'Settings',    icon: 'settings' },
     ],
   },
 ]
@@ -87,7 +88,7 @@ export function DashboardShell({ userName, orgName }: Props) {
                     data-active={isActive ? 'true' : undefined}
                     onClick={() => setMobileOpen(false)}
                   >
-                    <i className={`ti ${item.icon} ${styles.navIcon}`} />
+                    <Icon name={item.icon} className={styles.navIcon} />
                     {item.label}
                   </Link>
                 )
@@ -115,7 +116,7 @@ export function DashboardShell({ userName, orgName }: Props) {
               onClick={() => setMobileOpen((v) => !v)}
               aria-label="Menu"
             >
-              <i className="ti ti-menu-2" />
+              <Icon name="menu-2" />
             </button>
             <span className={styles.pageTitle}>Dashboard</span>
             <span className={styles.breadcrumb}>/ {orgName}</span>
@@ -124,11 +125,11 @@ export function DashboardShell({ userName, orgName }: Props) {
           <div className={styles.topbarRight}>
             <span className={styles.topbarDate}>{today}</span>
             <Link href="/account" className={styles.iconBtn} aria-label="Account">
-              <i className="ti ti-user-circle" />
+              <Icon name="user-circle" />
             </Link>
             <form action={signOut} style={{ display: 'contents' }}>
               <button type="submit" className={styles.iconBtn} aria-label="Sign out">
-                <i className="ti ti-logout" />
+                <Icon name="logout" />
               </button>
             </form>
           </div>

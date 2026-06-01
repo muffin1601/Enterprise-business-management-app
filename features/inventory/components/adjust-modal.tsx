@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { adjustmentSchema, type AdjustmentInput } from '@/validations/inventory'
 import { adjustStock } from '../server/actions'
+import { Icon } from '@/components/ui'
 import styles from './inventory.module.scss'
 
 interface Props {
@@ -45,7 +46,7 @@ export function AdjustModal({ itemId, itemName, currentStock, unit, onClose }: P
       <div className={styles.modal}>
         <div className={styles.modalHeader}>
           <span className={styles.modalTitle}>Adjust Stock</span>
-          <button className={styles.modalClose} onClick={onClose}><i className="ti ti-x" /></button>
+          <button className={styles.modalClose} onClick={onClose}><Icon name="x" /></button>
         </div>
 
         <div className={styles.modalBody}>
@@ -70,10 +71,10 @@ export function AdjustModal({ itemId, itemName, currentStock, unit, onClose }: P
                 <label className={styles.fieldLabel}>Adjustment Type</label>
                 <div className={styles.toggle}>
                   <button type="button" className={styles.toggleBtn} data-active={adjType === 'add' ? 'true' : undefined} onClick={() => setAdjType('add')}>
-                    <i className="ti ti-plus" style={{ marginRight: 6 }} /> Add Stock
+                    <Icon name="plus" style={{ marginRight: 6 }} /> Add Stock
                   </button>
                   <button type="button" className={styles.toggleBtn} data-active={adjType === 'sub' ? 'true' : undefined} onClick={() => setAdjType('sub')}>
-                    <i className="ti ti-minus" style={{ marginRight: 6 }} /> Reduce Stock
+                    <Icon name="minus" style={{ marginRight: 6 }} /> Reduce Stock
                   </button>
                 </div>
               </div>

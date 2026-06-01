@@ -4,6 +4,7 @@ import { useOverview, useActivity, useNotices } from '@/features/dashboard/hooks
 import { SalesTrendChart } from './sales-trend-chart'
 import Link from 'next/link'
 import type { Route } from 'next'
+import { Icon } from '@/components/ui'
 import styles from './dashboard.module.scss'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -48,12 +49,12 @@ const INV_OVERVIEW = [
 ]
 
 const QUICK_ACTIONS = [
-  { href: '/quotes/new',    label: 'New Quote',    icon: 'ti-file-plus',     desc: 'Draft a quote' },
-  { href: '/customers/new', label: 'Add Customer', icon: 'ti-user-plus',     desc: 'CRM record' },
-  { href: '/items/new',     label: 'Add Item',     icon: 'ti-package',       desc: 'Catalogue' },
-  { href: '/purchase-orders/new', label: 'Purchase Order', icon: 'ti-shopping-cart-plus', desc: 'Raise PO' },
-  { href: '/invoices/new',  label: 'New Invoice',  icon: 'ti-file-invoice',  desc: 'Bill a customer' },
-  { href: '/reports',       label: 'Reports',      icon: 'ti-chart-bar',     desc: 'Analytics' },
+  { href: '/quotes/new',    label: 'New Quote',    icon: 'file-plus',     desc: 'Draft a quote' },
+  { href: '/customers/new', label: 'Add Customer', icon: 'user-plus',     desc: 'CRM record' },
+  { href: '/items/new',     label: 'Add Item',     icon: 'package',       desc: 'Catalogue' },
+  { href: '/purchase-orders/new', label: 'Purchase Order', icon: 'shopping-cart-plus', desc: 'Raise PO' },
+  { href: '/invoices/new',  label: 'New Invoice',  icon: 'file-invoice',  desc: 'Bill a customer' },
+  { href: '/reports',       label: 'Reports',      icon: 'chart-bar',     desc: 'Analytics' },
 ]
 
 // ── Props ─────────────────────────────────────────────────────────────────────
@@ -106,8 +107,8 @@ export function DashboardGrid({ orgName, userName }: Props) {
                 {k.sub && <span className={styles.kpiSub}>{k.sub}</span>}
                 {k.delta && (
                   <span className={styles.kpiDelta} data-dir={k.dir}>
-                    {k.dir === 'up' && <i className="ti ti-trending-up" />}
-                    {k.dir === 'down' && <i className="ti ti-trending-down" />}
+                    {k.dir === 'up' && <Icon name="trending-up" />}
+                    {k.dir === 'down' && <Icon name="trending-down" />}
                     {k.delta}
                   </span>
                 )}
@@ -215,7 +216,7 @@ export function DashboardGrid({ orgName, userName }: Props) {
             <div className={styles.notifList}>
               {notices!.invitations.map((inv) => (
                 <div key={inv.id} className={styles.notifItem}>
-                  <i className={`ti ti-mail ${styles.notifIcon}`} data-tone="info" />
+                  <Icon name="mail" className={styles.notifIcon} data-tone="info" />
                   <div className={styles.notifBody}>
                     <div className={styles.notifTitle}>Pending invitation</div>
                     <div className={styles.notifSub}>{inv.email} · {inv.roleName}</div>
@@ -228,13 +229,13 @@ export function DashboardGrid({ orgName, userName }: Props) {
               {/* Static business notifications as placeholder */}
               <div className={styles.notifList}>
                 {[
-                  { tone: 'warn',    icon: 'ti-alert-triangle', title: '7 items below reorder level', sub: 'Pipes & Electrical — review stock' },
-                  { tone: 'info',    icon: 'ti-file-invoice',   title: '3 invoices due this week',    sub: '₹8.4L total outstanding' },
-                  { tone: 'success', icon: 'ti-circle-check',   title: 'Quote QT-2026-0028 accepted', sub: 'Elite Residences — ₹14.2L' },
-                  { tone: 'info',    icon: 'ti-package',        title: 'GRN-2026-0019 received',      sub: 'Kajaria ceramics — 1,200 SQM' },
+                  { tone: 'warn',    icon: 'alert-triangle', title: '7 items below reorder level', sub: 'Pipes & Electrical — review stock' },
+                  { tone: 'info',    icon: 'file-invoice',   title: '3 invoices due this week',    sub: '₹8.4L total outstanding' },
+                  { tone: 'success', icon: 'circle-check',   title: 'Quote QT-2026-0028 accepted', sub: 'Elite Residences — ₹14.2L' },
+                  { tone: 'info',    icon: 'package',        title: 'GRN-2026-0019 received',      sub: 'Kajaria ceramics — 1,200 SQM' },
                 ].map((n, i) => (
                   <div key={i} className={styles.notifItem}>
-                    <i className={`ti ${n.icon} ${styles.notifIcon}`} data-tone={n.tone} />
+                    <Icon name={n.icon} className={styles.notifIcon} data-tone={n.tone} />
                     <div className={styles.notifBody}>
                       <div className={styles.notifTitle}>{n.title}</div>
                       <div className={styles.notifSub}>{n.sub}</div>
@@ -255,7 +256,7 @@ export function DashboardGrid({ orgName, userName }: Props) {
         <div className={styles.qaRow}>
           {QUICK_ACTIONS.map((qa) => (
             <Link key={qa.href} href={qa.href as Route} className={styles.qaBtn}>
-              <i className={`ti ${qa.icon} ${styles.qaIcon}`} />
+              <Icon name={qa.icon} className={styles.qaIcon} />
               <span className={styles.qaLabel}>{qa.label}</span>
               <span className={styles.qaDesc}>{qa.desc}</span>
             </Link>

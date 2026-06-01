@@ -177,6 +177,207 @@ export async function adjustStock(itemId: string, input: unknown): Promise<Actio
   return ok(undefined)
 }
 
+// ── createItemWithVariations ──────────────────────────────────────────────────
+export async function createItemWithVariations(
+  input: unknown,
+  variations: import('./queries').VariationInput[],
+): Promise<ActionResult<{ parentId: string; variantIds: string[] }>> {
+  const r = await ctxOrErr(); if ('error' in r) return r.error
+  if (!r.c.has('inventory.create')) return err('forbidden', 'Missing inventory.create permission.')
+
+  const parsed = itemSchema.safeParse(input)
+  if (!parsed.success) return err('validation', 'Check the form fields.', { fieldErrors: fe(parsed.error) })
+
+  const d = parsed.data
+  const supabase = await createSupabaseServerClient()
+  const hasVariants = variations.length > 0
+
+  // 1. Create the parent item (template when variants exist, normal otherwise)
+  const parentSku = d.sku || await getNextSku()
+  const { data: parent, error: parentErr } = await supabase.from('items').insert({
+    org_id: r.c.orgId,
+    sku: parentSku, name: d.name, variant_label: d.variantLabel ?? null,
+    description: d.description ?? null, barcode: d.barcode ?? null,
+    family_id: d.familyId ?? null, brand_id: d.brandId ?? null, unit_id: d.unitId ?? null,
+    hsn_code: d.hsnCode ?? null, gst_rate: d.gstRate ?? 18,
+    purchase_price: d.purchasePrice ?? null, selling_price: d.sellingPrice ?? null,
+    cost_price: d.costPrice ?? null,
+    stock: hasVariants ? 0 : (d.stock ?? 0),
+    min_stock: d.minStock ?? 0, reorder_level: d.reorderLevel ?? 0, max_stock: d.maxStock ?? 0,
+    lead_time_days: d.leadTimeDays ?? 0,
+    weight_kg: d.weightKg ?? null, dimensions: d.dimensions ?? null,
+    tags: d.tags ?? [], notes: d.notes ?? null,
+    is_active: d.isActive ?? true, is_imported: d.isImported ?? false,
+    is_template: hasVariants,
+    delivery_days: d.deliveryDays ?? null,
+    import_currency: d.importCurrency ?? null, import_price: d.importPrice ?? null,
+    exchange_rate: d.exchangeRate ?? null, import_discount_pct: d.importDiscountPct ?? null,
+    transport_type: d.transportType ?? null, transport_value: d.transportValue ?? null,
+    custom_duty_pct: d.customDutyPct ?? null, profit_multiplier: d.profitMultiplier ?? null,
+    created_by: r.c.userId, updated_by: r.c.userId,
+  }).select('id').single()
+
+  if (parentErr || !parent) return err('internal', parentErr?.message ?? 'Failed to create item.')
+
+  const parentId = parent.id as string
+
+  await recordAuditEvent({ orgId: r.c.orgId, actorId: r.c.userId, entityType: 'items', entityId: parentId, action: 'insert', after: { name: d.name, sku: parentSku } })
+
+  // Opening stock movement for parent (no variants case)
+  if (!hasVariants && (d.stock ?? 0) > 0) {
+    await supabase.from('stock_movements').insert({
+      org_id: r.c.orgId, item_id: parentId,
+      date: new Date().toISOString().split('T')[0],
+      qty: d.stock, value: (d.costPrice ?? d.purchasePrice ?? 0) * (d.stock ?? 0),
+      direction: 'in', movement_type: 'opening',
+      reference: 'Opening stock', created_by: r.c.userId,
+    })
+  }
+
+  if (!hasVariants) {
+    revalAll(parentId)
+    return ok({ parentId, variantIds: [] })
+  }
+
+  // 2. Create each variant as a child item
+  const variantIds: string[] = []
+
+  for (const v of variations) {
+    const parts = [v.size, v.finish, v.make, v.brand].filter(Boolean)
+    const variantLabel = parts.join(' · ')
+    const variantName  = variantLabel ? `${d.name} — ${variantLabel}` : d.name
+    const variantSku   = await getNextSku()
+
+    const { data: child, error: childErr } = await supabase.from('items').insert({
+      org_id: r.c.orgId,
+      parent_id: parentId,
+      sku: variantSku, name: variantName, variant_label: variantLabel || null,
+      description: d.description ?? null,
+      family_id: d.familyId ?? null, brand_id: d.brandId ?? null, unit_id: d.unitId ?? null,
+      hsn_code: d.hsnCode ?? null, gst_rate: d.gstRate ?? 18,
+      purchase_price: v.purchasePrice ?? d.purchasePrice ?? null,
+      selling_price: v.sellingPrice ?? d.sellingPrice ?? null,
+      cost_price: d.costPrice ?? null,
+      stock: v.stock ?? 0,
+      min_stock: d.minStock ?? 0, reorder_level: d.reorderLevel ?? 0, max_stock: d.maxStock ?? 0,
+      lead_time_days: d.leadTimeDays ?? 0,
+      is_active: d.isActive ?? true, is_imported: d.isImported ?? false,
+      is_template: false,
+      delivery_days: d.deliveryDays ?? null,
+      import_currency: d.importCurrency ?? null, import_price: d.importPrice ?? null,
+      exchange_rate: d.exchangeRate ?? null, import_discount_pct: d.importDiscountPct ?? null,
+      transport_type: d.transportType ?? null, transport_value: d.transportValue ?? null,
+      custom_duty_pct: d.customDutyPct ?? null, profit_multiplier: d.profitMultiplier ?? null,
+      tags: d.tags ?? [], notes: null,
+      created_by: r.c.userId, updated_by: r.c.userId,
+    }).select('id').single()
+
+    if (childErr || !child) continue
+
+    const childId = child.id as string
+    variantIds.push(childId)
+
+    // item_variations record
+    await supabase.from('item_variations').insert({
+      org_id: r.c.orgId, item_id: childId,
+      size: v.size || null, make: v.make || null,
+      finish: v.finish || null, brand: v.brand || null,
+      created_by: r.c.userId, updated_by: r.c.userId,
+    })
+
+    // Opening stock movement per variant
+    if ((v.stock ?? 0) > 0) {
+      await supabase.from('stock_movements').insert({
+        org_id: r.c.orgId, item_id: childId,
+        date: new Date().toISOString().split('T')[0],
+        qty: v.stock, value: (v.purchasePrice ?? d.purchasePrice ?? 0) * (v.stock ?? 0),
+        direction: 'in', movement_type: 'opening',
+        reference: 'Opening stock', created_by: r.c.userId,
+      })
+    }
+
+    await recordAuditEvent({ orgId: r.c.orgId, actorId: r.c.userId, entityType: 'items', entityId: childId, action: 'insert', after: { name: variantName, sku: variantSku, parentId } })
+  }
+
+  revalAll(parentId)
+  return ok({ parentId, variantIds })
+}
+
+// ── addVariantToItem ──────────────────────────────────────────────────────────
+export async function addVariantToItem(
+  parentId: string,
+  variation: import('./queries').VariationInput,
+  baseData: Partial<import('@/validations/inventory').ItemInput>,
+): Promise<ActionResult<{ id: string }>> {
+  const r = await ctxOrErr(); if ('error' in r) return r.error
+  if (!r.c.has('inventory.create')) return err('forbidden', 'Missing inventory.create permission.')
+
+  const supabase = await createSupabaseServerClient()
+
+  // Fetch parent for defaults
+  const { data: parent } = await supabase.from('items').select('name,family_id,brand_id,unit_id,hsn_code,gst_rate,purchase_price,selling_price,cost_price,is_imported,is_active,org_id').eq('id', parentId).eq('org_id', r.c.orgId).maybeSingle()
+  if (!parent) return err('not_found', 'Parent item not found.')
+
+  const parts = [variation.size, variation.finish, variation.make, variation.brand].filter(Boolean)
+  const variantLabel = parts.join(' · ')
+  const variantName  = variantLabel ? `${parent.name} — ${variantLabel}` : parent.name
+  const variantSku   = await getNextSku()
+
+  const { data: child, error } = await supabase.from('items').insert({
+    org_id: r.c.orgId,
+    parent_id: parentId,
+    sku: variantSku, name: variantName, variant_label: variantLabel || null,
+    family_id: parent.family_id, brand_id: parent.brand_id, unit_id: parent.unit_id,
+    hsn_code: parent.hsn_code, gst_rate: parent.gst_rate ?? 18,
+    purchase_price: variation.purchasePrice ?? parent.purchase_price ?? null,
+    selling_price: variation.sellingPrice ?? parent.selling_price ?? null,
+    cost_price: parent.cost_price ?? null,
+    stock: variation.stock ?? 0,
+    is_active: parent.is_active ?? true, is_imported: parent.is_imported ?? false,
+    is_template: false, tags: [], notes: null,
+    created_by: r.c.userId, updated_by: r.c.userId,
+  }).select('id').single()
+
+  if (error || !child) return err('internal', error?.message ?? 'Failed to create variant.')
+
+  const childId = child.id as string
+
+  await supabase.from('item_variations').insert({
+    org_id: r.c.orgId, item_id: childId,
+    size: variation.size || null, make: variation.make || null,
+    finish: variation.finish || null, brand: variation.brand || null,
+    created_by: r.c.userId, updated_by: r.c.userId,
+  })
+
+  // Mark parent as template if not already
+  await supabase.from('items').update({ is_template: true, updated_by: r.c.userId }).eq('id', parentId).eq('org_id', r.c.orgId)
+
+  if ((variation.stock ?? 0) > 0) {
+    await supabase.from('stock_movements').insert({
+      org_id: r.c.orgId, item_id: childId,
+      date: new Date().toISOString().split('T')[0],
+      qty: variation.stock, value: (variation.purchasePrice ?? 0) * (variation.stock ?? 0),
+      direction: 'in', movement_type: 'opening',
+      reference: 'Opening stock', created_by: r.c.userId,
+    })
+  }
+
+  await recordAuditEvent({ orgId: r.c.orgId, actorId: r.c.userId, entityType: 'items', entityId: childId, action: 'insert', after: { name: variantName, sku: variantSku, parentId } })
+  revalAll(parentId)
+  return ok({ id: childId })
+}
+
+// ── updateItemImage ───────────────────────────────────────────────────────────
+export async function updateItemImage(itemId: string, imageUrl: string | null): Promise<ActionResult<void>> {
+  const r = await ctxOrErr(); if ('error' in r) return r.error
+  if (!r.c.has('inventory.edit') && !r.c.has('items.edit')) return err('forbidden', 'No permission.')
+  const supabase = await createSupabaseServerClient()
+  const { error } = await supabase.from('items').update({ image_url: imageUrl, updated_by: r.c.userId }).eq('id', itemId).eq('org_id', r.c.orgId)
+  if (error) return err('internal', error.message)
+  revalAll(itemId)
+  return ok(undefined)
+}
+
 // ── Lookup CRUD ───────────────────────────────────────────────────────────────
 export async function createFamily(input: unknown): Promise<ActionResult<{id:string}>> {
   const r = await ctxOrErr(); if ('error' in r) return r.error

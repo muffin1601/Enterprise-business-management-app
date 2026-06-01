@@ -3,37 +3,35 @@ import Link from 'next/link'
 import type { Route } from 'next'
 import { getActionContext } from '@/lib/auth/action-context'
 import {
-  getItem,
-  getOrgCurrency,
-  listBrands,
-  listFamilies,
-  listUnits,
+  getItem, getOrgCurrency, listBrands, listFamilies, listUnits,
 } from '@/features/items/server/queries'
 import type { ItemInput } from '@/validations/item'
 import { ItemForm } from '@/features/items/components/item-form'
-import { Alert } from '@/components/ui'
 import styles from '@/features/items/components/items.module.scss'
 
-export const metadata = { title: 'Edit item · Watcon' }
+export const metadata = { title: 'Edit Item · Watcon' }
 
 export default async function EditItemPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const ctx = await getActionContext()
+
   if (!ctx.has('items.edit')) {
     return (
       <main className={styles.page}>
-        <h1>Edit item</h1>
-        <Alert tone="warning">You don&rsquo;t have permission to edit items.</Alert>
+        <div style={{
+          padding: '14px 18px',
+          background: 'var(--c-danger-bg)', color: 'var(--c-danger)',
+          border: '1px solid var(--c-danger)', borderLeft: '3px solid var(--c-danger)',
+          borderRadius: 'var(--radius-sm)', fontFamily: 'var(--font-body)', fontSize: 'var(--fs-500)',
+        }}>
+          You do not have permission to edit items.
+        </div>
       </main>
     )
   }
 
   const [item, families, brands, units, currency] = await Promise.all([
-    getItem(id),
-    listFamilies(),
-    listBrands(),
-    listUnits(),
-    getOrgCurrency(),
+    getItem(id), listFamilies(), listBrands(), listUnits(), getOrgCurrency(),
   ])
   if (!item) notFound()
 
@@ -63,8 +61,15 @@ export default async function EditItemPage({ params }: { params: Promise<{ id: s
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <h1>Edit item</h1>
-        <Link href={`/items/${id}` as Route} className={styles.back}>← Cancel</Link>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+            <Link href={`/items/${id}` as Route} style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--c-tertiary)', textDecoration: 'none' }}>
+              ← {item.name}
+            </Link>
+          </div>
+          <div className={styles.title}>Edit Item</div>
+          <div className={styles.subtitle}>Update catalogue details, pricing or stock.</div>
+        </div>
       </header>
       <ItemForm
         mode="edit"

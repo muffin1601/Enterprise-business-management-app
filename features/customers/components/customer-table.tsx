@@ -6,6 +6,7 @@ import { useState, useTransition } from 'react'
 import type { CustomerRow, CustomerPage } from '../server/queries'
 import { deleteCustomer } from '../server/actions'
 import { CUSTOMER_TYPE_LABELS, PAYMENT_TERMS_LABELS } from '@/validations/customer'
+import { Icon } from '@/components/ui'
 import styles from './customers.module.scss'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -78,8 +79,9 @@ export function CustomerTable({
       >
         <span className={styles.thSort}>
           {label}
-          <i
-            className={`ti ti-arrows-sort ${styles.sortIcon} ${active ? styles.sortActive : ''}`}
+          <Icon
+            name="arrows-sort"
+            className={`${styles.sortIcon} ${active ? styles.sortActive : ''}`}
           />
         </span>
       </th>
@@ -180,11 +182,11 @@ export function CustomerTable({
                 <td className={`${styles.td} ${styles.right}`}>
                   <div className={styles.rowActions}>
                     <Link href={`/customers/${r.id}`}>
-                      <IconButton title="View"><i className="ti ti-eye" /></IconButton>
+                      <IconButton title="View"><Icon name="eye" /></IconButton>
                     </Link>
                     {canEdit && (
                       <Link href={`/customers/${r.id}/edit`}>
-                        <IconButton title="Edit"><i className="ti ti-pencil" /></IconButton>
+                        <IconButton title="Edit"><Icon name="pencil" /></IconButton>
                       </Link>
                     )}
                     {canDelete && (
@@ -193,7 +195,7 @@ export function CustomerTable({
                         onClick={() => handleDelete(r.id, r.name)}
                         disabled={deletingId === r.id}
                       >
-                        <i className="ti ti-trash" />
+                        <Icon name="trash" />
                       </IconButton>
                     )}
                   </div>
@@ -216,7 +218,7 @@ export function CustomerTable({
             disabled={currentPage <= 1}
             onClick={() => onPageChange(currentPage - 1)}
           >
-            <i className="ti ti-chevron-left" />
+            <Icon name="chevron-left" />
           </button>
 
           {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
@@ -237,7 +239,7 @@ export function CustomerTable({
             disabled={currentPage >= totalPages}
             onClick={() => onPageChange(currentPage + 1)}
           >
-            <i className="ti ti-chevron-right" />
+            <Icon name="chevron-right" />
           </button>
         </div>
       </div>

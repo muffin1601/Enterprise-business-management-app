@@ -5,8 +5,8 @@ html { font-size: 100%; }
 
 body {
   font-family: var(--font-body);
-  font-size: var(--fs-500);      // 13px base
-  font-weight: var(--fw-regular);
+  font-size: var(--fs-500);
+  font-weight: var(--fw-regular);   // 300 — light Noto Serif JP
   color: var(--c-ink);
   background-color: var(--c-bg);
   -webkit-font-smoothing: antialiased;
@@ -15,9 +15,10 @@ body {
   line-height: var(--lh-normal);
 }
 
-// All form elements inherit body
-input, button, textarea, select {
+// All form elements: Noto Serif JP, inherit weight
+input, button, textarea, select, option {
   font-family: var(--font-body);
+  font-weight: var(--fw-regular);
   font-size: inherit;
   color: inherit;
 }

@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import type { Lookup } from '../server/queries'
+import { Icon } from '@/components/ui'
 import styles from './inventory.module.scss'
 
 const STATUS_TABS = [
@@ -52,7 +53,7 @@ export function ItemFilters({ total, families, brands }: Props) {
       <div className={styles.filterBar}>
         {/* Search */}
         <div className={styles.searchWrap}>
-          <i className={`ti ti-search ${styles.searchIcon}`} />
+          <Icon name="search" className={styles.searchIcon} />
           <input
             type="search"
             className={styles.searchInput}

@@ -10,6 +10,8 @@ export type ItemRow = {
   variantLabel: string | null
   family: string | null
   brand: string | null
+  unit: string | null
+  imageUrl: string | null
   isImported: boolean
   stock: number
   purchasePrice: number | null
@@ -38,7 +40,7 @@ export async function listItems(filter: ItemFilter): Promise<ItemPage> {
   let q = supabase
     .from('items')
     .select(
-      'id, sku, name, variant_label, is_imported, stock, purchase_price, selling_price, family_id, brand_id, item_families!items_family_id_fkey(name), brands!items_brand_id_fkey(name)',
+      'id, sku, name, variant_label, image_url, is_imported, stock, purchase_price, selling_price, family_id, brand_id, unit_id, item_families!items_family_fkey(name), brands!items_brand_fkey(name), units!items_unit_fkey(code)',
       { count: 'exact' },
     )
     .eq('org_id', orgId)
@@ -67,6 +69,8 @@ export async function listItems(filter: ItemFilter): Promise<ItemPage> {
       variantLabel: (r.variant_label as string | null) ?? null,
       family: (r.item_families as unknown as { name: string } | null)?.name ?? null,
       brand: (r.brands as unknown as { name: string } | null)?.name ?? null,
+      unit: (r.units as unknown as { code: string } | null)?.code ?? null,
+      imageUrl: (r.image_url as string | null) ?? null,
       isImported: Boolean(r.is_imported),
       stock,
       purchasePrice: n(r.purchase_price),
@@ -115,7 +119,7 @@ export async function getItem(id: string): Promise<ItemDetail | null> {
   const { data } = await supabase
     .from('items')
     .select(
-      '*, item_families!items_family_id_fkey(name), brands!items_brand_id_fkey(name), units!items_unit_id_fkey(code), item_variations(id, size, make, finish, brand)',
+      '*, item_families!items_family_fkey(name), brands!items_brand_fkey(name), units!items_unit_fkey(code), item_variations(id, size, make, finish, brand)',
     )
     .eq('org_id', orgId)
     .eq('id', id)
@@ -197,6 +201,28 @@ export type InventorySummary = {
   totalStockValue: number
   lowStockCount: number
   importedCount: number
+}
+
+export type ItemActivityItem = {
+  id: string; action: string; entityType: string; at: string
+  actorName: string | null; after: Record<string, unknown> | null
+}
+
+export async function getItemActivity(itemId: string): Promise<ItemActivityItem[]> {
+  const orgId = await getActiveOrgId()
+  if (!orgId) return []
+  const supabase = await createSupabaseServerClient()
+  const { data } = await supabase
+    .from('audit_logs')
+    .select('id,action,entity_type,at,after,users!audit_logs_actor_id_fkey(full_name)')
+    .eq('org_id', orgId).eq('entity_id', itemId)
+    .order('at', { ascending: false }).limit(50)
+  return (data ?? []).map((a) => ({
+    id: a.id as string, action: a.action as string, entityType: a.entity_type as string,
+    at: a.at as string,
+    actorName: (a.users as unknown as { full_name: string | null } | null)?.full_name ?? null,
+    after: a.after as Record<string, unknown> | null,
+  }))
 }
 
 /** Active org's currency code for money formatting (defaults INR). */

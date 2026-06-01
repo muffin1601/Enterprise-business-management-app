@@ -2,22 +2,19 @@ import { Suspense } from 'react'
 import Link from 'next/link'
 import type { Route } from 'next'
 import { getActionContext } from '@/lib/auth/action-context'
+import { Icon } from '@/components/ui'
 import {
-  getInventorySummary,
   getOrgCurrency,
   listBrands,
   listFamilies,
   listItems,
 } from '@/features/items/server/queries'
 import { itemFilterSchema } from '@/validations/item'
-import { InventorySummaryCards } from '@/features/items/components/inventory-summary'
 import { ItemFilters } from '@/features/items/components/item-filters'
-import { ItemList } from '@/features/items/components/item-list'
-import { ItemPagination } from '@/features/items/components/item-pagination'
-import { Alert, Button } from '@/components/ui'
+import { ItemListClient } from '@/features/items/components/item-list-client'
 import styles from '@/features/items/components/items.module.scss'
 
-export const metadata = { title: 'Inventory · Watcon' }
+export const metadata = { title: 'Items · Watcon' }
 
 export default async function ItemsPage({
   searchParams,
@@ -29,57 +26,84 @@ export default async function ItemsPage({
   const filter = parsed.success ? parsed.data : itemFilterSchema.parse({})
 
   const ctx = await getActionContext()
+
   if (!ctx.has('items.view')) {
     return (
       <main className={styles.page}>
-        <header className={styles.header}>
-          <div>
-            <div className={styles.title}>Inventory</div>
-            <div className={styles.subtitle}>Item catalogue, pricing and stock.</div>
-          </div>
-        </header>
-        <Alert tone="warning">You don&apos;t have permission to view the catalogue.</Alert>
+        <div style={{
+          padding: '14px 18px',
+          background: 'var(--c-danger-bg)', color: 'var(--c-danger)',
+          border: '1px solid var(--c-danger)', borderLeft: '3px solid var(--c-danger)',
+          borderRadius: 'var(--radius-sm)', fontFamily: 'var(--font-body)', fontSize: 'var(--fs-500)',
+        }}>
+          You do not have permission to view items.
+        </div>
       </main>
     )
   }
 
-  const [summary, page, families, brands, currency] = await Promise.all([
-    getInventorySummary(),
+  const [page, families, brands, currency] = await Promise.all([
     listItems(filter),
     listFamilies(),
     listBrands(),
     getOrgCurrency(),
   ])
 
+  const canDelete = ctx.has('items.delete')
+
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <div>
-          <div className={styles.title}>Inventory</div>
-          <div className={styles.subtitle}>Catalogue, pricing and stock. {page.total} items.</div>
+        <div className={styles.titleGroup}>
+          <div className={styles.title}>Items</div>
+          <div className={styles.subtitle}>Catalogue, pricing and stock.</div>
         </div>
         <div className={styles.headerActions}>
           <Link href={'/items/lookups' as Route}>
-            <Button variant="ghost" size="sm">Categories &amp; brands</Button>
+            <button style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              background: 'transparent', color: 'var(--c-secondary)',
+              border: '1px solid var(--c-border)', padding: '9px 16px',
+              fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 500,
+              letterSpacing: '0.10em', textTransform: 'uppercase', cursor: 'pointer',
+              borderRadius: 'var(--radius-sm)',
+            }}>
+              <Icon name="settings" />
+              Lookups
+            </button>
           </Link>
           {ctx.has('items.create') && (
             <Link href={'/items/new' as Route}>
-              <Button variant="primary" size="sm">+ New item</Button>
+              <button style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                background: 'var(--c-ink)', color: 'var(--c-inverse)',
+                border: '1px solid var(--c-ink)', padding: '9px 16px',
+                fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 500,
+                letterSpacing: '0.10em', textTransform: 'uppercase', cursor: 'pointer',
+                borderRadius: 'var(--radius-sm)',
+              }}>
+                <Icon name="plus" />
+                New Item
+              </button>
             </Link>
           )}
         </div>
       </header>
 
-      <InventorySummaryCards summary={summary} currency={currency} />
-
       <Suspense>
-        <ItemFilters families={families} brands={brands} />
+        <ItemFilters families={families} brands={brands} total={page.total} />
       </Suspense>
 
-      <ItemList rows={page.rows} currency={currency} />
-
-      <Suspense>
-        <ItemPagination page={page.page} totalPages={page.totalPages} total={page.total} />
+      <Suspense fallback={
+        <div style={{
+          padding: '60px 0', textAlign: 'center',
+          fontFamily: 'var(--font-body)', fontSize: 'var(--fs-400)',
+          color: 'var(--c-tertiary)', letterSpacing: '0.08em',
+        }}>
+          Loading…
+        </div>
+      }>
+        <ItemListClient page={page} currency={currency} canDelete={canDelete} />
       </Suspense>
     </main>
   )

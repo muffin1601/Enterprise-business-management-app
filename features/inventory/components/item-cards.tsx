@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 import type { ItemRow, ItemPage } from '../server/queries'
 import { deleteItem } from '../server/actions'
+import { Icon } from '@/components/ui'
 import styles from './inventory.module.scss'
 
 const fmtINR = (n: number | null) => {
@@ -53,7 +54,7 @@ function ItemCard({
           <img src={row.imageUrl} alt={row.name} />
         ) : (
           <div className={styles.noImage}>
-            <i className="ti ti-photo-off" />
+            <Icon name="photo-off" />
             <span>No Image</span>
           </div>
         )}
@@ -61,11 +62,11 @@ function ItemCard({
         {/* Hover overlay with actions */}
         <div className={styles.cardOverlay}>
           <Link href={`/inventory/items/${row.id}`} className={styles.cardOverlayBtn} title="View">
-            <i className="ti ti-eye" />
+            <Icon name="eye" />
           </Link>
           {canEdit && (
             <Link href={`/inventory/items/${row.id}/edit`} className={styles.cardOverlayBtn} title="Edit">
-              <i className="ti ti-pencil" />
+              <Icon name="pencil" />
             </Link>
           )}
           {canDelete && (
@@ -74,7 +75,7 @@ function ItemCard({
               title="Archive"
               onClick={() => onDelete(row.id, row.name)}
             >
-              <i className="ti ti-archive" />
+              <Icon name="archive" />
             </button>
           )}
         </div>
@@ -163,7 +164,7 @@ export function ItemCards({ page, canEdit, canDelete, currentPage, onPageChange 
   if (rows.length === 0) {
     return (
       <div className={styles.empty}>
-        <i className="ti ti-box" />
+        <Icon name="box" />
         <div className={styles.emptyTitle}>No items found</div>
         <div className={styles.emptyBody}>Try adjusting your search or filters</div>
       </div>
@@ -193,7 +194,7 @@ export function ItemCards({ page, canEdit, canDelete, currentPage, onPageChange 
           <span className={styles.pageInfo}>Showing {start_}–{end} of {total} items</span>
           <div className={styles.pageBtns}>
             <button className={styles.pageBtn} disabled={currentPage <= 1} onClick={() => onPageChange(currentPage - 1)}>
-              <i className="ti ti-chevron-left" />
+              <Icon name="chevron-left" />
             </button>
             {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => i + 1).map((p) => (
               <button
@@ -205,7 +206,7 @@ export function ItemCards({ page, canEdit, canDelete, currentPage, onPageChange 
               </button>
             ))}
             <button className={styles.pageBtn} disabled={currentPage >= totalPages} onClick={() => onPageChange(currentPage + 1)}>
-              <i className="ti ti-chevron-right" />
+              <Icon name="chevron-right" />
             </button>
           </div>
         </div>

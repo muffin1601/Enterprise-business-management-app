@@ -3,10 +3,12 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
-import { useTransition } from 'react'
+import { useState, useTransition } from 'react'
 import { itemSchema, GST_RATES, type ItemInput } from '@/validations/inventory'
-import { createItem, updateItem } from '../server/actions'
-import type { Lookup } from '../server/queries'
+import { createItemWithVariations, updateItem } from '../server/actions'
+import type { Lookup, VariationInput } from '../server/queries'
+import { Icon } from '@/components/ui'
+import { VariationsPanel } from './variations-panel'
 import styles from './inventory.module.scss'
 
 const CURRENCIES = ['INR', 'USD', 'EUR', 'CNY'] as const
@@ -23,6 +25,7 @@ interface Props {
 export function ItemForm({ mode, itemId, families, brands, units, defaultValues }: Props) {
   const router = useRouter()
   const [pending, start] = useTransition()
+  const [variations, setVariations] = useState<VariationInput[]>([])
 
   const { register, handleSubmit, setError, watch, setValue, formState: { errors } } = useForm<ItemInput>({
     resolver: zodResolver(itemSchema),
@@ -38,21 +41,25 @@ export function ItemForm({ mode, itemId, families, brands, units, defaultValues 
 
   async function onSubmit(data: ItemInput) {
     start(async () => {
-      const result = mode === 'create'
-        ? await createItem(data)
-        : await updateItem(itemId!, data)
-
-      if (!result.ok) {
-        if (result.error.fieldErrors) {
-          Object.entries(result.error.fieldErrors).forEach(([f, m]) =>
-            setError(f as keyof ItemInput, { message: m[0] })
-          )
+      if (mode === 'edit') {
+        const result = await updateItem(itemId!, data)
+        if (!result.ok) {
+          if (result.error.fieldErrors) Object.entries(result.error.fieldErrors).forEach(([f, m]) => setError(f as keyof ItemInput, { message: m[0] }))
+          setError('root', { message: result.error.message })
+          return
         }
-        setError('root', { message: result.error.message })
+        router.push(`/inventory/items/${itemId}`)
+        router.refresh()
         return
       }
 
-      router.push(`/inventory/items/${(result.data as {id:string}).id ?? itemId}`)
+      const result = await createItemWithVariations(data, variations)
+      if (!result.ok) {
+        if (result.error.fieldErrors) Object.entries(result.error.fieldErrors).forEach(([f, m]) => setError(f as keyof ItemInput, { message: m[0] }))
+        setError('root', { message: result.error.message })
+        return
+      }
+      router.push(`/inventory/items/${result.data.parentId}`)
       router.refresh()
     })
   }
@@ -91,6 +98,39 @@ export function ItemForm({ mode, itemId, families, brands, units, defaultValues 
     </div>
   )
 
+  // Combobox — free-text input with datalist suggestions; resolves to UUID if matched
+  const Combo = ({ name, label, options, placeholder = '' }: {
+    name: keyof ItemInput; label: string
+    options: { value: string; label: string }[]; placeholder?: string
+  }) => {
+    const listId = `combo-${name}`
+    const currentId = watch(name) as string | undefined
+    const currentLabel = options.find(o => o.value === currentId)?.label ?? (currentId ?? '')
+
+    return (
+      <div>
+        <label className={styles.fieldLabel}>{label}</label>
+        <input
+          type="text"
+          list={listId}
+          className={styles.fieldInput}
+          placeholder={placeholder}
+          defaultValue={currentLabel}
+          onChange={(e) => {
+            const typed = e.target.value.trim()
+            const match = options.find(o => o.label.toLowerCase() === typed.toLowerCase())
+            setValue(name, (match ? match.value : typed) as never)
+          }}
+          autoComplete="off"
+        />
+        <datalist id={listId}>
+          {options.map(o => <option key={o.value} value={o.label} />)}
+        </datalist>
+        {errors[name] && <div className={styles.fieldError}>{(errors[name]?.message as string)}</div>}
+      </div>
+    )
+  }
+
   return (
     <form className={styles.form} onSubmit={handleSubmit(onSubmit)} noValidate>
       {errors.root && (
@@ -114,9 +154,9 @@ export function ItemForm({ mode, itemId, families, brands, units, defaultValues 
             <F name="variantLabel" label="Variant Label"   placeholder="e.g. 600×600 · Matte" />
           </div>
           <div className={styles.formGrid3}>
-            <Sel name="familyId" label="Category" options={families.map(f => ({ value: f.id, label: f.label }))} placeholder="Select category" />
-            <Sel name="brandId"  label="Brand"    options={brands.map(b => ({ value: b.id, label: b.label }))}   placeholder="Select brand" />
-            <Sel name="unitId"   label="Unit"     options={units.map(u => ({ value: u.id, label: u.label }))}    placeholder="Select unit" />
+            <Combo name="familyId" label="Category" options={families.map(f => ({ value: f.id, label: f.label }))} placeholder="Type or select category" />
+            <Combo name="brandId"  label="Brand / Make" options={brands.map(b => ({ value: b.id, label: b.label }))} placeholder="Type or select brand" />
+            <Combo name="unitId"   label="Unit" options={units.map(u => ({ value: u.id, label: u.label }))} placeholder="Type or select unit" />
           </div>
           <div>
             <label className={styles.fieldLabel}>Description</label>
@@ -196,6 +236,32 @@ export function ItemForm({ mode, itemId, families, brands, units, defaultValues 
         <div className={styles.panelHeader}><span className={styles.panelTitle}>Internal Notes</span></div>
         <textarea className={styles.fieldTextarea} rows={3} placeholder="Private notes about this item…" {...register('notes')} />
       </div>
+
+      {/* ── Variations ──────────────────────────────────────────── */}
+      {mode === 'create' && (
+        <div className={styles.panel}>
+          <div className={styles.panelHeader}>
+            <span className={styles.panelTitle}>
+              Variations &nbsp;
+              <span style={{ color: 'var(--c-info)', fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>
+                — each becomes a separate item
+              </span>
+            </span>
+            {variations.length > 0 && (
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--c-tertiary)' }}>
+                {variations.length} variant{variations.length > 1 ? 's' : ''}
+              </span>
+            )}
+          </div>
+          <VariationsPanel
+            value={variations}
+            onChange={setVariations}
+            baseName={watch('name') || 'Item'}
+            baseSellingPrice={watch('sellingPrice') ?? undefined}
+            basePurchasePrice={watch('purchasePrice') ?? undefined}
+          />
+        </div>
+      )}
 
       {/* ── Actions ─────────────────────────────────────────────── */}
       <div className={styles.formActions}>

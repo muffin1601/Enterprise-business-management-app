@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { addNote, deleteNote } from '../server/actions'
 import type { CustomerNote } from '../server/queries'
+import { Icon } from '@/components/ui'
 import styles from './customers.module.scss'
 
 function relTime(iso: string) {
@@ -89,7 +90,7 @@ export function NotesSection({ customerId, notes, canEdit }: Props) {
       {/* List */}
       {ordered.length === 0 ? (
         <div className={styles.empty}>
-          <div className={styles.emptyIcon}><i className="ti ti-notes" /></div>
+          <div className={styles.emptyIcon}><Icon name="notes" /></div>
           <div className={styles.emptyTitle}>No notes yet</div>
           <div className={styles.emptyBody}>Add your first note above</div>
         </div>
@@ -106,7 +107,7 @@ export function NotesSection({ customerId, notes, canEdit }: Props) {
                   <span>{relTime(n.createdAt)}</span>
                   {n.isPinned && (
                     <span style={{ marginLeft: 8, color: 'var(--color-warning-fg)' }}>
-                      <i className="ti ti-pin" style={{ fontSize: 12 }} /> Pinned
+                      <Icon name="pin" size={12} /> Pinned
                     </span>
                   )}
                 </div>
@@ -119,7 +120,7 @@ export function NotesSection({ customerId, notes, canEdit }: Props) {
                     }}
                     title="Delete note"
                   >
-                    <i className="ti ti-trash" />
+                    <Icon name="trash" />
                   </button>
                 )}
               </div>

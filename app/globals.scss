@@ -85,10 +85,10 @@
   --color-stock-track:   var(--c-border);
 
   // ── Typography ────────────────────────────────────────────────────────────
-  // --noto-serif is the CSS variable injected by next/font for Noto Serif JP
+  // Noto Serif JP everywhere — heading, body, UI, mono fallback.
   --font-heading: var(--noto-serif, 'Noto Serif JP'), Georgia, serif;
-  --font-display: var(--font-heading);  // alias
-  --font-body:    var(--font-inter, 'Inter'), system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-heading);
+  --font-body:    var(--noto-serif, 'Noto Serif JP'), Georgia, serif;
   --font-sans:    var(--font-body);
   --font-mono:    var(--font-mono, 'JetBrains Mono'), ui-monospace, monospace;
 
@@ -112,10 +112,10 @@
   --fsh-md:   2.25rem;     // 36px  — page heading
   --fsh-lg:   3rem;        // 48px  — hero, landing
 
-  --fw-light:    300;
-  --fw-regular:  400;
-  --fw-medium:   500;
-  --fw-semibold: 600;
+  --fw-light:    200;
+  --fw-regular:  300;
+  --fw-medium:   400;
+  --fw-semibold: 500;
 
   --lh-tight:    1.15;
   --lh-snug:     1.3;

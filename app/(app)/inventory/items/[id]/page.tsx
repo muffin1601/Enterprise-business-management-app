@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import { getActionContext } from '@/lib/auth/action-context'
-import { getItem, getStockMovements, getAdjustments } from '@/features/inventory/server/queries'
+import { getItem, getStockMovements, getAdjustments, getItemVariants } from '@/features/inventory/server/queries'
 import { ItemDetailView } from '@/features/inventory/components/item-detail'
 import styles from '@/features/inventory/components/inventory.module.scss'
 
@@ -28,9 +28,10 @@ export default async function ItemDetailPage({
   const item = await getItem(id)
   if (!item) notFound()
 
-  const [movements, adjustments] = await Promise.all([
+  const [movements, adjustments, variants] = await Promise.all([
     getStockMovements(id),
     getAdjustments(id),
+    getItemVariants(id),
   ])
 
   return (
@@ -38,7 +39,9 @@ export default async function ItemDetailPage({
       item={item}
       movements={movements}
       adjustments={adjustments}
+      variants={variants}
       activeTab={activeTab}
+      orgId={ctx.orgId}
       canEdit={ctx.has('inventory.edit') || ctx.has('items.edit')}
       canDelete={ctx.has('inventory.delete') || ctx.has('items.delete')}
       canAdjust={ctx.has('inventory.adjust') || ctx.has('stock.adjust')}

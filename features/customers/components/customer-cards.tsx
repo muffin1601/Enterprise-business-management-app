@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 import type { CustomerRow, CustomerPage } from '../server/queries'
 import { deleteCustomer } from '../server/actions'
+import { Icon } from '@/components/ui'
 import styles from './customers.module.scss'
 
 const fmtINR = (n: number) => {
@@ -62,13 +63,13 @@ function CustomerCard({
           <div className={styles.cardContact}>
             {row.phone && (
               <div className={styles.contactRow}>
-                <i className="ti ti-phone" />
+                <Icon name="phone" />
                 <span>{row.phone}</span>
               </div>
             )}
             {row.email && (
               <div className={styles.contactRow}>
-                <i className="ti ti-mail" />
+                <Icon name="mail" />
                 <span>{row.email}</span>
               </div>
             )}
@@ -107,7 +108,7 @@ function CustomerCard({
           title={`Delete ${row.name}`}
           onClick={(e) => { e.stopPropagation(); onDelete(row.id, row.name) }}
         >
-          <i className="ti ti-trash" />
+          <Icon name="trash" />
         </button>
       )}
     </div>
@@ -145,7 +146,7 @@ export function CustomerCards({ page, canEdit, canDelete, currentPage, onPageCha
   if (rows.length === 0) {
     return (
       <div className={styles.empty}>
-        <i className={`ti ti-users ${styles.emptyIcon}`} />
+        <Icon name="users" className={styles.emptyIcon} />
         <div className={styles.emptyTitle}>No customers found</div>
         <div className={styles.emptyBody}>Try adjusting your search or filters</div>
       </div>
@@ -167,7 +168,7 @@ export function CustomerCards({ page, canEdit, canDelete, currentPage, onPageCha
           <span className={styles.pageInfo}>Showing {start_}–{end} of {total} customers</span>
           <div className={styles.pageBtns}>
             <button className={styles.pageBtn} disabled={currentPage <= 1} onClick={() => onPageChange(currentPage - 1)}>
-              <i className="ti ti-chevron-left" />
+              <Icon name="chevron-left" />
             </button>
             {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => i + 1).map((p) => (
               <button key={p} className={`${styles.pageBtn} ${p === currentPage ? styles.pageBtnActive : ''}`} onClick={() => onPageChange(p)}>
@@ -175,7 +176,7 @@ export function CustomerCards({ page, canEdit, canDelete, currentPage, onPageCha
               </button>
             ))}
             <button className={styles.pageBtn} disabled={currentPage >= totalPages} onClick={() => onPageChange(currentPage + 1)}>
-              <i className="ti ti-chevron-right" />
+              <Icon name="chevron-right" />
             </button>
           </div>
         </div>

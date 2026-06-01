@@ -37,12 +37,7 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${notoSerif.variable} ${jetbrainsMono.variable}`}
     >
-      <head>
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.x/dist/tabler-icons.min.css"
-        />
-      </head>
+      <head />
       <body>
         {children}
         <Toaster />

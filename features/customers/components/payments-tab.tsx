@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { paymentSchema, PAYMENT_MODES, PAYMENT_MODE_LABELS, type PaymentInput } from '@/validations/customer'
 import { recordPayment } from '../server/actions'
 import type { PaymentRow } from '../server/queries'
+import { Icon } from '@/components/ui'
 import styles from './customers.module.scss'
 
 const fmtINR  = (n: number) => `₹${new Intl.NumberFormat('en-IN', { minimumFractionDigits: 2 }).format(n)}`
@@ -48,7 +49,7 @@ function RecordPaymentModal({
       <div className={styles.modal}>
         <div className={styles.modalHeader}>
           <span className={styles.modalTitle}>Record Payment</span>
-          <button className={styles.modalClose} onClick={onClose}><i className="ti ti-x" /></button>
+          <button className={styles.modalClose} onClick={onClose}><Icon name="x" /></button>
         </div>
 
         <div className={styles.modalBody}>
@@ -133,8 +134,8 @@ export function PaymentsTab({ customerId, payments, canEdit }: Props) {
   const totalReceived = payments.reduce((s, p) => s + p.amount, 0)
 
   const modeIcon: Record<string, string> = {
-    neft: 'ti-building-bank', rtgs: 'ti-building-bank', upi: 'ti-device-mobile',
-    cheque: 'ti-writing', cash: 'ti-cash', card: 'ti-credit-card', other: 'ti-receipt',
+    neft: 'building-bank', rtgs: 'building-bank', upi: 'device-mobile',
+    cheque: 'writing', cash: 'cash', card: 'credit-card', other: 'receipt',
   }
 
   return (
@@ -153,7 +154,7 @@ export function PaymentsTab({ customerId, payments, canEdit }: Props) {
         </div>
         {canEdit && (
           <button onClick={() => setModal(true)} style={primaryBtn(false)}>
-            <i className="ti ti-plus" style={{ marginRight: 6 }} />
+            <Icon name="plus" style={{ marginRight: 6 }} />
             Record Payment
           </button>
         )}
@@ -162,7 +163,7 @@ export function PaymentsTab({ customerId, payments, canEdit }: Props) {
       {/* Payment list */}
       {payments.length === 0 ? (
         <div className={styles.panel} style={{ textAlign: 'center', padding: '48px 0' }}>
-          <i className="ti ti-cash" style={{ fontSize: 40, color: 'var(--c-border-2)', display: 'block', marginBottom: 12 }} />
+          <Icon name="cash" size={40} style={{ color: 'var(--c-border-2)', display: 'block', marginBottom: 12 }} />
           <div style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--c-secondary)', fontWeight: 500 }}>No payments recorded</div>
           <div style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--c-tertiary)', marginTop: 4 }}>
             {canEdit ? 'Use "Record Payment" to add the first payment.' : 'Payments will appear here once recorded.'}
@@ -194,7 +195,7 @@ export function PaymentsTab({ customerId, payments, canEdit }: Props) {
                     </td>
                     <td style={{ padding: '12px 14px', borderBottom: '1px solid var(--c-border)' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                        <i className={`ti ${modeIcon[p.mode] ?? 'ti-receipt'}`} style={{ fontSize: 14, color: 'var(--c-tertiary)' }} />
+                        <Icon name={modeIcon[p.mode] ?? 'receipt'} size={14} style={{ color: 'var(--c-tertiary)' }} />
                         <span style={{ fontFamily: 'var(--font-body)', fontWeight: 500, color: 'var(--c-ink)', textTransform: 'uppercase', fontSize: 11, letterSpacing: '0.05em' }}>
                           {PAYMENT_MODE_LABELS[p.mode as keyof typeof PAYMENT_MODE_LABELS] ?? p.mode}
                         </span>

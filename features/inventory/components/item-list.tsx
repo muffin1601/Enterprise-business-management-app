@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 import type { ItemRow, ItemPage } from '../server/queries'
 import { deleteItem } from '../server/actions'
+import { Icon } from '@/components/ui'
 import styles from './inventory.module.scss'
 
 const fmtINR = (n: number | null) => {
@@ -121,9 +122,9 @@ export function ItemList({ page, canEdit, canDelete, currentPage, sort, order, o
                 </td>
                 <td className={`${styles.td} ${styles.right}`}>
                   <div className={styles.rowActions}>
-                    <Link href={`/inventory/items/${r.id}`} className={styles.iconBtn} title="View"><i className="ti ti-eye" /></Link>
-                    {canEdit && <Link href={`/inventory/items/${r.id}/edit`} className={styles.iconBtn} title="Edit"><i className="ti ti-pencil" /></Link>}
-                    {canDelete && <button className={styles.iconBtn} onClick={() => handleDelete(r.id, r.name)} title="Archive"><i className="ti ti-archive" /></button>}
+                    <Link href={`/inventory/items/${r.id}`} className={styles.iconBtn} title="View"><Icon name="eye" /></Link>
+                    {canEdit && <Link href={`/inventory/items/${r.id}/edit`} className={styles.iconBtn} title="Edit"><Icon name="pencil" /></Link>}
+                    {canDelete && <button className={styles.iconBtn} onClick={() => handleDelete(r.id, r.name)} title="Archive"><Icon name="archive" /></button>}
                   </div>
                 </td>
               </tr>
@@ -136,11 +137,11 @@ export function ItemList({ page, canEdit, canDelete, currentPage, sort, order, o
         <div className={styles.pagination}>
           <span className={styles.pageInfo}>Showing {start_}–{end} of {total} items</span>
           <div className={styles.pageBtns}>
-            <button className={styles.pageBtn} disabled={currentPage <= 1} onClick={() => onPageChange(currentPage - 1)}><i className="ti ti-chevron-left" /></button>
+            <button className={styles.pageBtn} disabled={currentPage <= 1} onClick={() => onPageChange(currentPage - 1)}><Icon name="chevron-left" /></button>
             {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => i + 1).map(p => (
               <button key={p} className={`${styles.pageBtn} ${p === currentPage ? styles.active : ''}`} onClick={() => onPageChange(p)}>{p}</button>
             ))}
-            <button className={styles.pageBtn} disabled={currentPage >= totalPages} onClick={() => onPageChange(currentPage + 1)}><i className="ti ti-chevron-right" /></button>
+            <button className={styles.pageBtn} disabled={currentPage >= totalPages} onClick={() => onPageChange(currentPage + 1)}><Icon name="chevron-right" /></button>
           </div>
         </div>
       )}

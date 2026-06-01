@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut } from '@/features/auth/server/actions'
 import { PageActionsProvider, PageActionsSlot } from './page-actions'
+import { Icon } from '@/components/ui'
 import styles from './AppShell.module.scss'
 
 const NAV = [
@@ -20,16 +21,13 @@ const NAV = [
     items: [
       { href: '/quotes',    label: 'Quotes',       icon: 'ti-file-invoice' },
       { href: '/customers', label: 'Customers',    icon: 'ti-users' },
-      { href: '/orders',    label: 'Sales Orders', icon: 'ti-receipt' },
-      { href: '/invoices',  label: 'Invoices',     icon: 'ti-file-dollar' },
+      // { href: '/orders',    label: 'Sales Orders', icon: 'ti-receipt' },
     ],
   },
   {
     group: 'INVENTORY',
     items: [
-      { href: '/inventory/items',       label: 'Items',       icon: 'ti-box' },
-      { href: '/inventory/movements',   label: 'Movements',   icon: 'ti-arrows-exchange' },
-      { href: '/inventory/adjustments', label: 'Adjustments', icon: 'ti-adjustments-horizontal' },
+      { href: '/inventory/items', label: 'Items', icon: 'ti-box' },
     ],
   },
   {
@@ -41,8 +39,7 @@ const NAV = [
   {
     group: 'PEOPLE',
     items: [
-      { href: '/hr',    label: 'HR',    icon: 'ti-id' },
-      { href: '/users', label: 'Users', icon: 'ti-user-cog' },
+      { href: '/users', label: 'Team & Users', icon: 'ti-users' },
     ],
   },
   {
@@ -132,7 +129,7 @@ export function AppShell({ userName, orgName, children }: Props) {
                     data-active={isActive(item.href) ? 'true' : undefined}
                     onClick={() => setOpen(false)}
                   >
-                    <i className={`ti ${item.icon} ${styles.navIcon}`} />
+                    <Icon name={item.icon.replace(/^ti-/, '')} className={styles.navIcon} />
                     {item.label}
                   </Link>
                 ))}
@@ -150,7 +147,7 @@ export function AppShell({ userName, orgName, children }: Props) {
             </div>
             <form action={signOut} style={{ display: 'contents' }}>
               <button type="submit" className={styles.footerSignOut} title="Sign out">
-                <i className="ti ti-logout" />
+                <Icon name="logout" />
               </button>
             </form>
           </div>
@@ -166,7 +163,7 @@ export function AppShell({ userName, orgName, children }: Props) {
                 onClick={() => setOpen((v) => !v)}
                 aria-label="Open navigation"
               >
-                <i className="ti ti-menu-2" />
+                <Icon name="menu-2" />
               </button>
               <span className={styles.topbarTitle}>{title}</span>
             </div>

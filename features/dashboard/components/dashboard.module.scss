@@ -31,10 +31,14 @@
 // ── KPI strip ─────────────────────────────────────────────────────────────────
 .kpis {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 12px;
-  @include up(sm)  { grid-template-columns: repeat(3, 1fr); }
-  @include up(md)  { grid-template-columns: repeat(6, 1fr); }
+}
+
+.kpiStrip {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
 }
 
 .kpiCard {

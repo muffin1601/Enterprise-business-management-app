@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { contactSchema, type ContactInput } from '@/validations/customer'
 import { addContact, updateContact, deleteContact } from '../server/actions'
 import type { CustomerContact } from '../server/queries'
+import { Icon } from '@/components/ui'
 import styles from './customers.module.scss'
 
 interface Props {
@@ -64,7 +65,7 @@ function ContactModal({
             {contact ? 'Edit Contact' : 'Add Contact'}
           </span>
           <button className={styles.modalClose} onClick={onClose}>
-            <i className="ti ti-x" />
+            <Icon name="x" />
           </button>
         </div>
 
@@ -146,7 +147,7 @@ export function ContactsSection({ customerId, contacts, canEdit }: Props) {
 
       {contacts.length === 0 ? (
         <div className={styles.empty}>
-          <div className={styles.emptyIcon}><i className="ti ti-users" /></div>
+          <div className={styles.emptyIcon}><Icon name="users" /></div>
           <div className={styles.emptyTitle}>No contacts yet</div>
           <div className={styles.emptyBody}>Add contacts for this customer</div>
         </div>
@@ -167,12 +168,12 @@ export function ContactsSection({ customerId, contacts, canEdit }: Props) {
                 <div className={styles.contactMeta}>
                   {c.phone && (
                     <span className={styles.contactMetaItem}>
-                      <i className="ti ti-phone" />{c.phone}
+                      <Icon name="phone" />{c.phone}
                     </span>
                   )}
                   {c.email && (
                     <span className={styles.contactMetaItem}>
-                      <i className="ti ti-mail" />{c.email}
+                      <Icon name="mail" />{c.email}
                     </span>
                   )}
                 </div>
@@ -181,10 +182,10 @@ export function ContactsSection({ customerId, contacts, canEdit }: Props) {
               {canEdit && (
                 <div className={styles.contactActions}>
                   <IconBtn title="Edit" onClick={() => setModal(c)}>
-                    <i className="ti ti-pencil" />
+                    <Icon name="pencil" />
                   </IconBtn>
                   <IconBtn title="Remove" onClick={() => handleDelete(c.id, c.name)}>
-                    <i className="ti ti-trash" />
+                    <Icon name="trash" />
                   </IconBtn>
                 </div>
               )}
@@ -195,7 +196,7 @@ export function ContactsSection({ customerId, contacts, canEdit }: Props) {
 
       {canEdit && (
         <button className={styles.addRow} style={{ marginTop: 10 }} onClick={() => setModal('new')}>
-          <i className="ti ti-user-plus" /> Add Contact
+          <Icon name="user-plus" /> Add Contact
         </button>
       )}
     </div>
