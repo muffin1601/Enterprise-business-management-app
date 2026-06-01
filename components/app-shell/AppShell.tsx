@@ -19,8 +19,10 @@ const NAV = [
   {
     group: 'SALES',
     items: [
-      { href: '/quotes',    label: 'Quotes',       icon: 'ti-file-invoice' },
-      { href: '/customers', label: 'Customers',    icon: 'ti-users' },
+      { href: '/quotes',    label: 'Quotes',        icon: 'ti-file-invoice' },
+      { href: '/orders',    label: 'Sales Orders',  icon: 'ti-receipt' },
+      { href: '/invoices',  label: 'Invoices',      icon: 'ti-file-dollar' },
+      { href: '/customers', label: 'Customers',     icon: 'ti-users' },
     ],
   },
   {
@@ -57,9 +59,9 @@ const NAV = [
 const PAGE_TITLES: Record<string, string> = {
   '/dashboard':        'Dashboard',
   '/customers':        'Customers',
-  '/quotes':           'Quotes',
-  '/orders':           'Sales Orders',
-  '/invoices':         'Invoices',
+  '/quotes':    'Quotes',
+  '/orders':    'Sales Orders',
+  '/invoices':  'Invoices',
   '/inventory/items':       'Inventory',
   '/inventory/movements':   'Stock Movements',
   '/inventory/adjustments': 'Adjustments',

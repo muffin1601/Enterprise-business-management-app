@@ -99,6 +99,8 @@ const ICON_MAP: Record<string, React.ComponentType<LucideProps>> = {
   'file-edit':           FileEdit,
   'file-plus':           FilePlus,
   'file-x':              FileX,
+  'file-dollar':         Receipt,
+  'file-invoice':        Receipt,
   'folder-open':         FolderOpen,
   'paperclip':           Paperclip,
   'pin':                 Pin,
