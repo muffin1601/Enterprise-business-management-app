@@ -13,7 +13,7 @@ import { getNextSku } from './queries'
 
 const fe = (e: import('zod').ZodError) => e.flatten().fieldErrors as Record<string, string[]>
 
-async function ctxOrErr() {
+async function ctxOrErr(): Promise<{ c: import('@/lib/auth/action-context').ActionContext } | { c?: never; error: import('@/types/action').ActionErr }> {
   try { return { c: await getActionContext() } }
   catch (e) {
     if (e instanceof AuthError) return { error: err(e.code as 'unauthenticated'|'forbidden', e.message) }
