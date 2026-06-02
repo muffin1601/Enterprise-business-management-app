@@ -1,0 +1,187 @@
+// PO Create Form styles
+@use 'mixins' as *;
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  font-family: var(--font-body);
+  min-height: calc(100vh - 100px);
+}
+
+// ── Step bar ──────────────────────────────────────────────────────────────────
+
+.stepBar {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.stepBtn {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 14px 20px; background: var(--c-surface); border: none;
+  font-family: var(--font-body); font-size: 13px; font-weight: var(--fw-medium);
+  color: var(--c-secondary); cursor: pointer; transition: background var(--dur-fast), color var(--dur-fast);
+  & + & { border-left: 1px solid var(--c-border); }
+  &:hover:not(.stepDisabled):not(.stepActive) { background: var(--c-surface-2); color: var(--c-ink); }
+}
+
+.stepActive { background: var(--c-ink) !important; color: var(--c-inverse) !important; }
+.stepDisabled { opacity: 0.4; cursor: not-allowed !important; }
+
+.stepNum {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; flex-shrink: 0;
+  .stepActive & { background: rgba(255,255,255,0.25); }
+  .stepBtn:not(.stepActive) & { background: var(--c-border); color: var(--c-secondary); }
+}
+
+// ── Step content ──────────────────────────────────────────────────────────────
+
+.stepContent { display: flex; flex-direction: column; gap: 12px; }
+.stepTitle { font-family: var(--font-body); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-tertiary); font-weight: var(--fw-medium); }
+.stepHint { font-family: var(--font-body); font-size: 12px; color: var(--c-secondary); }
+
+// ── Picker ────────────────────────────────────────────────────────────────────
+
+.pickerPanel { display: flex; flex-direction: column; gap: 10px; }
+
+.searchInput {
+  width: 100%; height: 44px; border: 1px solid var(--c-border); border-radius: var(--radius-sm);
+  padding: 0 16px; background: var(--c-surface); font-family: var(--font-body); font-size: 14px;
+  color: var(--c-ink); outline: none; transition: border-color var(--dur-fast);
+  &:focus { border-color: var(--c-border-2); }
+  &::placeholder { color: var(--c-tertiary); }
+}
+
+.pickerList {
+  display: flex; flex-direction: column; gap: 6px;
+  max-height: calc(100vh - 400px); min-height: 200px; overflow-y: auto;
+}
+
+.pickerEmpty { font-family: var(--font-body); font-size: 13px; color: var(--c-tertiary); padding: 32px 0; text-align: center; }
+
+.pickerRow {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; background: var(--c-surface); border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm); cursor: pointer; text-align: left; width: 100%;
+  transition: border-color var(--dur-fast), background var(--dur-fast);
+  &:hover { border-color: var(--c-border-2); }
+}
+
+.pickerRowSelected { border-color: var(--c-ink); background: var(--c-bg); }
+.pickerRowLeft { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
+.pickerRowRight { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.pickerCode { font-family: var(--font-mono); font-size: 11px; color: var(--c-tertiary); letter-spacing: 0.06em; }
+.pickerName { font-family: var(--font-body); font-size: 14px; font-weight: var(--fw-semibold); color: var(--c-ink); }
+.pickerSub  { font-family: var(--font-body); font-size: 12px; color: var(--c-secondary); }
+.pickerDate { font-family: var(--font-body); font-size: 11px; color: var(--c-tertiary); }
+.pickerAmount { font-family: var(--font-mono); font-size: 14px; color: var(--c-ink); }
+.checkmark { font-size: 14px; color: var(--c-success); }
+
+.pickerPagination {
+  display: flex; align-items: center; justify-content: center; gap: 16px;
+  font-family: var(--font-body); font-size: 12px; color: var(--c-secondary);
+  button { padding: 5px 12px; border: 1px solid var(--c-border); border-radius: var(--radius-sm); background: var(--c-surface); font-family: var(--font-body); font-size: 12px; cursor: pointer; &:hover:not(:disabled) { background: var(--c-surface-2); } &:disabled { opacity: 0.4; cursor: not-allowed; } }
+}
+
+// ── Selected banner ───────────────────────────────────────────────────────────
+
+.selectedBanner {
+  background: var(--c-bg); border: 1px solid var(--c-border); border-left: 3px solid var(--c-ink);
+  border-radius: var(--radius-sm); padding: 14px 18px;
+  display: flex; flex-direction: column; gap: 3px;
+}
+
+.selectedLabel { font-family: var(--font-body); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--c-tertiary); font-weight: var(--fw-medium); }
+.selectedName  { font-family: var(--font-body); font-size: 15px; font-weight: var(--fw-semibold); color: var(--c-ink); }
+.selectedSub   { font-family: var(--font-body); font-size: 12px; color: var(--c-secondary); }
+.selectedAmount{ font-family: var(--font-heading); font-size: 20px; font-weight: var(--fw-light); color: var(--c-ink); margin-top: 2px; }
+
+// ── Details form ──────────────────────────────────────────────────────────────
+
+.detailsForm { display: flex; flex-direction: column; gap: 20px; }
+
+.selectionSummary {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 12px 14px; background: var(--c-surface-2); border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+}
+
+.changeBtn {
+  background: none; border: none; cursor: pointer; font-family: var(--font-body); font-size: 13px;
+  color: var(--c-ink); font-weight: var(--fw-medium); padding: 0; text-decoration: underline;
+  text-underline-offset: 2px; text-decoration-color: var(--c-border-2);
+  &:hover { text-decoration-color: var(--c-ink); }
+}
+
+.arrowSep { color: var(--c-tertiary); }
+
+.formGrid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  @media (max-width: 540px) { grid-template-columns: 1fr; }
+}
+
+.formRow { display: flex; flex-direction: column; gap: 6px; }
+
+.label {
+  font-family: var(--font-body); font-size: 9px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--c-tertiary); font-weight: var(--fw-medium);
+}
+
+.checkLabel {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-body); font-size: 13px; color: var(--c-secondary); cursor: pointer;
+  input { cursor: pointer; }
+}
+
+.input {
+  width: 100%; height: 42px; background: var(--c-surface); border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm); padding: 0 12px; font-family: var(--font-body); font-size: 14px;
+  color: var(--c-ink); outline: none; box-sizing: border-box; transition: border-color var(--dur-fast);
+  &:focus { border-color: var(--c-border-2); }
+}
+
+.textarea {
+  width: 100%; background: var(--c-surface); border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm); padding: 10px 12px; font-family: var(--font-body); font-size: 14px;
+  color: var(--c-ink); outline: none; resize: vertical; line-height: 1.6; box-sizing: border-box;
+  transition: border-color var(--dur-fast);
+  &:focus { border-color: var(--c-border-2); }
+}
+
+.infoBox {
+  background: var(--c-surface-2); border: 1px solid var(--c-border); border-radius: var(--radius-sm);
+  padding: 12px 14px; font-family: var(--font-body); font-size: 12px; color: var(--c-secondary); line-height: 1.6;
+}
+
+.errorMsg {
+  padding: 10px 14px; background: var(--c-danger-bg); color: var(--c-danger);
+  border: 1px solid var(--c-danger); border-radius: var(--radius-sm);
+  font-family: var(--font-body); font-size: 13px;
+}
+
+.formActions { display: flex; align-items: center; gap: 12px; padding-top: 8px; }
+
+.btnPrimary {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--c-ink); color: var(--c-inverse); border: 1px solid var(--c-ink);
+  padding: 11px 24px; font-family: var(--font-body); font-size: 11px; font-weight: var(--fw-medium);
+  letter-spacing: 0.10em; text-transform: uppercase; cursor: pointer;
+  border-radius: var(--radius-sm); transition: opacity var(--dur-fast);
+  &:hover { opacity: 0.85; }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+.btnSecondary {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: transparent; color: var(--c-secondary); border: 1px solid var(--c-border);
+  padding: 11px 24px; font-family: var(--font-body); font-size: 11px; font-weight: var(--fw-medium);
+  letter-spacing: 0.10em; text-transform: uppercase; cursor: pointer;
+  border-radius: var(--radius-sm); text-decoration: none;
+  transition: border-color var(--dur-fast), color var(--dur-fast);
+  &:hover { border-color: var(--c-border-2); color: var(--c-ink); }
+}

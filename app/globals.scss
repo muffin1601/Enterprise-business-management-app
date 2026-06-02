@@ -170,8 +170,8 @@
   --sidebar-w:           224px;
   --sidebar-w-collapsed: 64px;
   --topbar-h:            64px;
-  --content-pad-x:       32px;
-  --content-pad-y:       32px;
+  --content-pad-x:       24px;
+  --content-pad-y:       24px;
   --z-base:      0;
   --z-dropdown:  100;
   --z-topbar:    100;
@@ -192,67 +192,179 @@
   :root { --dur-fast: 0ms; --dur-base: 0ms; --dur-slow: 0ms; }
 }
 
-// ── Quote print-only container (hidden on screen, shown only in @media print) ─
-#quote-print-area { display: none; }
+// ── Print-only containers (hidden on screen, revealed only when printing) ─────
+#quote-print-area    { display: none; }
+#so-print-area       { display: none; }
+#invoice-print-area  { display: none; }
+#po-print-area       { display: none; }
+#dc-print-area       { display: none; }
 
-// ── Quote preview A4 print ────────────────────────────────────────────────────
+// ── Shared A4 print styles ────────────────────────────────────────────────────
+// Applies to: Quotes (/quotes/[id]/preview)
+//             Sales Orders (/orders/[id]/preview)
+//             Invoices (/invoices/[id]/preview)
+//
+// Design intent:
+//   - @page sets physical A4 with generous margins on every sheet
+//   - .print-page is the content container: no fixed height, no box-shadow
+//   - Content flows naturally across pages; browser inserts page breaks
+//   - .location-block, tr, .sub-row are kept whole (no mid-block splits)
+//   - Dark background bars (black totals rows) print in colour
+// ─────────────────────────────────────────────────────────────────────────────
+
 @media print {
-  // @page margin = padding on EVERY physical page including overflow pages
-  @page { size: A4 portrait; margin: 10mm 12mm; }
+  // Physical page: A4, 15mm top/bottom margin, 12mm left/right
+  // This margin appears on EVERY printed sheet automatically
+  @page {
+    size: A4 portrait;
+    margin: 15mm 12mm;
+  }
 
+  // Reset browser chrome
   html, body {
     background: #ffffff !important;
     margin: 0 !important;
     padding: 0 !important;
     height: auto !important;
     overflow: visible !important;
+    font-size: 10pt !important;
   }
 
-  // Hide EVERYTHING — then selectively reveal only print area
+  // ── Hide everything, then reveal only the active print container ───────────
   body * { visibility: hidden !important; }
 
-  // Show only the dedicated print container and its children
-  #quote-print-area { display: block !important; visibility: visible !important; }
+  // Quotes
+  #quote-print-area {
+    display: block !important;
+    visibility: visible !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+  }
   #quote-print-area * { visibility: visible !important; }
 
-  // Selective printing (quote only / BOQ only / both)
+  // Sales Orders
+  #so-print-area {
+    display: block !important;
+    visibility: visible !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+  }
+  #so-print-area * { visibility: visible !important; }
+
+  // Purchase Orders
+  #po-print-area {
+    display: block !important;
+    visibility: visible !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+  }
+  #po-print-area * { visibility: visible !important; }
+
+  // Delivery Challans
+  #dc-print-area {
+    display: block !important;
+    visibility: visible !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+  }
+  #dc-print-area * { visibility: visible !important; }
+
+  // Invoices
+  #invoice-print-area {
+    display: block !important;
+    visibility: visible !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+  }
+  #invoice-print-area * { visibility: visible !important; }
+
+  // ── Quote selective printing (quote only / BOQ only / both) ───────────────
   body[data-print="quote"] #quote-print-area .boq-page   { display: none !important; }
   body[data-print="boq"]   #quote-print-area .quote-page { display: none !important; }
 
-  // Each A4 card — no padding here, @page margin handles all edges
+  // ── .print-page: the A4 content card ─────────────────────────────────────
+  // On screen: fixed 794px white card with shadow (set inline in components)
+  // On print:  full width, no shadow, no fixed height → content flows naturally
   .print-page {
     display: block !important;
-    width: 186mm !important;
-    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 0 !important;         // remove the screen 1123px min-height
+    height: auto !important;
+    padding: 0 !important;            // @page margin provides all whitespace
     margin: 0 !important;
     box-shadow: none !important;
+    border: none !important;
     background: #ffffff !important;
     box-sizing: border-box !important;
-    // NO page-break-after — only boq-page has page-break-before to separate sheets
+    overflow: visible !important;
+    page-break-inside: auto !important;
+    break-inside: auto !important;
   }
 
-  // BOQ page always starts on a fresh sheet
+  // BOQ page always starts on a fresh A4 sheet
   .boq-page {
     page-break-before: always !important;
     break-before: page !important;
   }
 
-  // Outer wrapper: no flex gap in print (gap creates phantom blank space)
-  #quote-print-area > div {
+  // Outer flex wrappers — collapse gap so no phantom blank space between cards
+  #quote-print-area > div,
+  #so-print-area > div,
+  #invoice-print-area > div {
     display: block !important;
     gap: 0 !important;
   }
 
-  // Keep location sections together — don't split across pages
-  .location-block { page-break-inside: avoid; break-inside: avoid; }
+  // ── Avoid breaking inside semantic content blocks ─────────────────────────
+  // Location / area sections — keep together where possible
+  .location-block {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
 
-  // Don't split table rows or subtotal rows
-  tr,
-  .sub-row { page-break-inside: avoid; break-inside: avoid; }
+  // Table rows and subtotal rows must never split mid-row
+  tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
 
-  // Print dark bars and colours correctly
+  .sub-row {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  // Keep the grand-total block with its preceding row
+  table tfoot {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  // Invoice items table — keep header row attached to first data row
+  thead {
+    display: table-header-group; // repeat header on each page
+  }
+
+  // ── Colour accuracy ───────────────────────────────────────────────────────
+  // Without this, dark background bars (black total rows) print as white
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
+  }
+
+  // ── Hide screen-only chrome ────────────────────────────────────────────────
+  .no-print {
+    display: none !important;
+    visibility: hidden !important;
   }
 }

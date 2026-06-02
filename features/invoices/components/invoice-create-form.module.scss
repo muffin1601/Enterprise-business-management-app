@@ -1,0 +1,184 @@
+// Invoice Create Form — same layout pattern as SO create form
+@use 'mixins' as *;
+
+.root {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  min-height: calc(100vh - 60px);
+  font-family: var(--font-body);
+
+  @include up(lg) { grid-template-columns: 1fr 1fr; }
+}
+
+.left {
+  border-right: 1px solid var(--c-border);
+  padding: 28px 28px 28px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: var(--c-bg);
+}
+
+.right {
+  padding: 28px 0 28px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sectionTitle {
+  font-family: var(--font-body);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-tertiary);
+  font-weight: var(--fw-medium);
+}
+
+// ── SO picker ─────────────────────────────────────────────────────────────────
+
+.pickerPanel { display: flex; flex-direction: column; gap: 12px; flex: 1; }
+
+.searchInput {
+  width: 100%; height: 44px;
+  border: 1px solid var(--c-border); border-radius: var(--radius-sm);
+  padding: 0 16px; background: var(--c-surface);
+  font-family: var(--font-body); font-size: 14px; color: var(--c-ink);
+  outline: none; transition: border-color var(--dur-fast);
+  &:focus { border-color: var(--c-border-2); }
+  &::placeholder { color: var(--c-tertiary); }
+}
+
+.pickerList {
+  display: flex; flex-direction: column; gap: 6px;
+  overflow-y: auto; flex: 1;
+  max-height: calc(100vh - 260px); min-height: 200px;
+}
+
+.pickerEmpty {
+  font-family: var(--font-body); font-size: 13px; color: var(--c-tertiary);
+  padding: 32px 0; text-align: center;
+}
+
+.soRow {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+  background: var(--c-surface); border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm); cursor: pointer; text-align: left; width: 100%;
+  transition: border-color var(--dur-fast), background var(--dur-fast);
+  &:hover { border-color: var(--c-border-2); }
+}
+
+.soRowSelected { border-color: var(--c-ink); background: var(--c-bg); }
+
+.soRowLeft { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
+.soRowRight { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+
+.soNo { font-family: var(--font-mono); font-size: 11px; color: var(--c-tertiary); letter-spacing: 0.06em; }
+.soCustomer { font-family: var(--font-body); font-size: 14px; font-weight: var(--fw-semibold); color: var(--c-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.soSubject { font-family: var(--font-body); font-size: 12px; color: var(--c-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.soStatus { font-family: var(--font-body); font-size: 9px; font-weight: var(--fw-semibold); letter-spacing: 0.08em; text-transform: uppercase; color: var(--c-tertiary); padding: 2px 7px; border: 1px solid var(--c-border); border-radius: 2px; background: var(--c-surface-2); }
+.soAmount { font-family: var(--font-mono); font-size: 13px; color: var(--c-ink); }
+.checkmark { font-size: 14px; color: var(--c-success); flex-shrink: 0; }
+
+.pickerPagination {
+  display: flex; align-items: center; justify-content: center; gap: 16px;
+  padding-top: 8px; font-family: var(--font-body); font-size: 12px; color: var(--c-secondary);
+  button {
+    padding: 5px 12px; border: 1px solid var(--c-border); border-radius: var(--radius-sm);
+    background: var(--c-surface); font-family: var(--font-body); font-size: 12px; cursor: pointer; color: var(--c-secondary);
+    transition: background var(--dur-fast);
+    &:hover:not(:disabled) { background: var(--c-surface-2); color: var(--c-ink); }
+    &:disabled { opacity: 0.4; cursor: not-allowed; }
+  }
+}
+
+// ── Selected banner ───────────────────────────────────────────────────────────
+
+.selectedBanner {
+  background: var(--c-bg); border: 1px solid var(--c-border);
+  border-left: 3px solid var(--c-ink); border-radius: var(--radius-sm);
+  padding: 16px 18px; display: flex; flex-direction: column; gap: 4px;
+}
+
+.selectedNo { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; color: var(--c-tertiary); }
+.selectedCustomer { font-family: var(--font-body); font-size: 16px; font-weight: var(--fw-semibold); color: var(--c-ink); }
+.selectedSubject { font-family: var(--font-body); font-size: 13px; color: var(--c-secondary); }
+.selectedAmount { font-family: var(--font-heading); font-size: 22px; font-weight: var(--fw-light); color: var(--c-ink); margin-top: 4px; }
+.selectedStatus { font-family: var(--font-body); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c-tertiary); }
+
+.noSelection {
+  font-family: var(--font-body); font-size: 13px; color: var(--c-tertiary);
+  padding: 20px; border: 1px dashed var(--c-border-2); border-radius: var(--radius-sm); text-align: center;
+}
+
+// ── Form fields ───────────────────────────────────────────────────────────────
+
+.formGrid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  @media (max-width: 540px) { grid-template-columns: 1fr; }
+}
+
+.formRow { display: flex; flex-direction: column; gap: 6px; }
+
+.label {
+  font-family: var(--font-body); font-size: 9px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--c-tertiary); font-weight: var(--fw-medium);
+}
+
+.checkLabel {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-body); font-size: 13px; color: var(--c-secondary); cursor: pointer;
+  input { cursor: pointer; }
+}
+
+.input {
+  width: 100%; height: 42px; background: var(--c-surface);
+  border: 1px solid var(--c-border); border-radius: var(--radius-sm);
+  padding: 0 12px; font-family: var(--font-body); font-size: 14px; color: var(--c-ink);
+  outline: none; box-sizing: border-box; transition: border-color var(--dur-fast);
+  &:focus { border-color: var(--c-border-2); }
+}
+
+.textarea {
+  width: 100%; background: var(--c-surface); border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm); padding: 10px 12px; font-family: var(--font-body);
+  font-size: 14px; color: var(--c-ink); outline: none; resize: vertical; line-height: 1.6;
+  box-sizing: border-box; transition: border-color var(--dur-fast);
+  &:focus { border-color: var(--c-border-2); }
+}
+
+.infoBox {
+  background: var(--c-surface-2); border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm); padding: 12px 14px;
+  font-family: var(--font-body); font-size: 12px; color: var(--c-secondary); line-height: 1.6;
+}
+
+.errorMsg {
+  padding: 10px 14px; background: var(--c-danger-bg); color: var(--c-danger);
+  border: 1px solid var(--c-danger); border-radius: var(--radius-sm);
+  font-family: var(--font-body); font-size: 13px;
+}
+
+.formActions { display: flex; align-items: center; gap: 12px; padding-top: 8px; }
+
+.btnPrimary {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--c-ink); color: var(--c-inverse); border: 1px solid var(--c-ink);
+  padding: 11px 24px; font-family: var(--font-body); font-size: 11px; font-weight: var(--fw-medium);
+  letter-spacing: 0.10em; text-transform: uppercase; cursor: pointer;
+  border-radius: var(--radius-sm); transition: opacity var(--dur-fast);
+  &:hover { opacity: 0.85; }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+.btnSecondary {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: transparent; color: var(--c-secondary); border: 1px solid var(--c-border);
+  padding: 11px 24px; font-family: var(--font-body); font-size: 11px; font-weight: var(--fw-medium);
+  letter-spacing: 0.10em; text-transform: uppercase; cursor: pointer;
+  border-radius: var(--radius-sm); text-decoration: none;
+  transition: border-color var(--dur-fast), color var(--dur-fast);
+  &:hover { border-color: var(--c-border-2); color: var(--c-ink); }
+}

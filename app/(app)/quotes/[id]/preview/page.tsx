@@ -120,8 +120,8 @@ export default async function QuotePreviewPage({
         </div>
       </div>
 
-      {/* ── Print-only: rendered in normal flow, hidden on screen ── */}
-      <div id="quote-print-area" aria-hidden="true">
+      {/* Print-only: flows naturally across A4 pages — shown by @media print */}
+      <div id="quote-print-area">
         <QuotePreviewView {...previewProps} />
       </div>
     </>

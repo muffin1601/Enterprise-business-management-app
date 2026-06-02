@@ -2,53 +2,56 @@ import Link from 'next/link'
 import type { Route } from 'next'
 import { notFound } from 'next/navigation'
 import { getActionContext } from '@/lib/auth/action-context'
-import { getAssignableRoles, getMemberDetail } from '@/features/admin/server/queries'
-import { UserDetail } from '@/features/admin/components/user-detail'
-import { Alert } from '@/components/ui'
-import styles from './page.module.scss'
+import {
+  getAssignableRoles, getMemberDetailEnriched, getMemberActivity,
+} from '@/features/admin/server/queries'
+import { MemberDetailView } from '@/features/admin/components/member-detail-view'
+import styles from '@/features/admin/components/team.module.scss'
 
-export const metadata = { title: 'User · Watcon' }
+export async function generateMetadata({ params }: { params: Promise<{ userId: string }> }) {
+  const { userId } = await params
+  const member = await getMemberDetailEnriched(userId)
+  return { title: member ? `${member.fullName || member.email} · Users · Watcon` : 'User · Watcon' }
+}
 
-/** User Detail + Edit (roles, status). Gated by `admin.users`. */
 export default async function UserDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ userId: string }>
+  searchParams: Promise<Record<string, string | undefined>>
 }) {
-  const { userId } = await params
-  const ctx = await getActionContext()
-  const canManage = ctx.has('admin.users')
+  const [{ userId }, sp] = await Promise.all([params, searchParams])
+  const activeTab = (sp.tab ?? 'profile') as 'profile' | 'access' | 'activity'
 
-  if (!canManage) {
-    return (
-      <main className={styles.main}>
-        <header className={styles.header}>
-          <h1>User</h1>
-          <Link href={'/users' as Route} className={styles.back}>← Users</Link>
-        </header>
-        <Alert tone="warning">You don&rsquo;t have permission to manage users.</Alert>
-      </main>
-    )
-  }
+  const ctx        = await getActionContext()
+  const canManage  = ctx.has('admin.users')
+  const isSelf     = ctx.userId === userId
 
-  const [member, assignableRoles] = await Promise.all([getMemberDetail(userId), getAssignableRoles()])
+  const [member, assignableRoles, activity] = await Promise.all([
+    getMemberDetailEnriched(userId),
+    canManage ? getAssignableRoles() : [],
+    activeTab === 'activity' ? getMemberActivity(userId) : [],
+  ])
+
   if (!member) notFound()
 
   return (
-    <main className={styles.main}>
-      <header className={styles.header}>
-        <h1>Manage member</h1>
-        <Link href={'/users' as Route} className={styles.back}>← Users</Link>
-      </header>
+    <main className={styles.page}>
+      <nav className={styles.breadcrumb}>
+        <Link href="/users" className={styles.breadcrumbLink}>Team & Users</Link>
+        <span className={styles.breadcrumbSep}>/</span>
+        <span>{member.fullName || member.email}</span>
+      </nav>
 
-      <div className={styles.grid}>
-        <UserDetail
-          member={member}
-          assignableRoles={assignableRoles}
-          canManage={canManage}
-          isSelf={member.userId === ctx.userId}
-        />
-      </div>
+      <MemberDetailView
+        member={member}
+        assignableRoles={assignableRoles}
+        activity={activity}
+        activeTab={activeTab}
+        canManage={canManage}
+        isSelf={isSelf}
+      />
     </main>
   )
 }

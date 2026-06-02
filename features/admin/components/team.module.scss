@@ -1,0 +1,274 @@
+// Team & Users module — Watcon Design System v2.
+@use 'mixins' as *;
+
+// ── Page ──────────────────────────────────────────────────────────────────────
+
+.page { display: flex; flex-direction: column; gap: 24px; font-family: var(--font-body); }
+
+.breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--c-tertiary); }
+.breadcrumbLink { color: var(--c-secondary); text-decoration: none; &:hover { color: var(--c-ink); text-decoration: underline; } }
+.breadcrumbSep { color: var(--c-border-2); }
+
+// ── Stats strip ───────────────────────────────────────────────────────────────
+
+.statsStrip {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  @include up(sm) { grid-template-columns: repeat(5, 1fr); }
+}
+
+.statCard {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  padding: 16px 18px;
+  &.stat_success { border-top: 3px solid var(--c-success); }
+  &.stat_warning { border-top: 3px solid var(--c-warning); }
+  &.stat_danger  { border-top: 3px solid var(--c-danger); }
+  &.stat_info    { border-top: 3px solid var(--c-info); }
+  &.stat_neutral { border-top: 3px solid var(--c-border-2); }
+}
+
+.statLabel { font-family: var(--font-body); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--c-tertiary); font-weight: var(--fw-medium); display: block; margin-bottom: 6px; }
+.statValue { font-family: var(--font-heading); font-size: 32px; font-weight: var(--fw-light); color: var(--c-ink); line-height: 1; display: block; }
+
+// ── Section header ────────────────────────────────────────────────────────────
+
+.sectionHeader { display: flex; align-items: center; justify-content: space-between; }
+.sectionTitle  { font-family: var(--font-body); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-tertiary); font-weight: var(--fw-medium); }
+.rolesLink     { font-family: var(--font-body); font-size: 12px; color: var(--c-secondary); text-decoration: none; &:hover { color: var(--c-ink); } }
+
+// ── Member card grid ──────────────────────────────────────────────────────────
+
+.memberGrid { display: grid; grid-template-columns: 1fr; gap: 10px; @include up(lg) { grid-template-columns: 1fr 1fr; } }
+
+.memberCard {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
+  &:hover { border-color: var(--c-border-2); box-shadow: 0 2px 12px rgba(17,17,17,0.06); }
+}
+
+.memberInactive { opacity: 0.65; }
+
+.memberLink {
+  display: flex; align-items: center; gap: 14px; padding: 16px 18px;
+  text-decoration: none; color: inherit; flex: 1; min-width: 0;
+}
+
+.memberAvatar {
+  width: 44px; height: 44px; border-radius: var(--radius-full);
+  background: var(--c-ink); color: var(--c-inverse);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-body); font-size: 14px; font-weight: var(--fw-medium);
+  letter-spacing: 0.03em; flex-shrink: 0; text-transform: uppercase;
+}
+
+.memberAvatarLg {
+  width: 56px; height: 56px; border-radius: var(--radius-full);
+  background: var(--c-ink); color: var(--c-inverse);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-body); font-size: 18px; font-weight: var(--fw-medium);
+  flex-shrink: 0; text-transform: uppercase;
+}
+
+.memberAvatarInactive { background: var(--c-tertiary); }
+
+.memberInfo { flex: 1; min-width: 0; }
+.memberName  { font-family: var(--font-body); font-size: var(--fs-600); font-weight: var(--fw-semibold); color: var(--c-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.memberEmail { font-family: var(--font-body); font-size: 11px; color: var(--c-tertiary); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.memberRoles { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.noRole { font-family: var(--font-body); font-size: 10px; color: var(--c-tertiary); font-style: italic; }
+
+.memberStatusCol { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; padding: 16px 12px; flex-shrink: 0; }
+.statusDot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dotActive   { background: var(--c-success); }
+.dotInactive { background: var(--c-tertiary); }
+.statusLabel { font-family: var(--font-body); font-size: 10px; color: var(--c-secondary); letter-spacing: 0.04em; }
+.joinedDate  { font-family: var(--font-body); font-size: 10px; color: var(--c-tertiary); }
+
+.memberActions { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 8px 10px; border-left: 1px solid var(--c-border); background: var(--c-bg); }
+.actionBtn { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: var(--radius-sm); background: none; border: none; cursor: pointer; color: var(--c-tertiary); transition: color var(--dur-fast), background var(--dur-fast); &:hover { color: var(--c-ink); background: var(--c-surface-2); } }
+.actionBtnDanger { &:hover { color: var(--c-danger); background: var(--c-danger-bg); } }
+
+// ── Role badges ───────────────────────────────────────────────────────────────
+
+.roleBadge    { font-family: var(--font-body); font-size: 9px; font-weight: var(--fw-semibold); letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 7px; border-radius: 2px; white-space: nowrap; }
+.roleOwner    { background: #0a0a0a; color: #ffffff; }
+.roleManager  { background: #e8f0fa; color: #1a5ba0; }
+.roleDefault  { background: var(--c-surface-2); color: var(--c-secondary); border: 1px solid var(--c-border); }
+.ownerBadge   { font-family: var(--font-body); font-size: 9px; font-weight: var(--fw-semibold); letter-spacing: 0.10em; text-transform: uppercase; padding: 2px 8px; border-radius: 2px; background: var(--c-ink); color: var(--c-inverse); margin-left: 8px; }
+
+// ── Invitations panel ─────────────────────────────────────────────────────────
+
+.invPanel { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius-sm); overflow: hidden; }
+.invPanelHeader { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--c-bg); border-bottom: 1px solid var(--c-border); }
+.invPanelTitle  { display: flex; align-items: center; gap: 8px; font-family: var(--font-body); font-size: 13px; font-weight: var(--fw-semibold); color: var(--c-ink); }
+.invBadge { background: var(--c-info); color: white; border-radius: 10px; padding: 1px 7px; font-size: 10px; font-weight: 700; }
+.invSection { padding: 12px 18px; border-bottom: 1px solid var(--c-border); &:last-child { border-bottom: none; } }
+.invSectionLabel { font-family: var(--font-body); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--c-tertiary); font-weight: var(--fw-medium); margin-bottom: 8px; }
+.invRow { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--c-border); flex-wrap: wrap; &:last-child { border-bottom: none; } }
+.invExpired { opacity: 0.6; }
+.invInfo { flex: 1; min-width: 0; }
+.invEmail { font-family: var(--font-body); font-size: 13px; font-weight: var(--fw-medium); color: var(--c-ink); display: block; }
+.invMeta  { font-family: var(--font-body); font-size: 11px; color: var(--c-tertiary); margin-top: 2px; display: block; }
+.invActions { display: flex; gap: 6px; flex-shrink: 0; }
+.invBtn { padding: 4px 10px; border: 1px solid var(--c-border); border-radius: var(--radius-sm); background: var(--c-surface); font-family: var(--font-body); font-size: 11px; cursor: pointer; color: var(--c-secondary); transition: background var(--dur-fast); &:hover { background: var(--c-surface-2); color: var(--c-ink); } }
+.invBtnDanger { color: var(--c-danger); border-color: var(--c-danger); &:hover { background: var(--c-danger-bg); } }
+.invLinkRow { width: 100%; display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+.invLink    { font-family: var(--font-mono); font-size: 10px; color: var(--c-tertiary); background: var(--c-surface-2); padding: 4px 8px; border-radius: 3px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.invCopyBtn { padding: 4px 10px; background: var(--c-ink); color: var(--c-inverse); border: none; border-radius: var(--radius-sm); font-family: var(--font-body); font-size: 10px; cursor: pointer; flex-shrink: 0; }
+
+// ── Bulk invite form ──────────────────────────────────────────────────────────
+
+.bulkToggleBtn { display: inline-flex; align-items: center; gap: 5px; padding: 8px 14px; background: transparent; border: 1px solid var(--c-border); border-radius: var(--radius-sm); font-family: var(--font-body); font-size: 11px; font-weight: var(--fw-medium); letter-spacing: 0.05em; color: var(--c-secondary); cursor: pointer; transition: background var(--dur-fast), color var(--dur-fast); &:hover { background: var(--c-surface-2); color: var(--c-ink); } }
+.bulkForm   { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius-sm); padding: 18px; display: flex; flex-direction: column; gap: 14px; min-width: 320px; }
+.bulkHeader { display: flex; align-items: center; justify-content: space-between; }
+.bulkTitle  { font-family: var(--font-body); font-size: 14px; font-weight: var(--fw-semibold); color: var(--c-ink); }
+.closeBtn   { background: none; border: none; cursor: pointer; color: var(--c-tertiary); font-size: 18px; padding: 2px; &:hover { color: var(--c-ink); } }
+.bulkTextarea { width: 100%; background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius-sm); padding: 10px 12px; font-family: var(--font-mono); font-size: 12px; color: var(--c-ink); outline: none; resize: vertical; line-height: 1.6; box-sizing: border-box; &:focus { border-color: var(--c-border-2); } }
+.bulkResult    { display: flex; flex-direction: column; gap: 6px; }
+.bulkResultOk  { font-family: var(--font-body); font-size: 13px; color: var(--c-success); }
+.bulkResultSkip{ font-family: var(--font-body); font-size: 12px; color: var(--c-warning); }
+
+// ── Form fields (shared) ──────────────────────────────────────────────────────
+
+.formRow    { display: flex; flex-direction: column; gap: 5px; }
+.formLabel  { font-family: var(--font-body); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--c-tertiary); font-weight: var(--fw-medium); }
+.formInput  { width: 100%; height: 40px; background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius-sm); padding: 0 12px; font-family: var(--font-body); font-size: 13px; color: var(--c-ink); outline: none; box-sizing: border-box; transition: border-color var(--dur-fast); &:focus { border-color: var(--c-border-2); } }
+.formSelect { width: 100%; height: 40px; background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius-sm); padding: 0 12px; font-family: var(--font-body); font-size: 13px; color: var(--c-ink); outline: none; appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23ABABAB' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; &:focus { border-color: var(--c-border-2); } }
+.formGrid   { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; @media (max-width:540px) { grid-template-columns: 1fr; } }
+.formError  { font-family: var(--font-body); font-size: 11px; color: var(--c-danger); }
+.inlineError { font-family: var(--font-body); font-size: 11px; color: var(--c-danger); }
+.formActions{ display: flex; align-items: center; gap: 10px; }
+
+.btnPrimary { display: inline-flex; align-items: center; gap: 5px; background: var(--c-ink); color: var(--c-inverse); border: 1px solid var(--c-ink); padding: 8px 18px; font-family: var(--font-body); font-size: 11px; font-weight: var(--fw-medium); letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; border-radius: var(--radius-sm); transition: opacity var(--dur-fast); &:hover { opacity: 0.85; } &:disabled { opacity: 0.4; cursor: not-allowed; } }
+.btnSecondary { display: inline-flex; align-items: center; gap: 5px; background: transparent; color: var(--c-secondary); border: 1px solid var(--c-border); padding: 8px 18px; font-family: var(--font-body); font-size: 11px; font-weight: var(--fw-medium); letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; border-radius: var(--radius-sm); text-decoration: none; transition: border-color var(--dur-fast), color var(--dur-fast); &:hover { border-color: var(--c-border-2); color: var(--c-ink); } }
+.btnPrimarySmall { padding: 4px 12px; background: var(--c-ink); color: var(--c-inverse); border: none; border-radius: var(--radius-sm); font-family: var(--font-body); font-size: 11px; cursor: pointer; }
+.btnSecondarySmall { padding: 4px 10px; background: transparent; color: var(--c-secondary); border: 1px solid var(--c-border); border-radius: var(--radius-sm); font-family: var(--font-body); font-size: 11px; cursor: pointer; }
+
+// ── Roles page ────────────────────────────────────────────────────────────────
+
+.rolesShell { display: grid; grid-template-columns: 1fr; gap: 20px; @include up(lg) { grid-template-columns: 220px 1fr; } align-items: start; }
+
+.rolesSidebar { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius-sm); overflow: hidden; position: sticky; top: 80px; }
+.rolesSidebarHeader { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: var(--c-bg); border-bottom: 1px solid var(--c-border); }
+.rolesSidebarTitle { font-family: var(--font-body); font-size: 11px; letter-spacing: 0.10em; text-transform: uppercase; color: var(--c-tertiary); font-weight: var(--fw-medium); }
+.addRoleBtn { display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: var(--radius-sm); background: none; border: 1px solid var(--c-border); cursor: pointer; color: var(--c-secondary); transition: background var(--dur-fast), color var(--dur-fast); &:hover { background: var(--c-surface-2); color: var(--c-ink); } }
+.roleGroup { padding: 8px 0; border-bottom: 1px solid var(--c-border); &:last-child { border-bottom: none; } }
+.roleGroupLabel { font-family: var(--font-body); font-size: 8px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--c-tertiary); font-weight: var(--fw-medium); padding: 4px 16px 6px; display: block; }
+.roleItem    { display: flex; align-items: center; padding: 0; }
+.roleItemBtn { display: flex; align-items: center; gap: 8px; padding: 9px 16px; flex: 1; background: transparent; border: none; cursor: pointer; text-align: left; transition: background var(--dur-fast); &:hover { background: var(--c-surface-2); } }
+.roleItemActive .roleItemBtn { background: var(--c-bg); }
+.roleItemActive { background: var(--c-bg); }
+.roleColorDot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.roleItemName { font-family: var(--font-body); font-size: 13px; color: var(--c-ink); flex: 1; }
+.roleItemCount { font-family: var(--font-mono); font-size: 10px; color: var(--c-tertiary); background: var(--c-surface-2); padding: 1px 6px; border-radius: 10px; }
+.roleDeleteBtn { padding: 6px 10px; background: none; border: none; cursor: pointer; color: var(--c-tertiary); &:hover { color: var(--c-danger); } }
+.createRoleForm { padding: 10px 16px; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--c-border); background: var(--c-surface-2); }
+.inlineInput { width: 100%; height: 32px; background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius-sm); padding: 0 8px; font-family: var(--font-body); font-size: 12px; color: var(--c-ink); outline: none; box-sizing: border-box; &:focus { border-color: var(--c-border-2); } }
+.colorPicker { width: 32px; height: 32px; border: none; padding: 0; cursor: pointer; background: none; }
+.createFirstRole { display: flex; align-items: center; gap: 6px; width: 100%; padding: 10px 16px; background: none; border: none; cursor: pointer; font-family: var(--font-body); font-size: 12px; color: var(--c-tertiary); transition: color var(--dur-fast); &:hover { color: var(--c-ink); } }
+
+// ── Permission matrix ─────────────────────────────────────────────────────────
+
+.rolesMain { }
+
+.matrix { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius-sm); overflow: hidden; }
+.matrixHeader { display: flex; align-items: flex-start; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid var(--c-border); background: var(--c-bg); gap: 12px; flex-wrap: wrap; }
+.matrixRoleName { font-family: var(--font-heading); font-size: 20px; font-weight: var(--fw-light); color: var(--c-ink); }
+.matrixRoleSub  { font-family: var(--font-body); font-size: 12px; color: var(--c-tertiary); margin-top: 3px; }
+.matrixBody { padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+.matrixModule { display: flex; flex-direction: column; gap: 8px; }
+.matrixModuleHeader { display: flex; align-items: center; justify-content: space-between; padding-bottom: 6px; border-bottom: 1px solid var(--c-border); }
+.matrixModuleName { font-family: var(--font-body); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--c-secondary); font-weight: var(--fw-semibold); }
+.matrixModuleActions { display: flex; gap: 6px; }
+.moduleToggleBtn { padding: 2px 10px; border-radius: 2px; font-family: var(--font-body); font-size: 10px; letter-spacing: 0.04em; cursor: pointer; border: none; }
+.moduleToggleGrant { background: var(--c-success-bg); color: var(--c-success); }
+.moduleToggleDeny  { background: var(--c-danger-bg);  color: var(--c-danger); }
+.matrixPermGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; }
+.permItem { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid var(--c-border); border-radius: var(--radius-sm); cursor: pointer; transition: border-color var(--dur-fast), background var(--dur-fast); &:hover:not(.permReadOnly) { border-color: var(--c-border-2); background: var(--c-surface-2); } }
+.permGranted   { border-color: var(--c-success) !important; background: var(--c-success-bg); }
+.permReadOnly  { cursor: default !important; opacity: 0.7; }
+.permToggle    { width: 32px; height: 18px; border-radius: 9px; background: var(--c-border-2); position: relative; flex-shrink: 0; transition: background var(--dur-fast); cursor: pointer; }
+.permToggleOn  { background: var(--c-success) !important; }
+.permToggleKnob { width: 14px; height: 14px; border-radius: 50%; background: white; position: absolute; top: 2px; left: 2px; transition: left var(--dur-fast); box-shadow: 0 1px 2px rgba(0,0,0,0.2); .permToggleOn & { left: 16px; } }
+.permLabel  { display: flex; flex-direction: column; min-width: 0; }
+.permShort  { font-family: var(--font-body); font-size: 11px; font-weight: var(--fw-medium); color: var(--c-ink); text-transform: capitalize; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.permKey    { font-family: var(--font-mono); font-size: 9px; color: var(--c-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dirtyBanner { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: #fdf3e3; border-bottom: 1px solid #f0c860; font-family: var(--font-body); font-size: 12px; color: #c4861a; }
+
+// ── Effective permissions ─────────────────────────────────────────────────────
+
+.effectivePerms { display: flex; flex-direction: column; gap: 16px; }
+.effectivePermsHeader { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.effectivePermsRoles  { font-family: var(--font-body); font-size: 12px; color: var(--c-secondary); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.effectiveCount { font-family: var(--font-mono); font-size: 11px; color: var(--c-tertiary); }
+.effectiveModules { display: flex; flex-direction: column; gap: 12px; }
+.effectiveModule { }
+.effectiveModLabel { font-family: var(--font-body); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--c-tertiary); font-weight: var(--fw-medium); margin-bottom: 6px; }
+.effectivePermList { display: flex; flex-wrap: wrap; gap: 6px; }
+.permChip { font-family: var(--font-body); font-size: 9px; font-weight: var(--fw-medium); padding: 3px 8px; border-radius: 2px; letter-spacing: 0.04em; white-space: nowrap; }
+.permChipGranted { background: var(--c-success-bg); color: var(--c-success); }
+.permChipDenied  { background: var(--c-surface-2); color: var(--c-tertiary); opacity: 0.5; }
+
+// ── Member detail ─────────────────────────────────────────────────────────────
+
+.memberDetailWrap   { display: flex; flex-direction: column; gap: 20px; }
+.memberDetailHeader { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; flex-wrap: wrap; padding: 20px; background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius-sm); }
+.memberDetailLeft   { display: flex; align-items: flex-start; gap: 16px; flex: 1; }
+.memberDetailName   { font-family: var(--font-heading); font-size: 22px; font-weight: var(--fw-light); color: var(--c-ink); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.memberDetailEmail  { font-family: var(--font-body); font-size: 13px; color: var(--c-tertiary); margin-top: 3px; }
+.memberDetailJob    { font-family: var(--font-body); font-size: 12px; color: var(--c-secondary); margin-top: 3px; }
+.memberDetailMeta   { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 8px; font-family: var(--font-body); font-size: 12px; color: var(--c-tertiary); }
+.memberDetailRoles  { display: flex; gap: 4px; flex-wrap: wrap; }
+.memberDetailActions{ display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+// ── Tabs ──────────────────────────────────────────────────────────────────────
+
+.tabs { display: flex; border-bottom: 1px solid var(--c-border); overflow-x: auto; }
+.tab  { padding: 10px 18px; font-family: var(--font-body); font-size: 12px; font-weight: var(--fw-medium); letter-spacing: 0.04em; color: var(--c-secondary); background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; transition: color var(--dur-fast); &:hover { color: var(--c-ink); } }
+.tabActive { color: var(--c-ink); border-bottom-color: var(--c-ink); }
+.tabContent { min-height: 200px; }
+
+// ── Profile tab ───────────────────────────────────────────────────────────────
+
+.profileTab    { display: flex; flex-direction: column; gap: 16px; }
+.profileForm   { display: flex; flex-direction: column; gap: 16px; max-width: 560px; }
+.profileInfo   { display: flex; flex-direction: column; gap: 4px; }
+.infoGrid      { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; @media (max-width:540px) { grid-template-columns: 1fr; } }
+.infoItem      { display: flex; flex-direction: column; gap: 3px; }
+.infoLabel     { font-family: var(--font-body); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--c-tertiary); font-weight: var(--fw-medium); }
+.infoValue     { font-family: var(--font-body); font-size: 13px; color: var(--c-ink); }
+
+// ── Access tab ────────────────────────────────────────────────────────────────
+
+.accessTab { display: flex; flex-direction: column; gap: 24px; }
+
+// ── Activity ──────────────────────────────────────────────────────────────────
+
+.activityTimeline { display: flex; flex-direction: column; }
+.activityItem { display: flex; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--c-border); &:last-child { border-bottom: none; } }
+.activityDot  { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.activityContent { display: flex; flex-direction: column; gap: 3px; }
+.activityTitle   { font-family: var(--font-body); font-size: 13px; color: var(--c-ink); }
+.activityRef     { color: var(--c-tertiary); font-weight: 400; }
+.activityBadge   { font-family: var(--font-body); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; padding: 1px 6px; border-radius: 2px; background: var(--c-surface-2); color: var(--c-secondary); margin-left: 6px; }
+.activityMeta    { font-family: var(--font-body); font-size: 11px; color: var(--c-tertiary); }
+
+// ── Empty state ───────────────────────────────────────────────────────────────
+
+.emptyState { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 24px; text-align: center; gap: 8px; }
+.emptyTitle { font-family: var(--font-heading); font-size: 20px; font-weight: var(--fw-light); color: var(--c-ink); }
+.emptySub   { font-family: var(--font-body); font-size: 13px; color: var(--c-tertiary); }
+
+// ── Flash messages ────────────────────────────────────────────────────────────
+
+.flashMsg { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-radius: var(--radius-sm); font-family: var(--font-body); font-size: 13px; gap: 12px; button { background: none; border: none; cursor: pointer; font-size: 16px; line-height: 1; opacity: 0.6; &:hover { opacity: 1; } } }
+.flashOk  { background: var(--c-success-bg); color: var(--c-success); border: 1px solid var(--c-success); }
+.flashErr { background: var(--c-danger-bg);  color: var(--c-danger);  border: 1px solid var(--c-danger); }

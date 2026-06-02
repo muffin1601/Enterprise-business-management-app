@@ -1,10 +1,14 @@
 import { notFound, redirect } from 'next/navigation'
 import type { Metadata } from 'next'
+import Link from 'next/link'
+import type { Route } from 'next'
 import { getActionContext } from '@/lib/auth/action-context'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { getActiveOrgId } from '@/lib/auth/session'
 import { QuoteEditor } from '@/features/quotes/components/quote-editor'
 import type { QuoteDetail, CustomerRef, ItemRef } from '@/features/quotes/components/quote-editor'
+import { getLinkedSoForQuote } from '@/features/sales-orders/server/queries'
+import { QuoteAcceptedSoBanner } from '@/features/quotes/components/quote-accepted-so-banner'
 
 export const dynamic = 'force-dynamic'
 
@@ -145,6 +149,7 @@ export default async function QuoteEditPage({ params }: { params: Promise<{ id: 
   })
 
   const isReadOnly = raw.status === 'accepted' || raw.status === 'cancelled'
+  const linkedSo   = raw.status === 'accepted' ? await getLinkedSoForQuote(id) : null
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -153,10 +158,17 @@ export default async function QuoteEditPage({ params }: { params: Promise<{ id: 
           padding: '10px 20px', background: 'var(--c-warning-bg)',
           borderBottom: '1px solid var(--c-warning)', flexShrink: 0,
           fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--c-warning)',
-          display: 'flex', alignItems: 'center', gap: 8,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8,
         }}>
-          <strong>{raw.status === 'accepted' ? 'Accepted' : 'Cancelled'}</strong>
-          — This quote is locked. Changes will not be saved. Use Revise to create a new version.
+          <span>
+            <strong>{raw.status === 'accepted' ? 'Accepted' : 'Cancelled'}</strong>
+            {raw.status === 'accepted'
+              ? ' — This quote is accepted and locked. Use Revise to create a new version.'
+              : ' — This quote is locked. Changes will not be saved. Use Revise to create a new version.'}
+          </span>
+          {raw.status === 'accepted' && ctx.has('sales_orders.create') && (
+            <QuoteAcceptedSoBanner quoteId={id} linkedSo={linkedSo} />
+          )}
         </div>
       )}
       <QuoteEditor quote={quote} customers={customers} items={items} canEdit={!isReadOnly} />

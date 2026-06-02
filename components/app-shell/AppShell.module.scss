@@ -334,6 +334,8 @@
   flex: 1;
   padding: var(--content-pad-y) var(--content-pad-x) 48px;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 // ── Mobile overlay ────────────────────────────────────────────────────────────

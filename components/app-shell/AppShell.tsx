@@ -118,8 +118,8 @@ export function AppShell({ userName, orgName, children }: Props) {
             <Image
               src="/logo2.png"
               alt="Watcon"
-              width={140}
-              height={48}
+              width={120}
+              height={38}
               className={styles.brandLogo}
               priority
             />

@@ -1,36 +1,70 @@
-import { getActionContext } from '@/lib/auth/action-context'
-import { listMembers } from '@/features/admin/server/queries'
-import { UserList } from '@/features/admin/components/user-list'
-import { Alert, Button } from '@/components/ui'
+import { Suspense } from 'react'
 import Link from 'next/link'
-import styles from './page.module.scss'
+import type { Route } from 'next'
+import { getActionContext } from '@/lib/auth/action-context'
+import {
+  listMembers, listAllInvitations, getAssignableRoles, getTeamStats,
+} from '@/features/admin/server/queries'
+import { TeamStats }        from '@/features/admin/components/team-stats'
+import { MemberCards }      from '@/features/admin/components/member-cards'
+import { InvitationsPanel } from '@/features/admin/components/invitations-panel'
+import { BulkInviteForm }   from '@/features/admin/components/bulk-invite-form'
+import { PageActions }      from '@/components/app-shell/page-actions'
+import styles from '@/features/admin/components/team.module.scss'
 
-export const metadata = { title: 'Users · Watcon' }
+export const metadata = { title: 'Team & Users · Watcon' }
 
 export default async function UsersPage() {
-  const ctx = await getActionContext()
+  const ctx       = await getActionContext()
   const canManage = ctx.has('admin.users')
 
-  return (
-    <main className={styles.main}>
-      <header className={styles.header}>
-        <div className={styles.titleGroup}>
-          <div className={styles.title}>Users</div>
-          <div className={styles.subtitle}>People in your organization.</div>
-        </div>
-        <div className={styles.headerActions}>
-          {canManage && (
-            <Link href="/settings/team">
-              <Button variant="ghost" size="sm">Invite member</Button>
-            </Link>
-          )}
-        </div>
-      </header>
+  const [members, stats, invitations, roles] = await Promise.all([
+    listMembers(),
+    getTeamStats(),
+    canManage ? listAllInvitations() : Promise.resolve([]),
+    canManage ? getAssignableRoles() : Promise.resolve([]),
+  ])
 
-      {canManage ? (
-        <UserList members={await listMembers()} />
-      ) : (
-        <Alert tone="warning">You don&apos;t have permission to manage users.</Alert>
+  return (
+    <main className={styles.page}>
+      {canManage && (
+        <PageActions>
+          <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+            {roles.length > 0 && <BulkInviteForm roles={roles} />}
+            <Link
+              href="/settings/team"
+              style={{
+                display:'inline-flex', alignItems:'center', gap:6,
+                background:'var(--c-ink)', color:'var(--c-inverse)',
+                border:'1px solid var(--c-ink)', padding:'8px 18px',
+                fontFamily:'var(--font-body)', fontSize:11, fontWeight:500,
+                letterSpacing:'0.10em', textTransform:'uppercase',
+                textDecoration:'none', borderRadius:'var(--radius-sm)',
+              }}
+            >
+              + Invite Member
+            </Link>
+          </div>
+        </PageActions>
+      )}
+
+      <TeamStats stats={stats} />
+
+      <div className={styles.sectionHeader}>
+        <div className={styles.sectionTitle}>Team Members</div>
+        {canManage && (
+          <Link href={'/users/roles' as Route} className={styles.rolesLink}>
+            Manage Roles →
+          </Link>
+        )}
+      </div>
+
+      <Suspense>
+        <MemberCards members={members} canManage={canManage} />
+      </Suspense>
+
+      {canManage && invitations.length > 0 && (
+        <InvitationsPanel invitations={invitations} canManage={canManage} />
       )}
     </main>
   )
