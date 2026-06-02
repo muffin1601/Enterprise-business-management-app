@@ -113,7 +113,7 @@ export function InvoicePreviewPrintBar({ invId, invNo }: { invId: string; invNo:
 interface Props { inv: InvoiceDetail; orgName: string; orgAddress?: string; orgGstin?: string }
 
 export function InvoicePreview({ inv, orgName, orgAddress, orgGstin }: Props) {
-  const today    = new Date().toISOString().split('T')[0]
+  const today    = new Date().toISOString().split('T')[0]!
   const isOverdue = !!(inv.dueDate && inv.dueDate < today && ['issued','partially_paid'].includes(inv.status))
 
   return (

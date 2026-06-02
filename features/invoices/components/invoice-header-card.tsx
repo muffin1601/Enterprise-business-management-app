@@ -14,7 +14,7 @@ const fmtDate = (s: string | null | undefined) =>
   s ? new Date(s).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'
 
 export function InvoiceHeaderCard({ inv }: { inv: InvoiceDetail }) {
-  const today    = new Date().toISOString().split('T')[0]
+  const today    = new Date().toISOString().split('T')[0]!
   const isOverdue = !!(inv.dueDate && inv.dueDate < today && ['issued','partially_paid'].includes(inv.status))
 
   return (

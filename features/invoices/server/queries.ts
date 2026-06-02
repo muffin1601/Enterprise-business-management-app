@@ -148,7 +148,7 @@ export async function listInvoices(filter: InvoiceFilter): Promise<InvoicePage> 
   const ps = INV_PAGE_SIZE
   if (!orgId) return { rows: [], total: 0, page: 1, pageSize: ps, totalPages: 0 }
 
-  const today = new Date().toISOString().split('T')[0]
+  const today = new Date().toISOString().split('T')[0]!
 
   let q = supabase
     .from('invoices')
@@ -373,7 +373,7 @@ export async function getInvoiceStats(): Promise<InvoiceStats> {
   const { orgId, supabase } = await ctx()
   if (!orgId) return { total:0, draft:0, issued:0, paid:0, partiallyPaid:0, cancelled:0, overdue:0, totalValue:0, totalOutstanding:0 }
 
-  const today = new Date().toISOString().split('T')[0]
+  const today = new Date().toISOString().split('T')[0]!
 
   const { data } = await supabase
     .from('invoices')

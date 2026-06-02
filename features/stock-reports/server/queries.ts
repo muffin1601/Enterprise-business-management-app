@@ -458,7 +458,7 @@ export async function getMovementLedger(filter: StockReportFilter): Promise<{ ro
       const isAdd = r.type === 'add'
       movements.push({
         id:         r.id as string,
-        date:       (r.at as string).split('T')[0],
+        date:       (r.at as string).split('T')[0]!,
         itemId:     r.item_id as string | null,
         itemName:   item?.name ?? 'Unknown',
         sku:        item?.sku ?? null,
