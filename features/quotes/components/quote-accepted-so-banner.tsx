@@ -41,19 +41,22 @@ export function QuoteAcceptedSoBanner({ quoteId, linkedSo }: Props) {
     <Link
       href={`/orders/new?quoteId=${quoteId}` as Route}
       style={{
-        display:       'inline-flex',
-        alignItems:    'center',
-        gap:           6,
-        padding:       '4px 14px',
-        background:    '#1d4ed8',
-        color:         '#fff',
-        border:        'none',
-        borderRadius:  4,
-        fontSize:      12,
-        fontWeight:    600,
-        whiteSpace:    'nowrap',
-        flexShrink:    0,
-        textDecoration:'none',
+        display:        'inline-flex',
+        alignItems:     'center',
+        gap:            6,
+        padding:        '6px 16px',
+        background:     'var(--c-fg, #111)',
+        color:          'var(--c-bg, #fff)',
+        border:         '1px solid var(--c-fg, #111)',
+        borderRadius:   2,
+        fontSize:       11,
+        fontWeight:     600,
+        letterSpacing:  '0.08em',
+        textTransform:  'uppercase' as const,
+        whiteSpace:     'nowrap',
+        flexShrink:     0,
+        textDecoration: 'none',
+        cursor:         'pointer',
       }}
     >
       + Create Sales Order

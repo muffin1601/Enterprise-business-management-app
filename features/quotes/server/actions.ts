@@ -508,9 +508,6 @@ export async function upsertQuoteLocations(
     locationIds.push(row.id as string)
   }
 
-  // Recalculate totals
-  await calculateQuoteTotals(supabase, quoteId, r.c.orgId)
-
   revalAll(quoteId)
   return ok({ locationIds })
 }
@@ -585,9 +582,17 @@ export async function upsertQuoteItems(
     .update({ material_subtotal: locMaterialSubtotal, location_total: locationTotal })
     .eq('id', locationId)
 
-  // Recalculate quote grand totals
-  await calculateQuoteTotals(supabase, quoteId, r.c.orgId)
+  revalAll(quoteId)
+  return ok(undefined)
+}
 
+// ── recalcQuoteTotals ─────────────────────────────────────────────────────────
+
+export async function recalcQuoteTotals(quoteId: string): Promise<ActionResult<void>> {
+  const r = await ctxOrErr(); if ('error' in r) return r.error
+  if (!r.c.has('quotes.edit')) return err('forbidden', 'Missing quotes.edit permission.')
+  const supabase = await createSupabaseServerClient()
+  await calculateQuoteTotals(supabase, quoteId, r.c.orgId)
   revalAll(quoteId)
   return ok(undefined)
 }

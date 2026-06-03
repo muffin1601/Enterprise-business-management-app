@@ -13,6 +13,7 @@ import {
   updateQuote,
   upsertQuoteLocations,
   upsertQuoteItems,
+  recalcQuoteTotals,
   updateQuoteStatus,
   reviseQuote,
   type QuoteStatus,
@@ -493,17 +494,23 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
 
   // ── Auto-save state ─────────────────────────────────────────────────────────
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
-  const debounceRef  = useRef<NodeJS.Timeout>(undefined)
-  const isFirstRender = useRef(true)
-  const isSavingRef   = useRef(false)   // prevent concurrent saves
+  const debounceRef    = useRef<NodeJS.Timeout>(undefined)
+  const isFirstRender  = useRef(true)
+  const isSavingRef    = useRef(false)   // prevent concurrent saves
+  const needsResaveRef = useRef(false)   // a save was skipped while saving was in progress
+  const saveAllRef     = useRef<() => Promise<void>>(() => Promise.resolve())
 
   // ── Totals (derived) ────────────────────────────────────────────────────────
   const totals = calculateTotals(locations, gstMode, gstPct, transport)
 
   // ── Save logic ──────────────────────────────────────────────────────────────
   const saveAll = useCallback(async () => {
-    if (isSavingRef.current) return   // already saving — skip
+    if (isSavingRef.current) {
+      needsResaveRef.current = true   // debounce fired while saving — retry after
+      return
+    }
     isSavingRef.current = true
+    needsResaveRef.current = false
     setSaveStatus('saving')
     try {
       // 1. Save meta
@@ -572,6 +579,9 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
         }
       }
 
+      // Recalculate totals once after all locations and items are saved
+      await recalcQuoteTotals(quote.id)
+
       setSaveStatus('saved')
       setTimeout(() => setSaveStatus('idle'), 2500)
     } catch (e) {
@@ -579,6 +589,11 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
       console.error('[saveAll] exception:', e)
     } finally {
       isSavingRef.current = false
+      // If a debounce fired while we were saving, run it now with latest state
+      if (needsResaveRef.current) {
+        needsResaveRef.current = false
+        saveAllRef.current()
+      }
     }
   }, [
     quote.id,
@@ -595,6 +610,9 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
     terms,
     locations,
   ])
+
+  // Keep saveAllRef current so the retry in finally always calls the latest closure
+  useEffect(() => { saveAllRef.current = saveAll }, [saveAll])
 
   // ── Debounced auto-save ──────────────────────────────────────────────────────
   useEffect(() => {
