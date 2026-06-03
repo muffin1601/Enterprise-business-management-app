@@ -17,15 +17,23 @@ import styles from './sales-orders.module.scss'
 
 type Tab = 'items' | 'delivery' | 'advance' | 'history'
 
+type LinkedRi = { id: string; riNo: string; status: string; grandTotal: number; date: string }
+
+const RI_STATUS_LABELS_SIMPLE: Record<string, string> = {
+  draft: 'Draft', validated: 'Validated', posted: 'Posted', sent: 'Sent', cancelled: 'Cancelled',
+}
+
 interface Props {
   so:               SoDetail
   canEdit:          boolean
   canDelete:        boolean
   linkedInvoice?:   { id: string; invoiceNo: string; status: string } | null
   canCreateInvoice?:boolean
+  linkedRis?:       LinkedRi[]
+  canCreateRi?:     boolean
 }
 
-export function SoDetail({ so, canEdit, canDelete, linkedInvoice, canCreateInvoice }: Props) {
+export function SoDetail({ so, canEdit, canDelete, linkedInvoice, canCreateInvoice, linkedRis = [], canCreateRi = false }: Props) {
   const [tab, setTab] = useState<Tab>('items')
 
   return (
@@ -88,6 +96,62 @@ export function SoDetail({ so, canEdit, canDelete, linkedInvoice, canCreateInvoi
               </Link>
             ) : null}
           </div>
+
+          {/* Running Invoices section */}
+          {(linkedRis.length > 0 || canCreateRi) && (
+            <div style={{ marginTop: 12 }}>
+              <div style={{ fontFamily:'var(--font-body)', fontSize:9, letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--c-tertiary)', fontWeight:500, marginBottom:8 }}>
+                Running Invoices
+              </div>
+              {linkedRis.length > 0 ? (
+                <div style={{ display:'flex', flexDirection:'column', gap:5 }}>
+                  {linkedRis.map(ri => (
+                    <Link
+                      key={ri.id}
+                      href={`/running-invoices/${ri.id}` as Route}
+                      style={{
+                        display:'flex', alignItems:'center', justifyContent:'space-between',
+                        padding:'7px 11px', background:'var(--c-surface)',
+                        border:'1px solid var(--c-border)', borderRadius:'var(--radius-sm)',
+                        textDecoration:'none', gap:8,
+                      }}
+                    >
+                      <div style={{ display:'flex', flexDirection:'column', gap:1 }}>
+                        <span style={{ fontFamily:'var(--font-mono)', fontSize:11, color:'var(--c-tertiary)' }}>{ri.riNo}</span>
+                        <span style={{ fontFamily:'var(--font-body)', fontSize:11, color:'var(--c-secondary)' }}>
+                          {new Date(ri.date).toLocaleDateString('en-IN', { day:'2-digit', month:'short' })}
+                        </span>
+                      </div>
+                      <span style={{ fontFamily:'var(--font-body)', fontSize:9, fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', padding:'2px 6px', background:'var(--c-surface-2)', color:'var(--c-secondary)', borderRadius:2, border:'1px solid var(--c-border)', whiteSpace:'nowrap' }}>
+                        {RI_STATUS_LABELS_SIMPLE[ri.status] ?? ri.status}
+                      </span>
+                    </Link>
+                  ))}
+                  {canCreateRi && ['dispatched','delivered'].includes(so.status) && (
+                    <Link
+                      href={`/running-invoices/new?soId=${so.id}` as Route}
+                      style={{ display:'flex', alignItems:'center', justifyContent:'center', padding:'7px', border:'1px dashed var(--c-border-2)', borderRadius:'var(--radius-sm)', textDecoration:'none', fontFamily:'var(--font-body)', fontSize:11, color:'var(--c-tertiary)' }}
+                    >
+                      + Another
+                    </Link>
+                  )}
+                </div>
+              ) : canCreateRi && ['dispatched','delivered'].includes(so.status) ? (
+                <Link
+                  href={`/running-invoices/new?soId=${so.id}` as Route}
+                  style={{
+                    display:'flex', alignItems:'center', justifyContent:'center', gap:6,
+                    padding:'9px 14px', background:'var(--c-ink)', color:'var(--c-inverse)',
+                    border:'none', borderRadius:'var(--radius-sm)', textDecoration:'none',
+                    fontFamily:'var(--font-body)', fontSize:11, fontWeight:500,
+                    letterSpacing:'0.08em', textTransform:'uppercase',
+                  }}
+                >
+                  + Create Running Invoice
+                </Link>
+              ) : null}
+            </div>
+          )}
         </div>
       </div>
 

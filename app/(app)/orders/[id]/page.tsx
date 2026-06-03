@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import { getActionContext } from '@/lib/auth/action-context'
 import { getSalesOrder } from '@/features/sales-orders/server/queries'
 import { getLinkedInvoiceForSo } from '@/features/invoices/server/queries'
+import { getLinkedRisForSo } from '@/features/running-invoices/server/queries'
 import { SoDetail } from '@/features/sales-orders/components/so-detail'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
@@ -28,9 +29,10 @@ export default async function SalesOrderDetailPage({
     )
   }
 
-  const [so, linkedInvoice] = await Promise.all([
+  const [so, linkedInvoice, linkedRis] = await Promise.all([
     getSalesOrder(id),
     ctx.has('invoices.view') ? getLinkedInvoiceForSo(id) : null,
+    ctx.has('running_bill.view') ? getLinkedRisForSo(id) : [],
   ])
 
   if (!so) notFound()
@@ -43,6 +45,8 @@ export default async function SalesOrderDetailPage({
         canDelete={ctx.has('sales_orders.delete')}
         linkedInvoice={linkedInvoice}
         canCreateInvoice={ctx.has('invoices.create')}
+        linkedRis={linkedRis}
+        canCreateRi={ctx.has('running_bill.create')}
       />
     </main>
   )

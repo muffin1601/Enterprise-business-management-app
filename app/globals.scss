@@ -198,6 +198,7 @@
 #invoice-print-area  { display: none; }
 #po-print-area       { display: none; }
 #dc-print-area       { display: none; }
+#ri-print-area       { display: none; }
 
 // ── Shared A4 print styles ────────────────────────────────────────────────────
 // Applies to: Quotes (/quotes/[id]/preview)
@@ -276,6 +277,17 @@
     width: 100% !important;
   }
   #dc-print-area * { visibility: visible !important; }
+
+  // Running Invoices
+  #ri-print-area {
+    display: block !important;
+    visibility: visible !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+  }
+  #ri-print-area * { visibility: visible !important; }
 
   // Invoices
   #invoice-print-area {

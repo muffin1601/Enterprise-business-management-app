@@ -591,6 +591,7 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
     transport,
     transportNote,
     includeBoqSummary,
+    logoUrl,
     terms,
     locations,
   ])
@@ -619,6 +620,7 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
     transport,
     transportNote,
     includeBoqSummary,
+    logoUrl,
     terms,
     locations,
     saveAll,
