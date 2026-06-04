@@ -17,7 +17,7 @@ export function SoLocationsTab({ so, canEdit }: Props) {
   const [saving,   startT] = useTransition()
   const [msg, setMsg] = useState<string | null>(null)
 
-  const canUpdateDelivery = canEdit && ['dispatched', 'delivered'].includes(so.status)
+  const canUpdateDelivery = canEdit && so.status !== 'cancelled'
 
   function toggle(locId: string) {
     setExpanded(prev => {

@@ -15,27 +15,30 @@ interface TransitionConfig {
   needsNote?: boolean
 }
 
+const CANCEL: TransitionConfig = {
+  toStatus: 'cancelled', label: 'Cancel Order', variant: 'danger', needsNote: true,
+  confirm: 'Are you sure you want to cancel this order?',
+}
+
 const TRANSITIONS: Record<string, TransitionConfig[]> = {
-  confirmed:  [
-    { toStatus: 'processing', label: 'Start Processing', variant: 'primary' },
-    { toStatus: 'cancelled',  label: 'Cancel Order',     variant: 'danger', needsNote: true, confirm: 'Are you sure you want to cancel this order?' },
+  draft: [
+    { toStatus: 'sent',     label: 'Mark Sent',     variant: 'primary' },
+    { toStatus: 'accepted', label: 'Mark Accepted', variant: 'secondary' },
+    CANCEL,
   ],
-  processing: [
-    { toStatus: 'ready',      label: 'Mark Ready',       variant: 'primary' },
-    { toStatus: 'cancelled',  label: 'Cancel Order',     variant: 'danger', needsNote: true, confirm: 'Are you sure you want to cancel this order?' },
+  sent: [
+    { toStatus: 'accepted', label: 'Mark Accepted', variant: 'primary' },
+    { toStatus: 'revised',  label: 'Mark Revised',  variant: 'secondary' },
+    CANCEL,
   ],
-  ready: [
-    { toStatus: 'dispatched', label: 'Mark Dispatched',  variant: 'primary', confirm: 'Confirm goods have been dispatched?' },
-    { toStatus: 'cancelled',  label: 'Cancel Order',     variant: 'danger', needsNote: true, confirm: 'Are you sure you want to cancel this order?' },
+  accepted: [
+    { toStatus: 'revised',  label: 'Mark Revised',  variant: 'secondary' },
+    CANCEL,
   ],
-  dispatched: [
-    { toStatus: 'delivered',  label: 'Confirm Delivered', variant: 'primary', confirm: 'Confirm delivery has been made?' },
-  ],
-  delivered: [
-    { toStatus: 'invoiced',   label: 'Mark Invoiced',    variant: 'secondary' },
-  ],
-  invoiced: [
-    { toStatus: 'closed',     label: 'Close Order',      variant: 'secondary', confirm: 'Mark this order as fully closed?' },
+  revised: [
+    { toStatus: 'sent',     label: 'Mark Sent',     variant: 'primary' },
+    { toStatus: 'accepted', label: 'Mark Accepted', variant: 'secondary' },
+    CANCEL,
   ],
 }
 
@@ -128,7 +131,7 @@ export function SoStatusActions({ soId, status, canEdit, canDelete }: Props) {
               {cfg.label}
             </button>
           ))}
-          {canDelete && ['confirmed', 'cancelled'].includes(status) && (
+          {canDelete && ['draft', 'accepted', 'cancelled'].includes(status) && (
             <button className={styles.btnDanger} onClick={handleDelete} type="button">
               <Icon name="trash" size={14} /> Delete
             </button>

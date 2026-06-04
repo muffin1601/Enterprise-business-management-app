@@ -220,7 +220,6 @@ export function SoPreview({ so, orgName, orgAddress, orgGstin }: {
   const grandMat       = included.reduce((s, l) => s + l.materialSubtotal, 0)
   const anyDelivered   = included.some(l => l.items.some(i => i.qtyDelivered > 0))
   const statusLabel    = SO_STATUS_LABELS[so.status] ?? so.status
-  const isDispatched   = ['dispatched','delivered','invoiced','closed'].includes(so.status)
 
   return (
     <div style={{ fontFamily:FONT, color:BLACK, display:'flex', flexDirection:'column', alignItems:'center', gap:24 }}>
@@ -257,9 +256,11 @@ export function SoPreview({ so, orgName, orgAddress, orgGstin }: {
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20, marginBottom:10, paddingBottom:8, borderBottom:`1px solid ${RULE}` }}>
           <div>
             <SectionLabel>Bill To</SectionLabel>
-            <div style={{ fontFamily:FONT, fontSize:14, fontWeight:700, color:BLACK, marginBottom:3 }}>{so.customerName ?? '—'}</div>
-            {so.customerPhone && <div style={{ fontFamily:FONT, fontSize:11, color:MID }}>{so.customerPhone}</div>}
-            {so.customerEmail && <div style={{ fontFamily:FONT, fontSize:11, color:MUTED }}>{so.customerEmail}</div>}
+            <div style={{ fontFamily:FONT, fontSize:14, fontWeight:700, color:BLACK, marginBottom:3 }}>{so.billToName ?? so.customerName ?? '—'}</div>
+            {so.billToAddress && <div style={{ fontFamily:FONT, fontSize:11, color:MID, lineHeight:1.7, whiteSpace:'pre-line', marginBottom:2 }}>{so.billToAddress}</div>}
+            {(so.billToPhone ?? so.customerPhone) && <div style={{ fontFamily:FONT, fontSize:11, color:MID }}>{so.billToPhone ?? so.customerPhone}</div>}
+            {(so.billToEmail ?? so.customerEmail) && <div style={{ fontFamily:FONT, fontSize:11, color:MUTED }}>{so.billToEmail ?? so.customerEmail}</div>}
+            {so.billToGstin && <div style={{ fontFamily:FONT, fontSize:11, color:MUTED }}>GSTIN: {so.billToGstin}</div>}
           </div>
           <div>
             <SectionLabel>Deliver To</SectionLabel>
@@ -291,7 +292,7 @@ export function SoPreview({ so, orgName, orgAddress, orgGstin }: {
 
         {/* ── LOCATION SECTIONS ────────────────────────────────────── */}
         {included.map((loc, i) => (
-          <LocationSection key={loc.id} loc={loc} idx={i} showDelivered={isDispatched || anyDelivered} />
+          <LocationSection key={loc.id} loc={loc} idx={i} showDelivered={anyDelivered} />
         ))}
 
         {/* ── TOTALS ───────────────────────────────────────────────── */}

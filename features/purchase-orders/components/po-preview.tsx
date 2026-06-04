@@ -126,21 +126,21 @@ export function PoPreview({ po, orgName, orgAddress, orgGstin, logoUrl }: Props)
         <table style={{ width:'100%', borderCollapse:'collapse', fontSize:10 }}>
           <thead>
             <tr style={{ borderBottom:`1px solid ${RULE}`, background:BGROW }}>
-              <TH style={{ width:'4%', textAlign:'left' }}>#</TH>
-              <TH style={{ width:'25%', textAlign:'left' }}>Item / Description</TH>
-              <TH style={{ width:'8%', textAlign:'left' }}>HSN</TH>
-              <TH style={{ width:'6%', textAlign:'center' }}>Unit</TH>
+              <TH style={{ width:'3%', textAlign:'left' }}>#</TH>
+              <TH style={{ width:'22%', textAlign:'left' }}>Item / Description</TH>
+              <TH style={{ width:'7%', textAlign:'left' }}>HSN</TH>
+              <TH style={{ width:'5%', textAlign:'center' }}>Unit</TH>
               <TH style={{ width:'7%', textAlign:'right' }}>Invoice Qty</TH>
-              <TH style={{ width:'8%', textAlign:'right' }}>Order Qty</TH>
-              <TH style={{ width:'10%', textAlign:'right' }}>Rate (₹)</TH>
-              <TH style={{ width:'6%', textAlign:'right' }}>Disc%</TH>
-              <TH style={{ width:'10%', textAlign:'right' }}>Taxable (₹)</TH>
+              <TH style={{ width:'7%', textAlign:'right' }}>Order Qty</TH>
+              <TH style={{ width:'9%', textAlign:'right' }}>Rate (₹)</TH>
+              <TH style={{ width:'5%', textAlign:'right' }}>Disc%</TH>
+              <TH style={{ width:'9%', textAlign:'right' }}>Taxable (₹)</TH>
               {po.isIgst ? (
-                <><TH style={{ width:'6%', textAlign:'right' }}>IGST%</TH><TH style={{ width:'10%', textAlign:'right' }}>IGST (₹)</TH></>
+                <><TH style={{ width:'7%', textAlign:'right' }}>IGST%</TH><TH style={{ width:'10%', textAlign:'right' }}>IGST (₹)</TH></>
               ) : (
-                <><TH style={{ width:'5%', textAlign:'right' }}>GST%</TH><TH style={{ width:'8%', textAlign:'right' }}>Tax (₹)</TH></>
+                <><TH style={{ width:'7%', textAlign:'right' }}>GST%</TH><TH style={{ width:'10%', textAlign:'right' }}>Tax (₹)</TH></>
               )}
-              <TH style={{ width:'10%', textAlign:'right' }}>Total (₹)</TH>
+              <TH style={{ width:'9%', textAlign:'right' }}>Total (₹)</TH>
             </tr>
           </thead>
           <tbody>

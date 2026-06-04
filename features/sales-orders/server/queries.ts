@@ -48,13 +48,10 @@ export type SoPage = {
 
 export type SoStats = {
   total:      number
-  confirmed:  number
-  processing: number
-  ready:      number
-  dispatched: number
-  delivered:  number
-  invoiced:   number
-  closed:     number
+  draft:      number
+  sent:       number
+  accepted:   number
+  revised:    number
   cancelled:  number
   totalValue: number
 }
@@ -128,6 +125,11 @@ export type SoDetail = {
   deliveryAddress:  string | null
   siteContactName:  string | null
   siteContactPhone: string | null
+  billToName:       string | null
+  billToAddress:    string | null
+  billToPhone:      string | null
+  billToEmail:      string | null
+  billToGstin:      string | null
   notes:            string | null
   internalNotes:    string | null
   terms:            { category: string; text: string }[]
@@ -252,6 +254,7 @@ export async function getSalesOrder(id: string): Promise<SoDetail | null> {
        gst_mode,gst_pct,transport,transport_note,material_subtotal,gst_amount,grand_total,
        advance_amount,advance_received,advance_date,advance_note,
        delivery_address,site_contact_name,site_contact_phone,
+       bill_to_name,bill_to_address,bill_to_phone,bill_to_email,bill_to_gstin,
        notes,internal_notes,terms,logo_url,created_at,updated_at,
        quotes(id,quote_no,logo_url),
        customers(id,code,name,phone,email)`,
@@ -366,6 +369,11 @@ export async function getSalesOrder(id: string): Promise<SoDetail | null> {
     deliveryAddress:  r.delivery_address as string | null,
     siteContactName:  r.site_contact_name as string | null,
     siteContactPhone: r.site_contact_phone as string | null,
+    billToName:       (r.bill_to_name as string | null) ?? cust?.name ?? null,
+    billToAddress:    r.bill_to_address as string | null,
+    billToPhone:      (r.bill_to_phone as string | null) ?? cust?.phone ?? null,
+    billToEmail:      (r.bill_to_email as string | null) ?? cust?.email ?? null,
+    billToGstin:      r.bill_to_gstin as string | null,
     notes:            r.notes as string | null,
     internalNotes:    r.internal_notes as string | null,
     terms:            rawTerms,
@@ -381,7 +389,7 @@ export async function getSalesOrder(id: string): Promise<SoDetail | null> {
 
 export async function getSalesOrderStats(): Promise<SoStats> {
   const { orgId, supabase } = await ctx()
-  if (!orgId) return { total:0, confirmed:0, processing:0, ready:0, dispatched:0, delivered:0, invoiced:0, closed:0, cancelled:0, totalValue:0 }
+  if (!orgId) return { total:0, draft:0, sent:0, accepted:0, revised:0, cancelled:0, totalValue:0 }
 
   const { data } = await supabase
     .from('sales_orders')
@@ -392,13 +400,10 @@ export async function getSalesOrderStats(): Promise<SoStats> {
   const rows = data ?? []
   return {
     total:      rows.length,
-    confirmed:  rows.filter(r => r.status === 'confirmed').length,
-    processing: rows.filter(r => r.status === 'processing').length,
-    ready:      rows.filter(r => r.status === 'ready').length,
-    dispatched: rows.filter(r => r.status === 'dispatched').length,
-    delivered:  rows.filter(r => r.status === 'delivered').length,
-    invoiced:   rows.filter(r => r.status === 'invoiced').length,
-    closed:     rows.filter(r => r.status === 'closed').length,
+    draft:      rows.filter(r => r.status === 'draft').length,
+    sent:       rows.filter(r => r.status === 'sent').length,
+    accepted:   rows.filter(r => r.status === 'accepted').length,
+    revised:    rows.filter(r => r.status === 'revised').length,
     cancelled:  rows.filter(r => r.status === 'cancelled').length,
     totalValue: rows.reduce((s, r) => s + n(r.grand_total), 0),
   }

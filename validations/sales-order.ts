@@ -5,14 +5,11 @@ import { z } from 'zod'
 export const SO_PAGE_SIZE = 20
 
 export const SO_STATUS_LABELS: Record<string, string> = {
-  confirmed:  'Confirmed',
-  processing: 'Processing',
-  ready:      'Ready',
-  dispatched: 'Dispatched',
-  delivered:  'Delivered',
-  invoiced:   'Invoiced',
-  closed:     'Closed',
-  cancelled:  'Cancelled',
+  draft:     'Draft',
+  sent:      'Sent',
+  accepted:  'Accepted',
+  revised:   'Revised',
+  cancelled: 'Cancelled',
 }
 
 export const SO_PRIORITY_LABELS: Record<string, string> = {
@@ -23,26 +20,20 @@ export const SO_PRIORITY_LABELS: Record<string, string> = {
 }
 
 export const SO_STATUS_COLORS: Record<string, string> = {
-  confirmed:  'blue',
-  processing: 'orange',
-  ready:      'cyan',
-  dispatched: 'purple',
-  delivered:  'teal',
-  invoiced:   'indigo',
-  closed:     'green',
-  cancelled:  'red',
+  draft:     'grey',
+  sent:      'blue',
+  accepted:  'green',
+  revised:   'orange',
+  cancelled: 'red',
 }
 
 // ─── Enums ────────────────────────────────────────────────────────────────────
 
 export const SoStatus = z.enum([
-  'confirmed',
-  'processing',
-  'ready',
-  'dispatched',
-  'delivered',
-  'invoiced',
-  'closed',
+  'draft',
+  'sent',
+  'accepted',
+  'revised',
   'cancelled',
 ])
 
@@ -58,6 +49,12 @@ export const salesOrderSchema = z.object({
   deliveryAddress:  z.string().optional(),
   siteContactName:  z.string().optional(),
   siteContactPhone: z.string().optional(),
+  // Bill To snapshot — optional overrides; defaults seeded from the customer master.
+  billToName:       z.string().optional(),
+  billToAddress:    z.string().optional(),
+  billToPhone:      z.string().optional(),
+  billToEmail:      z.string().email('Enter a valid email.').optional().or(z.literal('')),
+  billToGstin:      z.string().optional(),
   notes:            z.string().optional(),
   internalNotes:    z.string().optional(),
 })
@@ -100,6 +97,16 @@ export const soDeliverySchema = z.object({
   expectedDelivery: z.coerce.date().optional().nullable(),
 })
 
+// ─── Billing / Bill To Details ────────────────────────────────────────────────
+
+export const soBillingSchema = z.object({
+  billToName:    z.string().optional(),
+  billToAddress: z.string().optional(),
+  billToPhone:   z.string().optional(),
+  billToEmail:   z.string().email('Enter a valid email.').optional().or(z.literal('')),
+  billToGstin:   z.string().optional(),
+})
+
 // ─── Item Qty Delivered ───────────────────────────────────────────────────────
 
 export const soItemDeliverySchema = z.object({
@@ -118,7 +125,7 @@ export const soItemDeliverySchema = z.object({
 
 export const soFilterSchema = z.object({
   q:          z.string().optional(),
-  status:     z.enum(['all','confirmed','processing','ready','dispatched','delivered','invoiced','closed','cancelled']).default('all'),
+  status:     z.enum(['all','draft','sent','accepted','revised','cancelled']).default('all'),
   priority:   z.enum(['all','low','normal','high','urgent']).default('all'),
   customerId: z.string().optional(),
   dateFrom:   z.coerce.date().optional(),
@@ -135,6 +142,7 @@ export type UpdateSalesOrderInput = z.infer<typeof updateSalesOrderSchema>
 export type SoStatusUpdate        = z.infer<typeof soStatusUpdateSchema>
 export type SoAdvanceInput        = z.infer<typeof soAdvanceSchema>
 export type SoDeliveryInput       = z.infer<typeof soDeliverySchema>
+export type SoBillingInput        = z.infer<typeof soBillingSchema>
 export type SoItemDeliveryInput   = z.infer<typeof soItemDeliverySchema>
 export type SoFilter              = z.infer<typeof soFilterSchema>
 export type SoStatusType          = z.infer<typeof SoStatus>

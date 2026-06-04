@@ -5,10 +5,11 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 import { itemSchema, GST_RATES, type ItemInput } from '@/validations/inventory'
-import { createItemWithVariations, updateItem } from '../server/actions'
+import { createItemWithVariations, updateItem, createBrand, createFamily } from '../server/actions'
 import type { Lookup, VariationInput } from '../server/queries'
 import { Icon } from '@/components/ui'
 import { VariationsPanel } from './variations-panel'
+import { LookupCombo } from './lookup-combo'
 import styles from './inventory.module.scss'
 
 const CURRENCIES = ['INR', 'USD', 'EUR', 'CNY'] as const
@@ -154,8 +155,30 @@ export function ItemForm({ mode, itemId, families, brands, units, defaultValues 
             <F name="variantLabel" label="Variant Label"   placeholder="e.g. 600×600 · Matte" />
           </div>
           <div className={styles.formGrid3}>
-            <Combo name="familyId" label="Category" options={families.map(f => ({ value: f.id, label: f.label }))} placeholder="Type or select category" />
-            <Combo name="brandId"  label="Brand / Make" options={brands.map(b => ({ value: b.id, label: b.label }))} placeholder="Type or select brand" />
+            <LookupCombo
+              label="Category"
+              placeholder="Type or select category"
+              options={families.map(f => ({ value: f.id, label: f.label }))}
+              value={watch('familyId') ?? undefined}
+              onChange={id => setValue('familyId', (id ?? undefined) as never, { shouldValidate: false })}
+              onCreate={async name => {
+                const res = await createFamily({ name })
+                return res.ok ? { ok: true as const, id: res.data.id } : { ok: false as const, message: res.error.message }
+              }}
+              error={errors.familyId?.message as string | undefined}
+            />
+            <LookupCombo
+              label="Brand / Make"
+              placeholder="Type or select brand"
+              options={brands.map(b => ({ value: b.id, label: b.label }))}
+              value={watch('brandId') ?? undefined}
+              onChange={id => setValue('brandId', (id ?? undefined) as never, { shouldValidate: false })}
+              onCreate={async name => {
+                const res = await createBrand({ name })
+                return res.ok ? { ok: true as const, id: res.data.id } : { ok: false as const, message: res.error.message }
+              }}
+              error={errors.brandId?.message as string | undefined}
+            />
             <Combo name="unitId"   label="Unit" options={units.map(u => ({ value: u.id, label: u.label }))} placeholder="Type or select unit" />
           </div>
           <div>

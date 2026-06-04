@@ -34,8 +34,8 @@ export function InvoiceHeaderCard({ inv }: { inv: InvoiceDetail }) {
 
       <div className={styles.headerMeta}>
         <div className={styles.metaItem}>
-          <span className={styles.metaLabel}>Customer</span>
-          <span className={styles.metaValue}>{inv.customerName ?? '—'}</span>
+          <span className={styles.metaLabel}>Bill To</span>
+          <span className={styles.metaValue}>{inv.billToName ?? inv.customerName ?? '—'}</span>
         </div>
         <div className={styles.metaItem}>
           <span className={styles.metaLabel}>Invoice Date</span>

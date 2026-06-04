@@ -15,12 +15,13 @@ export async function GET(req: Request) {
     const orgId    = await getActiveOrgId()
     const supabase = await createSupabaseServerClient()
 
-    // SOs in dispatched or delivered status
+    // Any active (non-cancelled) SO — RI eligibility is driven by delivered,
+    // unbilled challans (counted below), not by SO status.
     let q = supabase
       .from('sales_orders')
       .select('id,so_no,status,customer_id,customers(id,name)')
       .eq('org_id', orgId!)
-      .in('status', ['dispatched','delivered','invoiced'])
+      .neq('status', 'cancelled')
       .is('deleted_at', null)
       .order('date', { ascending: false })
       .limit(100)

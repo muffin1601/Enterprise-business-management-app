@@ -149,7 +149,7 @@ export async function createInvoice(input: unknown): Promise<ActionResult<{ id: 
   // Guard: SO must be active and not already invoiced
   const { data: so } = await supabase
     .from('sales_orders')
-    .select('id,status,so_no,quote_id,customer_id,subject,gst_mode,gst_pct,transport,transport_note,grand_total,terms,logo_url')
+    .select('id,status,so_no,quote_id,customer_id,subject,gst_mode,gst_pct,transport,transport_note,grand_total,terms,logo_url,bill_to_name,bill_to_address,bill_to_phone,bill_to_email,bill_to_gstin')
     .eq('id', d.soId)
     .eq('org_id', r.c.orgId)
     .is('deleted_at', null)
@@ -157,9 +157,8 @@ export async function createInvoice(input: unknown): Promise<ActionResult<{ id: 
 
   if (!so) return err('not_found', 'Sales order not found.')
 
-  const BLOCKED = ['cancelled', 'closed']
-  if (BLOCKED.includes(so.status as string)) {
-    return err('state_transition', `Cannot invoice a ${so.status} sales order.`)
+  if (so.status === 'cancelled') {
+    return err('state_transition', 'Cannot invoice a cancelled sales order.')
   }
 
   // Check for existing active invoice
@@ -198,6 +197,11 @@ export async function createInvoice(input: unknown): Promise<ActionResult<{ id: 
       notes:         d.notes ?? null,
       terms:         so.terms ?? [],
       logo_url:      so.logo_url ?? null,
+      bill_to_name:    so.bill_to_name ?? null,
+      bill_to_address: so.bill_to_address ?? null,
+      bill_to_phone:   so.bill_to_phone ?? null,
+      bill_to_email:   so.bill_to_email ?? null,
+      bill_to_gstin:   so.bill_to_gstin ?? null,
       taxable_value: 0, cgst_amount: 0, sgst_amount: 0,
       igst_amount: 0, total_gst: 0, grand_total: 0,
       amount_paid: 0, balance_due: 0,
@@ -259,12 +263,8 @@ export async function createInvoice(input: unknown): Promise<ActionResult<{ id: 
   // Recalculate invoice totals
   await recalcInvoiceTotals(supabase, invId, r.c.orgId)
 
-  // Transition SO status → 'invoiced'
-  await supabase
-    .from('sales_orders')
-    .update({ status: 'invoiced', updated_by: r.c.userId })
-    .eq('id', d.soId)
-    .eq('org_id', r.c.orgId)
+  // Note: SO status is decoupled from billing. Invoicing no longer mutates the
+  // SO status; the SO ↔ invoice link itself records that an invoice exists.
 
   // Record initial status history
   await insertStatusHistory(supabase, r.c.orgId, invId, null, 'draft', 'Invoice created from sales order.', r.c.userId)
@@ -562,13 +562,7 @@ export async function deleteInvoice(id: string): Promise<ActionResult<void>> {
   const { error } = await supabase.from('invoices').delete().eq('id', id).eq('org_id', r.c.orgId)
   if (error) return err('internal', error.message)
 
-  // Revert SO status back to invoiced→delivered if needed
-  await supabase
-    .from('sales_orders')
-    .update({ status: 'delivered', updated_by: r.c.userId })
-    .eq('id', inv.so_id as string)
-    .eq('org_id', r.c.orgId)
-    .eq('status', 'invoiced')
+  // SO status is decoupled from billing — nothing to revert on the SO here.
 
   await recordAuditEvent({ orgId: r.c.orgId, actorId: r.c.userId, entityType: 'invoices', entityId: id, action: 'delete', after: { invoiceNo: inv.invoice_no } })
 

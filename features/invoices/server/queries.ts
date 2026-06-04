@@ -111,6 +111,11 @@ export type InvoiceDetail = {
   customerCode:  string | null
   customerPhone: string | null
   customerEmail: string | null
+  billToName:    string | null
+  billToAddress: string | null
+  billToPhone:   string | null
+  billToEmail:   string | null
+  billToGstin:   string | null
   subject:       string | null
   date:          string
   dueDate:       string | null
@@ -241,6 +246,7 @@ export async function getInvoice(id: string): Promise<InvoiceDetail | null> {
        taxable_value,transport,transport_note,
        cgst_amount,sgst_amount,igst_amount,total_gst,grand_total,
        amount_paid,balance_due,payment_terms,
+       bill_to_name,bill_to_address,bill_to_phone,bill_to_email,bill_to_gstin,
        notes,terms,logo_url,issued_at,created_at,updated_at,
        sales_orders(id,so_no),
        quotes(id,quote_no),
@@ -336,6 +342,11 @@ export async function getInvoice(id: string): Promise<InvoiceDetail | null> {
     customerCode:  cust?.code ?? null,
     customerPhone: cust?.phone ?? null,
     customerEmail: cust?.email ?? null,
+    billToName:    (r.bill_to_name as string | null) ?? cust?.name ?? null,
+    billToAddress: r.bill_to_address as string | null,
+    billToPhone:   (r.bill_to_phone as string | null) ?? cust?.phone ?? null,
+    billToEmail:   (r.bill_to_email as string | null) ?? cust?.email ?? null,
+    billToGstin:   r.bill_to_gstin as string | null,
     subject:       r.subject as string | null,
     date:          r.date as string,
     dueDate:       r.due_date as string | null,
@@ -434,9 +445,8 @@ export async function canCreateInvoiceForSo(
 
   if (!so) return { allowed: false, reason: 'Sales order not found.' }
 
-  const BLOCKED = ['cancelled', 'closed']
-  if (BLOCKED.includes(so.status as string)) {
-    return { allowed: false, reason: `Cannot invoice a ${so.status} sales order.` }
+  if (so.status === 'cancelled') {
+    return { allowed: false, reason: 'Cannot invoice a cancelled sales order.' }
   }
 
   const existing = await getLinkedInvoiceForSo(soId)
@@ -475,7 +485,7 @@ export async function getEligibleSosForInvoicing(
     .select('id,so_no,subject,grand_total,status,customers(id,name)')
     .eq('org_id', orgId)
     .is('deleted_at', null)
-    .not('status', 'in', '("cancelled","closed")')
+    .neq('status', 'cancelled')
     .order('date', { ascending: false })
 
   if (search) {

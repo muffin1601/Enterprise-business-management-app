@@ -2,12 +2,30 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
+import Link, { useLinkStatus } from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut } from '@/features/auth/server/actions'
 import { PageActionsProvider, PageActionsSlot } from './page-actions'
+import { TopProgress } from './top-progress'
 import { Icon } from '@/components/ui'
 import styles from './AppShell.module.scss'
+
+/** Small spinner shown on a nav item while its route is loading. */
+function NavPending() {
+  const { pending } = useLinkStatus()
+  if (!pending) return null
+  return (
+    <span
+      aria-hidden
+      style={{
+        width: 12, height: 12, marginLeft: 'auto', flexShrink: 0,
+        border: '2px solid currentColor', borderTopColor: 'transparent',
+        borderRadius: '50%', opacity: 0.7,
+        animation: 'navspin 0.6s linear infinite',
+      }}
+    />
+  )
+}
 
 const NAV = [
   {
@@ -109,6 +127,8 @@ export function AppShell({ userName, orgName, children }: Props) {
 
   return (
     <PageActionsProvider>
+      <TopProgress />
+      <style>{`@keyframes navspin { to { transform: rotate(360deg) } }`}</style>
       <div className={styles.shell}>
         {open && <div className={styles.overlay} onClick={() => setOpen(false)} />}
 
@@ -140,6 +160,7 @@ export function AppShell({ userName, orgName, children }: Props) {
                   >
                     <Icon name={item.icon.replace(/^ti-/, '')} className={styles.navIcon} />
                     {item.label}
+                    <NavPending />
                   </Link>
                 ))}
               </div>

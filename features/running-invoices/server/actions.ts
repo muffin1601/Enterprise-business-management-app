@@ -190,8 +190,8 @@ export async function createRunningInvoice(
     .eq('id', d.soId).eq('org_id', r.c.orgId).is('deleted_at', null).maybeSingle()
 
   if (!so) return err('not_found', 'Sales order not found.')
-  if (!['dispatched','delivered','invoiced'].includes(so.status as string)) {
-    return err('state_transition', `Cannot invoice a ${so.status} sales order.`)
+  if (so.status === 'cancelled') {
+    return err('state_transition', 'Cannot invoice a cancelled sales order.')
   }
 
   // Guard: all DCs must be delivered and not already invoiced in a posted RI
@@ -451,14 +451,8 @@ export async function postRunningInvoice(id: string, note?: string): Promise<Act
     }).eq('id', rc.dc_id as string).eq('org_id', r.c.orgId)
   }
 
-  // 4. Check if SO is fully invoiced → update SO status
-  const { data: soItems } = await supabase
-    .from('so_items').select('qty,qty_invoiced').eq('so_id', ri.so_id as string)
-  const allInvoiced = (soItems ?? []).every(si => Number(si.qty_invoiced) >= Number(si.qty))
-  if (allInvoiced && (soItems ?? []).length > 0) {
-    await supabase.from('sales_orders').update({ status: 'invoiced', updated_by: r.c.userId })
-      .eq('id', ri.so_id as string).eq('org_id', r.c.orgId)
-  }
+  // 4. SO status is decoupled from billing — posting an RI no longer changes it.
+  //    Billing progress is tracked via so_items.qty_invoiced and the linked RIs.
 
   // 5. Status history + audit
   await insertStatusHistory(supabase, r.c.orgId, id, 'validated', 'posted', note, r.c.userId)
@@ -503,9 +497,7 @@ export async function cancelRunningInvoice(id: string, note?: string): Promise<A
       await supabase.from('delivery_challans').update({ invoiced_at: null, running_invoice_id: null })
         .eq('id', rc.dc_id as string).eq('org_id', r.c.orgId)
     }
-    // Revert SO status if needed
-    await supabase.from('sales_orders').update({ status: 'delivered', updated_by: r.c.userId })
-      .eq('id', ri.so_id as string).eq('org_id', r.c.orgId).eq('status', 'invoiced')
+    // SO status is decoupled from billing — nothing to revert on the SO here.
   }
 
   await supabase.from('running_invoices').update({ status: 'cancelled', updated_by: r.c.userId })

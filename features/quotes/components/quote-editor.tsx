@@ -496,36 +496,51 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
   const debounceRef    = useRef<NodeJS.Timeout>(undefined)
   const isFirstRender  = useRef(true)
-  const isSavingRef    = useRef(false)   // prevent concurrent saves
-  const needsResaveRef = useRef(false)   // a save was skipped while saving was in progress
-  const saveAllRef     = useRef<() => Promise<void>>(() => Promise.resolve())
+  // Serialised save queue — each saveAll() awaits any in-flight save then writes
+  // the latest state, so explicit saves (Save & Exit, blur) can await a complete
+  // write before navigating away.
+  const saveChainRef   = useRef<Promise<void>>(Promise.resolve())
+  // Mirror of the latest committed state, read by performSave so a queued/auto
+  // save always persists current values — never a stale closure snapshot (which
+  // could overwrite freshly-typed later-location items).
+  const stateRef = useRef<{
+    customerId: string; subject: string; date: string; status: QuoteStatus
+    gstMode: 'add' | 'inclusive' | 'none'; gstPct: number; transport: number
+    transportNote: string; includeBoqSummary: boolean; logoUrl: string | null
+    terms: LocalTerm[]; locations: LocalLocation[]
+  } | null>(null)
 
   // ── Totals (derived) ────────────────────────────────────────────────────────
   const totals = calculateTotals(locations, gstMode, gstPct, transport)
 
+  // Keep the save mirror in sync with every render's committed state.
+  stateRef.current = {
+    customerId, subject, date, status, gstMode, gstPct, transport,
+    transportNote, includeBoqSummary, logoUrl, terms, locations,
+  }
+
   // ── Save logic ──────────────────────────────────────────────────────────────
-  const saveAll = useCallback(async () => {
-    if (isSavingRef.current) {
-      needsResaveRef.current = true   // debounce fired while saving — retry after
-      return
-    }
-    isSavingRef.current = true
-    needsResaveRef.current = false
+  // Reads from stateRef (latest committed state) rather than closure variables,
+  // so a save queued behind an in-flight one always persists current values and
+  // can never overwrite newer data with a stale snapshot.
+  const performSave = useCallback(async () => {
+    const s = stateRef.current
+    if (!s) return
     setSaveStatus('saving')
     try {
       // 1. Save meta
       const metaResult = await updateQuote(quote.id, {
-        customerId: customerId || undefined,
-        subject: subject || undefined,
-        date: new Date(date),
-        status,
-        gstMode,
-        gstPct,
-        transport,
-        transportNote: transportNote || undefined,
-        includeBoqSummary,
-        logoUrl: logoUrl || undefined,
-        terms: terms.map((t) => ({ category: t.category as TermCategory, text: t.text })),
+        customerId: s.customerId || undefined,
+        subject: s.subject || undefined,
+        date: new Date(s.date),
+        status: s.status,
+        gstMode: s.gstMode,
+        gstPct: s.gstPct,
+        transport: s.transport,
+        transportNote: s.transportNote || undefined,
+        includeBoqSummary: s.includeBoqSummary,
+        logoUrl: s.logoUrl || undefined,
+        terms: s.terms.map((t) => ({ category: t.category as TermCategory, text: t.text })),
       })
 
       if (!metaResult.ok) {
@@ -536,7 +551,7 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
       // 2. Upsert locations (returns new ids)
       const locResult = await upsertQuoteLocations(
         quote.id,
-        locations.map((loc, i) => ({
+        s.locations.map((loc, i) => ({
           name: loc.name,
           sortOrder: i,
           isIncluded: loc.isIncluded,
@@ -552,12 +567,11 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
 
       const locationIds = locResult.data.locationIds
 
-      // 3. Upsert items per location
       // 3. Upsert items per location — run sequentially to avoid race conditions
-      for (let i = 0; i < locations.length; i++) {
+      for (let i = 0; i < s.locations.length; i++) {
         const locationId = locationIds[i]
         if (!locationId) continue
-        const validItems = locations[i]!.items.filter(item => item.name.trim() !== '')
+        const validItems = s.locations[i]!.items.filter(item => item.name.trim() !== '')
         const itemResult = await upsertQuoteItems(
           locationId,
           quote.id,
@@ -587,32 +601,20 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
     } catch (e) {
       setSaveStatus('error')
       console.error('[saveAll] exception:', e)
-    } finally {
-      isSavingRef.current = false
-      // If a debounce fired while we were saving, run it now with latest state
-      if (needsResaveRef.current) {
-        needsResaveRef.current = false
-        saveAllRef.current()
-      }
     }
-  }, [
-    quote.id,
-    customerId,
-    subject,
-    date,
-    status,
-    gstMode,
-    gstPct,
-    transport,
-    transportNote,
-    includeBoqSummary,
-    logoUrl,
-    terms,
-    locations,
-  ])
+  }, [quote.id])
 
-  // Keep saveAllRef current so the retry in finally always calls the latest closure
-  useEffect(() => { saveAllRef.current = saveAll }, [saveAll])
+  // Public save entry point. Serialises saves through a promise chain: each call
+  // waits for any in-flight save to finish, then persists the LATEST state. This
+  // lets Save & Exit / blur handlers `await saveAll()` and be certain a complete
+  // write landed before navigating. Previously the in-progress guard returned
+  // immediately, so navigating mid-save persisted a stale snapshot and silently
+  // dropped later locations/items.
+  const saveAll = useCallback(() => {
+    const next = saveChainRef.current.catch(() => {}).then(() => performSave())
+    saveChainRef.current = next
+    return next
+  }, [performSave])
 
   // ── Debounced auto-save ──────────────────────────────────────────────────────
   useEffect(() => {

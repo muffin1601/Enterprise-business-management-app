@@ -158,9 +158,11 @@ export function InvoicePreview({ inv, orgName, orgAddress, orgGstin }: Props) {
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20, marginBottom:10, paddingBottom:8, borderBottom:`1px solid ${RULE}` }}>
           <div>
             <SectionLabel>Bill To</SectionLabel>
-            <div style={{ fontFamily:FONT, fontSize:14, fontWeight:700, color:BLACK, marginBottom:3 }}>{inv.customerName ?? '—'}</div>
-            {inv.customerPhone && <div style={{ fontFamily:FONT, fontSize:11, color:MID }}>{inv.customerPhone}</div>}
-            {inv.customerEmail && <div style={{ fontFamily:FONT, fontSize:11, color:MID }}>{inv.customerEmail}</div>}
+            <div style={{ fontFamily:FONT, fontSize:14, fontWeight:700, color:BLACK, marginBottom:3 }}>{inv.billToName ?? inv.customerName ?? '—'}</div>
+            {inv.billToAddress && <div style={{ fontFamily:FONT, fontSize:11, color:MID, lineHeight:1.7, whiteSpace:'pre-line', marginBottom:2 }}>{inv.billToAddress}</div>}
+            {(inv.billToPhone ?? inv.customerPhone) && <div style={{ fontFamily:FONT, fontSize:11, color:MID }}>{inv.billToPhone ?? inv.customerPhone}</div>}
+            {(inv.billToEmail ?? inv.customerEmail) && <div style={{ fontFamily:FONT, fontSize:11, color:MID }}>{inv.billToEmail ?? inv.customerEmail}</div>}
+            {inv.billToGstin && <div style={{ fontFamily:FONT, fontSize:11, color:MUTED }}>GSTIN: {inv.billToGstin}</div>}
           </div>
           <div>
             <SectionLabel>Subject / Project</SectionLabel>
@@ -178,28 +180,28 @@ export function InvoicePreview({ inv, orgName, orgAddress, orgGstin }: Props) {
         <table style={{ width:'100%', borderCollapse:'collapse', fontSize:10, marginBottom:0 }}>
           <thead>
             <tr style={{ borderBottom:`1px solid ${RULE}`, background:BGROW }}>
-              <TH style={{ width:'4%', textAlign:'left' }}>#</TH>
-              <TH style={{ width:'26%', textAlign:'left' }}>Item / Description</TH>
-              <TH style={{ width:'8%', textAlign:'left' }}>HSN/SAC</TH>
-              <TH style={{ width:'6%', textAlign:'center' }}>Unit</TH>
+              <TH style={{ width:'3%', textAlign:'left' }}>#</TH>
+              <TH style={{ width:'24%', textAlign:'left' }}>Item / Description</TH>
+              <TH style={{ width:'7%', textAlign:'left' }}>HSN/SAC</TH>
+              <TH style={{ width:'5%', textAlign:'center' }}>Unit</TH>
               <TH style={{ width:'9%', textAlign:'right' }}>Rate (₹)</TH>
-              <TH style={{ width:'5%', textAlign:'center' }}>Qty</TH>
-              <TH style={{ width:'6%', textAlign:'right' }}>Disc%</TH>
-              <TH style={{ width:'10%', textAlign:'right' }}>Taxable (₹)</TH>
+              <TH style={{ width:'4%', textAlign:'center' }}>Qty</TH>
+              <TH style={{ width:'5%', textAlign:'right' }}>Disc%</TH>
+              <TH style={{ width:'9%', textAlign:'right' }}>Taxable (₹)</TH>
               {inv.isIgst ? (
                 <>
-                  <TH style={{ width:'7%', textAlign:'right' }}>IGST%</TH>
-                  <TH style={{ width:'9%', textAlign:'right' }}>IGST (₹)</TH>
+                  <TH style={{ width:'9%', textAlign:'right' }}>IGST%</TH>
+                  <TH style={{ width:'12%', textAlign:'right' }}>IGST (₹)</TH>
                 </>
               ) : (
                 <>
                   <TH style={{ width:'6%', textAlign:'right' }}>CGST%</TH>
-                  <TH style={{ width:'8%', textAlign:'right' }}>CGST (₹)</TH>
+                  <TH style={{ width:'7%', textAlign:'right' }}>CGST (₹)</TH>
                   <TH style={{ width:'6%', textAlign:'right' }}>SGST%</TH>
-                  <TH style={{ width:'8%', textAlign:'right' }}>SGST (₹)</TH>
+                  <TH style={{ width:'7%', textAlign:'right' }}>SGST (₹)</TH>
                 </>
               )}
-              <TH style={{ width:'10%', textAlign:'right' }}>Total (₹)</TH>
+              <TH style={{ width: inv.isIgst ? '13%' : '8%', textAlign:'right' }}>Total (₹)</TH>
             </tr>
           </thead>
           <tbody>

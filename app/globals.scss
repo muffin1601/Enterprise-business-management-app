@@ -367,6 +367,27 @@
     display: table-header-group; // repeat header on each page
   }
 
+  // ── Tables: never exceed page width; wrap content instead of clipping ──────
+  // table-layout:fixed forces columns to honour their % widths and clamps the
+  // table to 100% of the sheet even if cell content is wide → no horizontal
+  // overflow / right-edge clipping in the PDF.
+  table {
+    width: 100% !important;
+    table-layout: fixed !important;
+    border-collapse: collapse !important;
+  }
+  // Long unbroken strings (item names, HSN codes, emails) wrap inside their
+  // column rather than spilling out and being clipped.
+  th, td {
+    overflow-wrap: break-word !important;
+    word-break: break-word !important;
+  }
+  // Header labels use white-space:nowrap on screen; allow them to wrap in print
+  // so fixed-width columns don't clip the header text.
+  th { white-space: normal !important; }
+  // Logos / images scale within their box and never overflow the sheet width.
+  img { max-width: 100% !important; }
+
   // ── Colour accuracy ───────────────────────────────────────────────────────
   // Without this, dark background bars (black total rows) print as white
   * {

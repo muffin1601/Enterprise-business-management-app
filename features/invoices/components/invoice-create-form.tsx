@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import Link from 'next/link'
 import { createInvoice } from '../server/actions'
+import { SO_STATUS_LABELS } from '@/validations/sales-order'
 import styles from './invoice-create-form.module.scss'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -35,11 +36,6 @@ type FormData = z.infer<typeof schema>
 const fmtINR = (n: number) => {
   if (n >= 100_000) return `₹${(n / 100_000).toFixed(2)}L`
   return `₹${new Intl.NumberFormat('en-IN').format(n)}`
-}
-
-const SO_STATUS_LABELS: Record<string, string> = {
-  confirmed: 'Confirmed', processing: 'Processing', ready: 'Ready',
-  dispatched: 'Dispatched', delivered: 'Delivered',
 }
 
 // ── SO Picker ─────────────────────────────────────────────────────────────────

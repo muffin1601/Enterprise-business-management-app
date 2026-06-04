@@ -38,7 +38,10 @@ export default function RootLayout({
       className={`${inter.variable} ${notoSerif.variable} ${jetbrainsMono.variable}`}
     >
       <head />
-      <body>
+      {/* suppressHydrationWarning: browser extensions (password managers,
+          form fillers) inject attributes on <body> before hydration, which
+          would otherwise trigger a hydration mismatch warning. */}
+      <body suppressHydrationWarning>
         {children}
         <Toaster />
       </body>

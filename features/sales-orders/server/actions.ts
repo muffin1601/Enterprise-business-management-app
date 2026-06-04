@@ -11,6 +11,7 @@ import {
   soStatusUpdateSchema,
   soAdvanceSchema,
   soDeliverySchema,
+  soBillingSchema,
   soItemDeliverySchema,
   type SoStatusType,
 } from '@/validations/sales-order'
@@ -63,17 +64,48 @@ async function insertStatusHistory(
   })
 }
 
+// Returns an error result if the SO is missing or its party details are locked.
+// Bill To / Ship To are locked once the order is cancelled or once a non-cancelled
+// invoice has been raised against it (changing party details would desync the bill).
+async function detailsLocked(
+  supabase: SupabaseClient,
+  orgId: string,
+  id: string,
+): Promise<{ ok: true } | { error: import('@/types/action').ActionErr }> {
+  const { data: so } = await supabase
+    .from('sales_orders')
+    .select('status')
+    .eq('id', id)
+    .eq('org_id', orgId)
+    .is('deleted_at', null)
+    .maybeSingle()
+
+  if (!so) return { error: err('not_found', 'Sales order not found.') }
+  if (so.status === 'cancelled') {
+    return { error: err('state_transition', 'Cannot edit details: the order is cancelled.') }
+  }
+
+  const { count: invCount } = await supabase
+    .from('invoices')
+    .select('id', { count: 'exact', head: true })
+    .eq('so_id', id)
+    .is('deleted_at', null)
+    .neq('status', 'cancelled')
+
+  if ((invCount ?? 0) > 0) {
+    return { error: err('state_transition', 'Cannot edit details: an invoice has already been raised for this order.') }
+  }
+  return { ok: true }
+}
+
 // ── State Machine ─────────────────────────────────────────────────────────────
 
 const VALID_TRANSITIONS: Record<SoStatusType, SoStatusType[]> = {
-  confirmed:  ['processing', 'cancelled'],
-  processing: ['ready', 'cancelled'],
-  ready:      ['dispatched', 'cancelled'],
-  dispatched: ['delivered'],
-  delivered:  ['invoiced'],
-  invoiced:   ['closed'],
-  closed:     [],
-  cancelled:  [],
+  draft:     ['sent', 'accepted', 'cancelled'],
+  sent:      ['accepted', 'revised', 'cancelled'],
+  accepted:  ['revised', 'cancelled'],
+  revised:   ['sent', 'accepted', 'cancelled'],
+  cancelled: [],
 }
 
 // ── createSalesOrder ──────────────────────────────────────────────────────────
@@ -109,6 +141,20 @@ export async function createSalesOrder(input: unknown): Promise<ActionResult<{ i
 
   if ((soCount ?? 0) > 0) return err('conflict', 'A Sales Order already exists for this quote.')
 
+  // Seed the Bill To snapshot from the customer master (per-document, editable later).
+  type CustBilling = { billing_name: string | null; billing_address: string | null; name: string | null; phone: string | null; email: string | null; gstin: string | null }
+  let cust: CustBilling | null = null
+  if (quote.customer_id) {
+    const { data } = await supabase
+      .from('customers')
+      .select('billing_name,billing_address,name,phone,email,gstin')
+      .eq('id', quote.customer_id)
+      .eq('org_id', r.c.orgId)
+      .maybeSingle()
+    cust = data as CustBilling | null
+  }
+  const blank = (s: string | null | undefined) => (s && s.trim() ? s : null)
+
   const soNo = await getNextSoNo(supabase, r.c.orgId)
 
   // Create SO header (snapshot financials from quote)
@@ -122,7 +168,7 @@ export async function createSalesOrder(input: unknown): Promise<ActionResult<{ i
       subject:          quote.subject ?? null,
       date:             new Date().toISOString().split('T')[0],
       expected_delivery: d.expectedDelivery ? d.expectedDelivery.toISOString().split('T')[0] : null,
-      status:           'confirmed',
+      status:           'accepted',
       priority:         d.priority ?? 'normal',
       gst_mode:         quote.gst_mode,
       gst_pct:          quote.gst_pct,
@@ -134,6 +180,11 @@ export async function createSalesOrder(input: unknown): Promise<ActionResult<{ i
       delivery_address: d.deliveryAddress ?? null,
       site_contact_name:  d.siteContactName ?? null,
       site_contact_phone: d.siteContactPhone ?? null,
+      bill_to_name:     blank(d.billToName)    ?? blank(cust?.billing_name) ?? cust?.name ?? null,
+      bill_to_address:  blank(d.billToAddress) ?? blank(cust?.billing_address) ?? null,
+      bill_to_phone:    blank(d.billToPhone)   ?? cust?.phone ?? null,
+      bill_to_email:    blank(d.billToEmail)   ?? cust?.email ?? null,
+      bill_to_gstin:    blank(d.billToGstin)   ?? cust?.gstin ?? null,
       notes:            d.notes ?? null,
       internal_notes:   d.internalNotes ?? null,
       terms:            quote.terms ?? [],
@@ -207,7 +258,7 @@ export async function createSalesOrder(input: unknown): Promise<ActionResult<{ i
   }
 
   // Record initial status history entry
-  await insertStatusHistory(supabase, r.c.orgId, soId, null, 'confirmed', 'Sales Order created from quote.', r.c.userId)
+  await insertStatusHistory(supabase, r.c.orgId, soId, null, 'accepted', 'Sales Order created from quote.', r.c.userId)
 
   await recordAuditEvent({
     orgId:      r.c.orgId,
@@ -215,7 +266,7 @@ export async function createSalesOrder(input: unknown): Promise<ActionResult<{ i
     entityType: 'sales_orders',
     entityId:   soId,
     action:     'insert',
-    after:      { soNo, quoteId: d.quoteId, status: 'confirmed' },
+    after:      { soNo, quoteId: d.quoteId, status: 'accepted' },
   })
 
   revalAll()
@@ -380,6 +431,9 @@ export async function updateDeliveryDetails(id: string, input: unknown): Promise
   const d = parsed.data
   const supabase = await createSupabaseServerClient()
 
+  const locked = await detailsLocked(supabase, r.c.orgId, id)
+  if ('error' in locked) return locked.error
+
   const { error } = await supabase
     .from('sales_orders')
     .update({
@@ -394,6 +448,61 @@ export async function updateDeliveryDetails(id: string, input: unknown): Promise
     .is('deleted_at', null)
 
   if (error) return err('internal', error.message)
+
+  await recordAuditEvent({
+    orgId:      r.c.orgId,
+    actorId:    r.c.userId,
+    entityType: 'sales_orders',
+    entityId:   id,
+    action:     'update',
+    after:      { deliveryAddress: d.deliveryAddress ?? null },
+  })
+
+  revalAll(id)
+  return ok(undefined)
+}
+
+// ── updateSoBilling (Bill To snapshot) ────────────────────────────────────────
+
+export async function updateSoBilling(id: string, input: unknown): Promise<ActionResult<void>> {
+  const r = await ctxOrErr(); if ('error' in r) return r.error
+  if (!r.c.has('sales_orders.edit')) return err('forbidden', 'Missing sales_orders.edit permission.')
+
+  const parsed = soBillingSchema.safeParse(input)
+  if (!parsed.success) return err('validation', 'Check the form fields.', { fieldErrors: fe(parsed.error) })
+
+  const d = parsed.data
+  const supabase = await createSupabaseServerClient()
+
+  const locked = await detailsLocked(supabase, r.c.orgId, id)
+  if ('error' in locked) return locked.error
+
+  const blank = (s: string | undefined) => (s && s.trim() ? s : null)
+
+  const { error } = await supabase
+    .from('sales_orders')
+    .update({
+      bill_to_name:    blank(d.billToName),
+      bill_to_address: blank(d.billToAddress),
+      bill_to_phone:   blank(d.billToPhone),
+      bill_to_email:   blank(d.billToEmail),
+      bill_to_gstin:   blank(d.billToGstin),
+      updated_by:      r.c.userId,
+    })
+    .eq('id', id)
+    .eq('org_id', r.c.orgId)
+    .is('deleted_at', null)
+
+  if (error) return err('internal', error.message)
+
+  await recordAuditEvent({
+    orgId:      r.c.orgId,
+    actorId:    r.c.userId,
+    entityType: 'sales_orders',
+    entityId:   id,
+    action:     'update',
+    after:      { billToName: blank(d.billToName) },
+  })
 
   revalAll(id)
   return ok(undefined)
@@ -442,7 +551,7 @@ export async function deleteSalesOrder(id: string): Promise<ActionResult<void>> 
 
   if (!so) return err('not_found', 'Sales order not found.')
 
-  if (!['confirmed', 'cancelled'].includes(so.status)) {
+  if (!['draft', 'accepted', 'cancelled'].includes(so.status)) {
     return err('state_transition', `Cannot delete a sales order with status '${so.status}'. Cancel it first.`)
   }
 

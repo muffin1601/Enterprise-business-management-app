@@ -381,6 +381,7 @@ export async function updateItemImage(itemId: string, imageUrl: string | null): 
 // ── Lookup CRUD ───────────────────────────────────────────────────────────────
 export async function createFamily(input: unknown): Promise<ActionResult<{id:string}>> {
   const r = await ctxOrErr(); if ('error' in r) return r.error
+  if (!r.c.has('inventory.create') && !r.c.has('inventory.edit')) return err('forbidden', 'Missing permission to add a category.')
   const p = familySchema.safeParse(input)
   if (!p.success) return err('validation', 'Invalid name.')
   const supabase = await createSupabaseServerClient()
@@ -392,6 +393,7 @@ export async function createFamily(input: unknown): Promise<ActionResult<{id:str
 
 export async function createBrand(input: unknown): Promise<ActionResult<{id:string}>> {
   const r = await ctxOrErr(); if ('error' in r) return r.error
+  if (!r.c.has('inventory.create') && !r.c.has('inventory.edit')) return err('forbidden', 'Missing permission to add a brand.')
   const p = brandSchema.safeParse(input)
   if (!p.success) return err('validation', 'Invalid name.')
   const supabase = await createSupabaseServerClient()

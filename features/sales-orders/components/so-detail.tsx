@@ -10,12 +10,13 @@ import { SoLocationsTab }     from './so-locations-tab'
 import { SoStatusHistoryTab } from './so-status-history-tab'
 import { SoAdvanceTab }       from './so-advance-tab'
 import { SoDeliveryTab }      from './so-delivery-tab'
+import { SoBillingTab }       from './so-billing-tab'
 import { SoStatusActions }    from './so-status-actions'
 import { Icon } from '@/components/ui'
 import { INV_STATUS_LABELS } from '@/validations/invoice'
 import styles from './sales-orders.module.scss'
 
-type Tab = 'items' | 'delivery' | 'advance' | 'history'
+type Tab = 'items' | 'billing' | 'delivery' | 'advance' | 'history'
 
 type LinkedRi = { id: string; riNo: string; status: string; grandTotal: number; date: string }
 
@@ -35,6 +36,8 @@ interface Props {
 
 export function SoDetail({ so, canEdit, canDelete, linkedInvoice, canCreateInvoice, linkedRis = [], canCreateRi = false }: Props) {
   const [tab, setTab] = useState<Tab>('items')
+  // Bill To / Ship To are locked once the order is cancelled or an invoice exists.
+  const detailsEditable = canEdit && so.status !== 'cancelled' && !linkedInvoice
 
   return (
     <div className={styles.detailLayout}>
@@ -127,7 +130,7 @@ export function SoDetail({ so, canEdit, canDelete, linkedInvoice, canCreateInvoi
                       </span>
                     </Link>
                   ))}
-                  {canCreateRi && ['dispatched','delivered'].includes(so.status) && (
+                  {canCreateRi && so.status !== 'cancelled' && (
                     <Link
                       href={`/running-invoices/new?soId=${so.id}` as Route}
                       style={{ display:'flex', alignItems:'center', justifyContent:'center', padding:'7px', border:'1px dashed var(--c-border-2)', borderRadius:'var(--radius-sm)', textDecoration:'none', fontFamily:'var(--font-body)', fontSize:11, color:'var(--c-tertiary)' }}
@@ -136,7 +139,7 @@ export function SoDetail({ so, canEdit, canDelete, linkedInvoice, canCreateInvoi
                     </Link>
                   )}
                 </div>
-              ) : canCreateRi && ['dispatched','delivered'].includes(so.status) ? (
+              ) : canCreateRi && so.status !== 'cancelled' ? (
                 <Link
                   href={`/running-invoices/new?soId=${so.id}` as Route}
                   style={{
@@ -157,7 +160,7 @@ export function SoDetail({ so, canEdit, canDelete, linkedInvoice, canCreateInvoi
 
       {/* ── Tabs ─────────────────────────────────────────── */}
       <div className={styles.tabs}>
-        {(['items', 'delivery', 'advance', 'history'] as Tab[]).map(t => (
+        {(['items', 'billing', 'delivery', 'advance', 'history'] as Tab[]).map(t => (
           <button
             key={t}
             className={`${styles.tab} ${tab === t ? styles.tabActive : ''}`}
@@ -165,6 +168,7 @@ export function SoDetail({ so, canEdit, canDelete, linkedInvoice, canCreateInvoi
             type="button"
           >
             {t === 'items'    ? 'Items & Locations'
+            : t === 'billing'  ? 'Billing'
             : t === 'delivery' ? 'Delivery'
             : t === 'advance'  ? 'Advance Payment'
             : 'Status History'}
@@ -174,7 +178,8 @@ export function SoDetail({ so, canEdit, canDelete, linkedInvoice, canCreateInvoi
 
       <div className={styles.tabContent}>
         {tab === 'items'    && <SoLocationsTab     so={so} canEdit={canEdit} />}
-        {tab === 'delivery' && <SoDeliveryTab       so={so} canEdit={canEdit} />}
+        {tab === 'billing'  && <SoBillingTab        so={so} canEdit={detailsEditable} />}
+        {tab === 'delivery' && <SoDeliveryTab       so={so} canEdit={detailsEditable} />}
         {tab === 'advance'  && <SoAdvanceTab        so={so} canEdit={canEdit} />}
         {tab === 'history'  && <SoStatusHistoryTab  history={so.statusHistory} />}
       </div>

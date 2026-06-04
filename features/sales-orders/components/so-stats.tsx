@@ -19,14 +19,13 @@ function StatCard({ label, value, color }: StatCardProps) {
 }
 
 export function SoStats({ stats }: { stats: SoStats }) {
-  const active = stats.confirmed + stats.processing + stats.ready
   return (
     <div className={styles.statsRow}>
-      <StatCard label="Total Orders"   value={stats.total}      color="var(--c-blue)" />
-      <StatCard label="Active"         value={active}           color="var(--c-orange)" />
-      <StatCard label="Dispatched"     value={stats.dispatched} color="var(--c-purple)" />
-      <StatCard label="Delivered"      value={stats.delivered}  color="var(--c-teal)" />
-      <StatCard label="Closed"         value={stats.closed}     color="var(--c-green)" />
+      <StatCard label="Total Orders"   value={stats.total}     color="var(--c-blue)" />
+      <StatCard label="Draft"          value={stats.draft}     color="var(--c-orange)" />
+      <StatCard label="Sent"           value={stats.sent}      color="var(--c-purple)" />
+      <StatCard label="Accepted"       value={stats.accepted}  color="var(--c-green)" />
+      <StatCard label="Cancelled"      value={stats.cancelled} color="var(--c-red)" />
       <StatCard label="Total Value"    value={fmtINR(stats.totalValue)} color="var(--c-indigo)" />
     </div>
   )

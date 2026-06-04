@@ -31,8 +31,8 @@ export function SoHeaderCard({ so }: { so: SoDetail }) {
 
       <div className={styles.headerMeta}>
         <div className={styles.metaItem}>
-          <span className={styles.metaLabel}>Customer</span>
-          <span className={styles.metaValue}>{so.customerName ?? '—'}</span>
+          <span className={styles.metaLabel}>Bill To</span>
+          <span className={styles.metaValue}>{so.billToName ?? so.customerName ?? '—'}</span>
         </div>
         <div className={styles.metaItem}>
           <span className={styles.metaLabel}>Order Date</span>
@@ -48,16 +48,22 @@ export function SoHeaderCard({ so }: { so: SoDetail }) {
             {so.quoteNo}
           </Link>
         </div>
-        {so.customerPhone && (
+        {(so.billToPhone ?? so.customerPhone) && (
           <div className={styles.metaItem}>
             <span className={styles.metaLabel}>Phone</span>
-            <span className={styles.metaValue}>{so.customerPhone}</span>
+            <span className={styles.metaValue}>{so.billToPhone ?? so.customerPhone}</span>
           </div>
         )}
-        {so.customerEmail && (
+        {(so.billToEmail ?? so.customerEmail) && (
           <div className={styles.metaItem}>
             <span className={styles.metaLabel}>Email</span>
-            <span className={styles.metaValue}>{so.customerEmail}</span>
+            <span className={styles.metaValue}>{so.billToEmail ?? so.customerEmail}</span>
+          </div>
+        )}
+        {so.billToGstin && (
+          <div className={styles.metaItem}>
+            <span className={styles.metaLabel}>GSTIN</span>
+            <span className={styles.metaValue}>{so.billToGstin}</span>
           </div>
         )}
       </div>

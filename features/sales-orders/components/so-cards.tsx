@@ -96,7 +96,7 @@ function SoCard({
             <Link href={`/orders/${row.id}` as Route} className={styles.btnView}>
               <Icon name="eye" size={14} /> View
             </Link>
-            {canDelete && ['confirmed', 'cancelled'].includes(row.status) && (
+            {canDelete && ['draft', 'accepted', 'cancelled'].includes(row.status) && (
               <button
                 className={styles.btnDelete}
                 onClick={() => onDelete(row.id, row.soNo)}
