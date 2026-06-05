@@ -28,16 +28,31 @@ export default async function NewQuotePage() {
   }
 
   // createQuote failed — show inline error (rare)
+  const isConflict = result.error.code === 'conflict'
+
   return (
-    <main style={{ padding: '48px 32px', fontFamily: 'var(--font-body)' }}>
+    <main style={{ padding: '48px 32px', fontFamily: 'var(--font-body)', maxWidth: 560 }}>
       <div style={{
-        padding: '14px 18px',
+        padding: '16px 18px',
         background: 'var(--c-danger-bg)', color: 'var(--c-danger)',
         border: '1px solid var(--c-danger)', borderLeft: '3px solid var(--c-danger)',
         borderRadius: 'var(--radius-sm)', fontSize: 14,
       }}>
-        Could not create quote: {result.error.message}
+        <strong style={{ display: 'block', marginBottom: 6, fontSize: 15 }}>
+          {isConflict ? 'Quote number already exists' : 'Could not create quote'}
+        </strong>
+        {result.error.message}
       </div>
+      <a
+        href="/quotes/new"
+        style={{
+          display: 'inline-block', marginTop: 16, padding: '9px 18px',
+          background: 'var(--c-ink)', color: 'var(--c-paper, #fff)',
+          borderRadius: 'var(--radius-sm)', fontSize: 14, textDecoration: 'none',
+        }}
+      >
+        Try again
+      </a>
     </main>
   )
 }

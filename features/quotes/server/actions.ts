@@ -36,12 +36,26 @@ function revalAll(id?: string) {
 
 async function getNextQuoteNo(supabase: SupabaseClient, orgId: string): Promise<string> {
   const year = new Date().getFullYear()
-  const { count } = await supabase
+  const prefix = `Q-${year}-`
+
+  // Derive the next sequence from the HIGHEST existing number for this year, not
+  // a row count — a count breaks on deletions, revisions, and cross-year rows.
+  const { data } = await supabase
     .from('quotes')
-    .select('id', { count: 'exact', head: true })
+    .select('quote_no')
     .eq('org_id', orgId)
-  const seq = String((count ?? 0) + 1).padStart(4, '0')
-  return `Q-${year}-${seq}`
+    .like('quote_no', `${prefix}%`)
+
+  let maxSeq = 0
+  for (const row of data ?? []) {
+    // quote_no looks like "Q-2026-0007" or a revision "Q-2026-0007-R1";
+    // take the 4-digit sequence immediately after the prefix.
+    const m = String(row.quote_no).slice(prefix.length).match(/^(\d+)/)
+    if (m) maxSeq = Math.max(maxSeq, parseInt(m[1]!, 10))
+  }
+
+  const seq = String(maxSeq + 1).padStart(4, '0')
+  return `${prefix}${seq}`
 }
 
 // ── calculateQuoteTotals (private) ────────────────────────────────────────────
@@ -153,34 +167,59 @@ export async function createQuote(input: unknown): Promise<ActionResult<{ id: st
   const d = parsed.data
   const supabase = await createSupabaseServerClient()
 
-  const quoteNo = await getNextQuoteNo(supabase, r.c.orgId)
+  // Insert with retry: if the generated quote number collides (another quote
+  // grabbed it in a race), recompute and try again a few times before failing.
+  let data: { id: string } | null = null
+  let error: { code?: string; message: string } | null = null
+  let quoteNo = ''
 
-  const { data, error } = await supabase
-    .from('quotes')
-    .insert({
-      org_id: r.c.orgId,
-      quote_no: quoteNo,
-      customer_id: d.customerId || null,
-      subject: d.subject ?? null,
-      date: d.date.toISOString().split('T')[0],
-      valid_until: d.validUntil ? d.validUntil.toISOString().split('T')[0] : null,
-      status: d.status ?? 'draft',
-      gst_mode: d.gstMode,
-      gst_pct: d.gstPct ?? 18,
-      transport: d.transport ?? 0,
-      transport_note: d.transportNote ?? null,
-      logo_url: d.logoUrl ?? null,
-      include_boq_summary: d.includeBoqSummary ?? true,
-      notes: d.notes ?? null,
-      revision: 0,
-      material_subtotal: 0,
-      gst_amount: 0,
-      grand_total: 0,
-      created_by: r.c.userId,
-      updated_by: r.c.userId,
-    })
-    .select('id')
-    .single()
+  for (let attempt = 0; attempt < 5; attempt++) {
+    quoteNo = await getNextQuoteNo(supabase, r.c.orgId)
+    const res = await supabase
+      .from('quotes')
+      .insert({
+        org_id: r.c.orgId,
+        quote_no: quoteNo,
+        customer_id: d.customerId || null,
+        subject: d.subject ?? null,
+        date: d.date.toISOString().split('T')[0],
+        valid_until: d.validUntil ? d.validUntil.toISOString().split('T')[0] : null,
+        status: d.status ?? 'draft',
+        gst_mode: d.gstMode,
+        gst_pct: d.gstPct ?? 18,
+        transport: d.transport ?? 0,
+        transport_note: d.transportNote ?? null,
+        logo_url: d.logoUrl ?? null,
+        include_boq_summary: d.includeBoqSummary ?? true,
+        notes: d.notes ?? null,
+        revision: 0,
+        material_subtotal: 0,
+        gst_amount: 0,
+        grand_total: 0,
+        created_by: r.c.userId,
+        updated_by: r.c.userId,
+      })
+      .select('id')
+      .single()
+
+    data = res.data as { id: string } | null
+    error = res.error
+
+    // 23505 = Postgres unique_violation. Only the quote-number constraint is
+    // worth retrying — recompute the number and loop.
+    if (error && (error.code === '23505' || /uq_quotes_no/.test(error.message))) {
+      data = null
+      continue
+    }
+    break
+  }
+
+  if (error && (error.code === '23505' || /uq_quotes_no/.test(error.message))) {
+    return err(
+      'conflict',
+      `Quote number "${quoteNo}" already exists. Please try again — the next available number will be assigned automatically.`,
+    )
+  }
 
   if (error || !data) return err('internal', error?.message ?? 'Failed to create quote.')
 
