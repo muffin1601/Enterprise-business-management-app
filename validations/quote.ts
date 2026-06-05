@@ -63,6 +63,9 @@ export const quoteLocationSchema = z.object({
   sortOrder: z.number().default(0),
   isIncluded: z.boolean().default(true),
   installationCharge: z.number().default(0),
+  // When set, installation_charge is derived as this % of the location's
+  // material subtotal. null/undefined → flat amount entered directly.
+  installationPct: z.number().min(0).max(100).nullable().optional(),
   installationNote: z.string().optional(),
 });
 

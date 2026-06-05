@@ -42,7 +42,7 @@ export default async function QuoteEditPage({ params }: { params: Promise<{ id: 
     // 2. Locations + items (separate query — nested joins don't work well with ordering)
     supabase
       .from('quote_locations')
-      .select('id,name,sort_order,is_included,installation_charge,installation_note,material_subtotal,location_total')
+      .select('id,name,sort_order,is_included,installation_charge,installation_pct,installation_note,material_subtotal,location_total')
       .eq('quote_id', id) // no .is('deleted_at',null) — quote_locations has no deleted_at
       .order('sort_order', { ascending: true }),
 
@@ -105,6 +105,7 @@ export default async function QuoteEditPage({ params }: { params: Promise<{ id: 
       sortOrder: Number(loc.sort_order) || 0,
       isIncluded: Boolean(loc.is_included),
       installationCharge: Number(loc.installation_charge) || 0,
+      installationPct: loc.installation_pct == null ? null : Number(loc.installation_pct),
       installationNote: (loc.installation_note as string | null) ?? null,
       materialSubtotal: Number(loc.material_subtotal) || 0,
       locationTotal: Number(loc.location_total) || 0,

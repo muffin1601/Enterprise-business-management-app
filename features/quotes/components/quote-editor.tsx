@@ -51,6 +51,7 @@ export type QuoteLocationDetail = {
   sortOrder: number
   isIncluded: boolean
   installationCharge: number
+  installationPct: number | null
   installationNote: string | null
   materialSubtotal: number
   locationTotal: number
@@ -180,9 +181,21 @@ function calcItemTotal(rate: number, qty: number, discountPct: number): number {
 interface Totals {
   locationTotals: { localId: string; materialSubtotal: number; locationTotal: number }[]
   materialSubtotal: number   // sum of included locations (materials only, no install)
+  installationTotal: number  // sum of included locations' installation charges
   includedSubtotal: number   // sum of included location totals (materials + install)
   gstAmount: number
   grandTotal: number
+}
+
+// Effective installation charge for a location: derived from material subtotal
+// when installationPct is set, otherwise the flat installationCharge.
+function effectiveInstall(
+  loc: { installationCharge?: number; installationPct?: number | null },
+  materialSubtotal: number,
+): number {
+  return loc.installationPct != null
+    ? materialSubtotal * (loc.installationPct / 100)
+    : (loc.installationCharge ?? 0)
 }
 
 function calculateTotals(
@@ -196,7 +209,8 @@ function calculateTotals(
       (sum, item) => sum + calcItemTotal(item.rate, item.qty, item.discountPct ?? 0),
       0,
     )
-    const locationTotal = materialSubtotal + (loc.installationCharge ?? 0)
+    const installationCharge = effectiveInstall(loc, materialSubtotal)
+    const locationTotal = materialSubtotal + installationCharge
     return { localId: loc.localId, materialSubtotal, locationTotal }
   })
 
@@ -207,6 +221,7 @@ function calculateTotals(
 
   const materialSubtotal = includedTotals.reduce((sum, lt) => sum + lt.materialSubtotal, 0)
   const includedSubtotal = includedTotals.reduce((sum, lt) => sum + lt.locationTotal, 0)
+  const installationTotal = includedSubtotal - materialSubtotal
 
   const base = includedSubtotal + (transport ?? 0)
   let gstAmount = 0
@@ -223,7 +238,7 @@ function calculateTotals(
     grandTotal = base
   }
 
-  return { locationTotals, materialSubtotal, includedSubtotal, gstAmount, grandTotal }
+  return { locationTotals, materialSubtotal, installationTotal, includedSubtotal, gstAmount, grandTotal }
 }
 
 // ── Sub-components ─────────────────────────────────────────────────────────────
@@ -466,8 +481,9 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
       sortOrder: loc.sortOrder,
       isIncluded: loc.isIncluded,
       installationCharge: loc.installationCharge,
+      installationPct: loc.installationPct ?? null,
       installationNote: loc.installationNote ?? '',
-      showInstallation: loc.installationCharge > 0 || !!loc.installationNote,
+      showInstallation: loc.installationCharge > 0 || loc.installationPct != null || !!loc.installationNote,
       items: loc.items.map((item) => ({
         id: item.id,
         localId: uid(),
@@ -555,7 +571,10 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
           name: loc.name,
           sortOrder: i,
           isIncluded: loc.isIncluded,
+          // When installationPct is set the server derives installation_charge
+          // from the location's material subtotal; this value is a fallback.
           installationCharge: loc.installationCharge ?? 0,
+          installationPct: loc.installationPct,
           installationNote: loc.installationNote ?? undefined,
         })),
       )
@@ -687,6 +706,7 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
         sortOrder: n - 1,
         isIncluded: true,
         installationCharge: 0,
+        installationPct: null,
         installationNote: '',
         showInstallation: false,
         items: [],
@@ -993,7 +1013,22 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
                 ) : hasInstallation ? (
                   <div className={styles.installationRow}>
                     <span className={styles.installLabel}>Installation</span>
-                    <span className={styles.installDash}>—</span>
+                    <select
+                      className={styles.installModeSelect}
+                      value={loc.installationPct != null ? 'percent' : 'flat'}
+                      disabled={!canEdit}
+                      onChange={(e) =>
+                        updateLocation(
+                          loc.localId,
+                          e.target.value === 'percent'
+                            ? { installationPct: 0 }
+                            : { installationPct: null },
+                        )
+                      }
+                    >
+                      <option value="flat">Flat ₹</option>
+                      <option value="percent">% of supply</option>
+                    </select>
                     <input
                       className={styles.installNoteInput}
                       placeholder="Note…"
@@ -1001,24 +1036,50 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
                       disabled={!canEdit}
                       onChange={(e) => updateLocation(loc.localId, { installationNote: e.target.value })}
                     />
-                    <input
-                      type="number"
-                      className={`${styles.installAmountInput} ${styles.textRight}`}
-                      value={loc.installationCharge === 0 ? '' : loc.installationCharge}
-                      placeholder="0"
-                      min={0}
-                      disabled={!canEdit}
-                      onChange={(e) =>
-                        updateLocation(loc.localId, { installationCharge: parseFloat(e.target.value) || 0 })
-                      }
-                    />
+                    {loc.installationPct != null ? (
+                      <>
+                        <div className={styles.installPctInputWrap}>
+                          <input
+                            type="number"
+                            className={`${styles.installPctInput} ${styles.textRight}`}
+                            value={loc.installationPct === 0 ? '' : loc.installationPct}
+                            placeholder="0"
+                            min={0}
+                            max={100}
+                            step="0.001"
+                            disabled={!canEdit}
+                            onChange={(e) =>
+                              updateLocation(loc.localId, {
+                                installationPct: Math.min(100, Math.max(0, parseFloat(e.target.value) || 0)),
+                              })
+                            }
+                          />
+                          <span className={styles.installPctSign}>%</span>
+                        </div>
+                        <span className={`${styles.installDerived} ${styles.textRight}`}>
+                          {fmtINR(effectiveInstall(loc, materialSubtotal))}
+                        </span>
+                      </>
+                    ) : (
+                      <input
+                        type="number"
+                        className={`${styles.installAmountInput} ${styles.textRight}`}
+                        value={loc.installationCharge === 0 ? '' : loc.installationCharge}
+                        placeholder="0"
+                        min={0}
+                        disabled={!canEdit}
+                        onChange={(e) =>
+                          updateLocation(loc.localId, { installationCharge: parseFloat(e.target.value) || 0 })
+                        }
+                      />
+                    )}
                     {canEdit && (
                       <button
                         className={styles.rowDeleteBtn}
                         type="button"
                         title="Remove installation charge"
                         onClick={() =>
-                          updateLocation(loc.localId, { showInstallation: false, installationCharge: 0, installationNote: '' })
+                          updateLocation(loc.localId, { showInstallation: false, installationCharge: 0, installationPct: null, installationNote: '' })
                         }
                       >
                         <Icon name="x" size={13} />
@@ -1111,16 +1172,22 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
                 <span>Material Subtotal</span>
                 <span>{fmtINR(totals.materialSubtotal)}</span>
               </div>
-              {gstMode !== 'none' && (
+              {totals.installationTotal > 0 && (
                 <div className={styles.totalsRow}>
-                  <span>GST @ {gstPct}%</span>
-                  <span>{fmtINR(totals.gstAmount)}</span>
+                  <span>Installation Total</span>
+                  <span>{fmtINR(totals.installationTotal)}</span>
                 </div>
               )}
               <div className={styles.totalsRow}>
                 <span>Transport</span>
                 <span>{fmtINR(transport)}</span>
               </div>
+              {gstMode !== 'none' && (
+                <div className={styles.totalsRow}>
+                  <span>GST @ {gstPct}%</span>
+                  <span>{fmtINR(totals.gstAmount)}</span>
+                </div>
+              )}
               <div className={`${styles.totalsRow} ${styles.grandTotalRow}`}>
                 <span>Grand Total</span>
                 <span>{fmtINR(totals.grandTotal)}</span>
@@ -1305,8 +1372,18 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
           {/* Grand Total Summary */}
           <div className={`${styles.sidebarPanel} ${styles.sidebarTotals}`}>
             <div className={styles.sidebarTotalRow}>
-              <span>Subtotal</span>
-              <span>{fmtINR(totals.includedSubtotal)}</span>
+              <span>Material Subtotal</span>
+              <span>{fmtINR(totals.materialSubtotal)}</span>
+            </div>
+            {totals.installationTotal > 0 && (
+              <div className={styles.sidebarTotalRow}>
+                <span>Installation Total</span>
+                <span>{fmtINR(totals.installationTotal)}</span>
+              </div>
+            )}
+            <div className={styles.sidebarTotalRow}>
+              <span>Transport</span>
+              <span>{fmtINR(transport)}</span>
             </div>
             {gstMode !== 'none' && (
               <div className={styles.sidebarTotalRow}>
@@ -1314,10 +1391,6 @@ export function QuoteEditor({ quote, customers, items: itemRefs, canEdit }: Quot
                 <span>{fmtINR(totals.gstAmount)}</span>
               </div>
             )}
-            <div className={styles.sidebarTotalRow}>
-              <span>Transport</span>
-              <span>{fmtINR(transport)}</span>
-            </div>
             <div className={`${styles.sidebarTotalRow} ${styles.sidebarGrandTotal}`}>
               <span>Grand Total</span>
               <span>{fmtINR(totals.grandTotal)}</span>

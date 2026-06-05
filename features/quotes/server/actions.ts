@@ -64,7 +64,7 @@ async function calculateQuoteTotals(
   // Fetch all locations
   const { data: locations } = await supabase
     .from('quote_locations')
-    .select('id, is_included, installation_charge')
+    .select('id, is_included, installation_charge, installation_pct')
     .eq('quote_id', quoteId)
 
   if (!locations) return
@@ -80,15 +80,26 @@ async function calculateQuoteTotals(
 
     const locMaterialSubtotal = (items ?? []).reduce((sum, i) => sum + (Number(i.total) || 0), 0)
 
-    // Update location material_subtotal and location_total
-    const locTotal = locMaterialSubtotal + (Number(loc.installation_charge) || 0)
+    // When installation_pct is set, the charge is derived from this location's
+    // material subtotal; otherwise it's the flat amount stored on the row.
+    const installationCharge =
+      loc.installation_pct == null
+        ? (Number(loc.installation_charge) || 0)
+        : locMaterialSubtotal * ((Number(loc.installation_pct) || 0) / 100)
+
+    // Update location material_subtotal, derived charge, and location_total
+    const locTotal = locMaterialSubtotal + installationCharge
     await supabase
       .from('quote_locations')
-      .update({ material_subtotal: locMaterialSubtotal, location_total: locTotal })
+      .update({
+        material_subtotal: locMaterialSubtotal,
+        installation_charge: installationCharge,
+        location_total: locTotal,
+      })
       .eq('id', loc.id)
 
     if (loc.is_included) {
-      quoteMaterialSubtotal += locMaterialSubtotal + (Number(loc.installation_charge) || 0)
+      quoteMaterialSubtotal += locTotal
     }
   }
 
@@ -397,6 +408,7 @@ export async function reviseQuote(id: string): Promise<ActionResult<{ id: string
           sort_order: loc.sort_order,
           is_included: loc.is_included,
           installation_charge: loc.installation_charge,
+          installation_pct: loc.installation_pct ?? null,
           installation_note: loc.installation_note,
           material_subtotal: 0,
           location_total: 0,
@@ -497,6 +509,7 @@ export async function upsertQuoteLocations(
         sort_order: i,
         is_included: loc.isIncluded ?? true,
         installation_charge: loc.installationCharge ?? 0,
+        installation_pct: loc.installationPct ?? null,
         installation_note: loc.installationNote ?? null,
         material_subtotal: 0,
         location_total: 0,

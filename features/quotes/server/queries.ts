@@ -189,7 +189,7 @@ export async function getQuote(id: string): Promise<QuoteDetail | null> {
 
   const { data: locData } = await supabase
     .from('quote_locations')
-    .select('id,name,sort_order,is_included,material_subtotal,installation_charge,installation_note,location_total')
+    .select('id,name,sort_order,is_included,material_subtotal,installation_charge,installation_pct,installation_note,location_total')
     .eq('quote_id', id)
     // quote_locations has no deleted_at column — do NOT filter on it
     .order('sort_order', { ascending: true })
@@ -231,6 +231,7 @@ export async function getQuote(id: string): Promise<QuoteDetail | null> {
     isIncluded:         Boolean(l.is_included),
     materialSubtotal:   n(l.material_subtotal),
     installationCharge: n(l.installation_charge),
+    installationPct:    l.installation_pct == null ? null : n(l.installation_pct),
     installationNote:   l.installation_note as string | null,
     locationTotal:      n(l.location_total),
     items:              itemsByLoc[l.id as string] ?? [],
